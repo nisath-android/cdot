@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contacts_nav_graph"
+    app:startDestination="@id/emptyContactFragment">
+
+    <fragment
+        android:id="@+id/emptyContactFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.fragments.EmptyFragment"
+        tools:layout="@layout/empty_fragment"
+        android:label="EmptyContactFragment" />
+    <action android:id="@+id/action_global_emptyContactFragment"
+        app:destination="@id/emptyContactFragment"/>
+    <fragment
+        android:id="@+id/detailContactFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.contact.fragments.DetailContactFragment"
+        android:label="DetailContactFragment" />
+    <action android:id="@+id/action_global_detailContactFragment"
+        app:destination="@id/detailContactFragment"/>
+
+</navigation>

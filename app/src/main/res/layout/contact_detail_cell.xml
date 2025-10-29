@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="data"
+            type="com.naminfo.cdot_vc.activities.main.contact.data.ContactNumberOrAddressData" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="?attr/dividerColor" />
+
+        <TextView
+            android:text="@{data.displayedValue}"
+            style="@style/contact_name_list_cell_font"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fadingEdge="horizontal"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:textIsSelectable="true"
+            android:scrollHorizontally="true"
+            android:singleLine="true" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:onClick="@{() -> data.startCall()}"
+                android:contentDescription="@string/content_description_start_call"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/round_orange_button_background"
+                android:src="@drawable/call_start_default" />
+
+            <ImageView
+                android:onClick="@{() -> data.startVideoCall()}"
+                android:contentDescription="@string/content_description_video_start_call"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:background="@drawable/round_orange_button_background"
+                android:src="@drawable/call_video_start" />
+
+            <ImageView
+                android:onClick="@{() -> data.startChat(false)}"
+                android:visibility="@{data.chatAllowed &amp;&amp; !data.hidePlainChat ? View.VISIBLE : View.GONE}"
+                android:contentDescription="@string/content_description_start_chat"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/round_orange_button_background"
+                android:src="@drawable/chat_start_default" />
+
+
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

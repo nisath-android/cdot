@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <!-- History → Contacts -->
+    <Transition
+        motion:constraintSetStart="@id/history_set"
+        motion:constraintSetEnd="@id/contacts_set" />
+
+    <!-- History → Dialer -->
+    <Transition
+        motion:constraintSetStart="@id/history_set"
+        motion:constraintSetEnd="@id/dialer_set" />
+
+    <!-- Contacts → Dialer -->
+    <Transition
+        motion:constraintSetStart="@id/contacts_set"
+        motion:constraintSetEnd="@id/dialer_set" />
+
+    <!-- ===== Constraint Sets ===== -->
+
+    <!-- Selector under History -->
+    <ConstraintSet android:id="@+id/history_set">
+        <Constraint
+            android:id="@id/selector"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/tabs_fragment_selector_size"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="@id/history"
+            motion:layout_constraintEnd_toEndOf="@id/history" />
+    </ConstraintSet>
+
+    <!-- Selector under Contacts -->
+    <ConstraintSet android:id="@+id/contacts_set">
+        <Constraint
+            android:id="@id/selector"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/tabs_fragment_selector_size"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="@id/contacts"
+            motion:layout_constraintEnd_toEndOf="@id/contacts" />
+    </ConstraintSet>
+
+    <!-- Selector under Dialer -->
+    <ConstraintSet android:id="@+id/dialer_set">
+        <Constraint
+            android:id="@id/selector"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/tabs_fragment_selector_size"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="@id/dialer"
+            motion:layout_constraintEnd_toEndOf="@id/dialer" />
+    </ConstraintSet>
+
+</MotionScene>

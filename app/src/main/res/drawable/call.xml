@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Pressed state with green color and grey border -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/green_color" />
+                    <stroke android:width="2dp" android:color="@color/grey_color" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Disabled state with green color and grey border -->
+    <item android:state_enabled="false">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/green_color" />
+                    <stroke android:width="2dp" android:color="@color/grey_color" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Default state with primary color and grey border -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/primary_color" />
+                    <stroke android:width="5dp" android:color="@color/white_color" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

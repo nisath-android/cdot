@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <size android:height="2dp"/>
+            <solid android:color="@color/ptt_nav_bottom_active_color"/>
+        </shape>
+    </item>
+</layer-list>

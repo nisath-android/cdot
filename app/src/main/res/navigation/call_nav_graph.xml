@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/call_nav_graph"
+    app:startDestination="@id/singleCallFragment">
+
+
+    <fragment
+        android:id="@+id/singleCallFragment"
+        android:name="com.naminfo.cdot_vc.activities.voip.fragments.SingleCallFragment"
+        android:label="SingleCallFragment" />
+    <action android:id="@+id/action_global_singleCallFragment"
+        app:destination="@id/singleCallFragment"/>
+
+    <fragment
+        android:id="@+id/incomingCallFragment"
+        android:name="com.naminfo.cdot_vc.activities.voip.fragments.IncomingCallFragment"
+        android:label="IncomingCallFragment" />
+    <action android:id="@+id/action_global_incomingCallFragment"
+        app:destination="@id/incomingCallFragment"/>
+
+    <fragment
+        android:id="@+id/outgoingCallFragment"
+        android:name="com.naminfo.cdot_vc.activities.voip.fragments.OutgoingCallFragment"
+        android:label="OutgoingCallFragment" /><action android:id="@+id/action_global_outgoingCallFragment" app:destination="@id/outgoingCallFragment"/>
+</navigation>

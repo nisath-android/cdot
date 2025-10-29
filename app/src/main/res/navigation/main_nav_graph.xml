@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/dialerFragment">
+
+
+    <fragment
+        android:id="@+id/dialerFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.dialer.DialerFragment"
+        android:label="DialerFragment" >
+        <action
+            android:id="@+id/action_dialerFragment_to_masterContactsFragment2"
+            app:destination="@id/masterContactsFragment" />
+        <action
+            android:id="@+id/action_dialerFragment_to_masterCallLogsFragment"
+            app:destination="@id/masterCallLogsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/masterContactsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.contact.fragments.MasterContactsFragment"
+        android:label="MasterContactsFragment" >
+        <action
+            android:id="@+id/action_masterContactsFragment_to_dialerFragment"
+            app:destination="@id/dialerFragment" />
+        <action
+            android:id="@+id/action_masterContactsFragment_to_masterCallLogsFragment"
+            app:destination="@id/masterCallLogsFragment" />
+    </fragment>
+    <action android:id="@+id/action_global_dialerFragment"
+        app:destination="@id/dialerFragment"/>
+    <action android:id="@+id/action_global_masterContactsFragment"
+        app:destination="@id/masterContactsFragment"/>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.SettingsFragment"
+        tools:layout="@layout/fragment_settings"
+        android:label="SettingsFragment" >
+        <deepLink
+            app:uri="linphone-android://settings/{Identity}"
+            android:autoVerify="true" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment" />
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.about.HelpFragment"
+        android:label="HelpFragment" >
+    </fragment>
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.about.AboutFragment"
+        tools:layout="@layout/fragment_about"
+        android:label="AboutFragment" >
+        <action
+            android:id="@+id/action_aboutFragment_to_helpFragment"
+            app:destination="@id/helpFragment"
+            app:popUpTo="@id/aboutFragment" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_global_aboutFragment"
+        app:destination="@id/aboutFragment"/>
+    <fragment
+        android:id="@+id/masterCallLogsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.history.MasterCallLogsFragment"
+        android:label="MasterCallLogsFragment" >
+        <action
+            android:id="@+id/action_masterCallLogsFragment_to_dialerFragment"
+            app:destination="@id/dialerFragment" />
+        <action
+            android:id="@+id/action_masterCallLogsFragment_to_masterContactsFragment"
+            app:destination="@id/masterContactsFragment" />
+    </fragment>
+    <action android:id="@+id/action_global_masterCallLogsFragment"
+        app:destination="@id/masterCallLogsFragment" />
+
+
+</navigation>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_nav_graph"
+    app:startDestination="@id/emptySettingsFragment">
+
+    <fragment
+        android:id="@+id/emptySettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.fragments.EmptyFragment"
+        tools:layout="@layout/empty_fragment"
+        android:label="EmptySettingsFragment" />
+
+    <fragment
+        android:id="@+id/accountSettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.AccountSettingsFragment"
+        tools:layout="@layout/fragment_account_settings"
+        android:label="AccountSettingsFragment" >
+    </fragment>
+    <action android:id="@+id/action_global_accountSettingsFragment"
+        app:destination="@id/accountSettingsFragment"/>
+
+    <fragment
+        android:id="@+id/audioSettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.AudioSettingsFragment"
+        android:label="AudioSettingsFragment" />
+    <action android:id="@+id/action_global_audioSettingsFragment" app:destination="@id/audioSettingsFragment" />
+    <fragment
+        android:id="@+id/videoSettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.VideoSettingsFragment"
+        android:label="VideoSettingsFragment" /><action android:id="@+id/action_global_videoSettingsFragment" app:destination="@id/videoSettingsFragment"/>
+    <fragment
+        android:id="@+id/callSettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.CallSettingsFragment"
+        android:label="CallSettingsFragment" /><action android:id="@+id/action_global_callSettingsFragment" app:destination="@id/callSettingsFragment"/>
+    <fragment
+        android:id="@+id/networkSettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.NetworkSettingsFragment"
+        android:label="NetworkSettingsFragment" /><action android:id="@+id/action_global_networkSettingsFragment" app:destination="@id/networkSettingsFragment"/>
+    <fragment
+        android:id="@+id/advancedSettingsFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.AdvancedSettingsFragment"
+        android:label="AdvancedSettingsFragment" /><action android:id="@+id/action_global_advancedSettingsFragment" app:destination="@id/advancedSettingsFragment"/>
+</navigation>

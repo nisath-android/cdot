@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/call_nav_graph">
+
+    <fragment
+        android:id="@+id/emptyChatFragment"
+        android:name="com.naminfo.cdot_vc.activities.main.fragments.EmptyFragment"
+        tools:layout="@layout/empty_fragment"
+        android:label="EmptyChatFragment"  />
+</navigation>

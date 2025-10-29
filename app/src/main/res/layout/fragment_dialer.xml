@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="com.naminfo.cdot_vc.activities.main.dialer.DialerViewModel"/>
+    </data>
+
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom">
+
+    <ImageView
+        android:id="@+id/image1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/mobion"
+        android:src="@drawable/mobion_icon"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:padding="10dp"
+        android:textAllCaps="true" />
+    <RelativeLayout
+        android:id="@+id/address_bar"
+        android:layout_below="@+id/image1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_activity_top_bar_size"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:background="?attr/lightToolbarBackgroundColor">
+
+        <ImageView
+            android:id="@+id/erase"
+            android:contentDescription="@string/content_description_dialer_erase"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:focusableInTouchMode="true"
+            android:src="@drawable/backspace" />
+        <!--  android:inputType="textEmailAddress|textUri|textNoSuggestions"-->
+        <EditText
+            android:id="@+id/sip_uri_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/erase"
+            android:clickable="false"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:cursorVisible="true"
+            android:inputType="none"
+
+            android:longClickable="false"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:background="@color/transparent_color"
+            android:backgroundTint="@color/transparent_color"
+
+            android:ellipsize="start"
+            android:hint="@string/hint_country"
+
+            android:paddingStart="20dp"
+            android:paddingEnd="5dp"
+            android:textColorHint="@color/grey_color"
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck"
+            android:autofillHints="" />
+
+
+    </RelativeLayout>
+    <include
+        layout="@layout/numpad"
+        android:layout_below="@+id/address_bar"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        app:keyListener="@{viewModel.onKeyClick}"/>
+
+    <LinearLayout
+        android:id="@+id/controls"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/numpad">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:background="@drawable/call"
+            android:contentDescription="@string/content_description_start_call"
+            android:padding="12dp"
+            android:src="@drawable/call_audio_start"
+            android:onClick="@{() -> viewModel.startCall()}"
+            android:clickable="@{viewModel.isAudioClickable}"
+            android:focusable="@{viewModel.isAudioClickable}"
+            android:visibility="@{viewModel.atLeastOneCall ? View.GONE : View.VISIBLE}"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/call"
+            android:layout_weight="2"
+            android:src="@drawable/call_video_start"
+            android:contentDescription="@string/content_description_start_call"
+            android:padding="12dp"
+            android:onClick="@{() -> viewModel.startVideoCall()}"
+            android:clickable="@{viewModel.isVideoClickable}"
+            android:focusable="@{viewModel.isVideoClickable}"
+            android:visibility="@{viewModel.atLeastOneCall ? View.GONE : View.VISIBLE}"
+            tools:ignore="ImageContrastCheck" />
+
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
+</layout>
