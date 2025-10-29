@@ -8,14 +8,21 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_SWIPE
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.snackbar.Snackbar
 import androidx.core.view.doOnAttach
 import androidx.databinding.DataBindingUtil
@@ -47,6 +54,8 @@ import com.naminfo.cdot_vc.utils.Event
 import com.naminfo.cdot_vc.utils.FileUtils
 import com.naminfo.cdot_vc.utils.LinphoneUtils
 import com.naminfo.cdot_vc.utils.PermissionHelper
+import com.naminfo.cdot_vc.utils.StatusBarUtils
+import com.naminfo.cdot_vc.utils.StatusBarUtils.setStatusBar
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -151,6 +160,21 @@ class MainActivity : GenericActivity(), SnackBarActivity, NavController.OnDestin
         lifecycleScope.launch {
             delay(2000) // Example: 2s delay or your loading work
             isInitialized = true // ✅ release splash
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                StatusBarUtils.setStatusBar(
+                    this@MainActivity,
+                    R.color.primary_dark_color,
+                    lightIcons = false // white icons
+                )
+                StatusBarUtils.showStatusBar(this@MainActivity)
+            } else {
+                @Suppress("DEPRECATION")
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN
+                )
+            }
+
         }
         sharedViewModel.toggleDrawerEvent.observe(
             this
