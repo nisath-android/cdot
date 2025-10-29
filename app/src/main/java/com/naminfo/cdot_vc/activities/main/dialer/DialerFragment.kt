@@ -166,7 +166,8 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
 
     private val backCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            requireActivity().finishAffinity() // closes app
+           requireActivity().finishAffinity() // closes app
+            //requireActivity().finishAndRemoveTask() // closes app
         }
     }
 

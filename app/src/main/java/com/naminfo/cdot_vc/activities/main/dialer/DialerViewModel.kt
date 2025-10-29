@@ -34,7 +34,7 @@ class DialerViewModel  : LogsUploadViewModel() {
 
     val autoInitiateVideoCalls = MutableLiveData<Boolean>()
 
-    //val scheduleConferenceAvailable = MutableLiveData<Boolean>()
+    val scheduleConferenceAvailable = MutableLiveData<Boolean>()
 
     val hideAddContactButton = MutableLiveData<Boolean>()
 
@@ -62,6 +62,7 @@ class DialerViewModel  : LogsUploadViewModel() {
         override fun handleClick(key: Char) {
             val sb: StringBuilder = StringBuilder(enteredUri.value)
             try {
+                Log.i("Dialer","[xxxyyyDialer] enteredUriCursorPosition: $enteredUriCursorPosition || ${key.toString()}")
                 sb.insert(enteredUriCursorPosition, key.toString())
             } catch (ioobe: IndexOutOfBoundsException) {
                 sb.insert(sb.length, key.toString())
@@ -130,7 +131,7 @@ class DialerViewModel  : LogsUploadViewModel() {
             state: RegistrationState?,
             message: String
         ) {
-            //scheduleConferenceAvailable.value = LinphoneUtils.isRemoteConferencingAvailable()
+            scheduleConferenceAvailable.value = LinphoneUtils.isRemoteConferencingAvailable()
         }
     }
 
@@ -143,7 +144,7 @@ class DialerViewModel  : LogsUploadViewModel() {
         hideAddContactButton.value = corePreferences.readOnlyNativeContacts
 
         showSwitchCamera.value = coreContext.showSwitchCameraButton()
-        //scheduleConferenceAvailable.value = LinphoneUtils.isRemoteConferencingAvailable()
+        scheduleConferenceAvailable.value = LinphoneUtils.isRemoteConferencingAvailable()
     }
 
     override fun onCleared() {
