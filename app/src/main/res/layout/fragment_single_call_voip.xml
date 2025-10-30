@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/tools">
+    xmlns:bind="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -192,6 +193,8 @@
                 android:id="@+id/local_preview_video_surface"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:layout_size="@{controlsViewModel.pipMode ? @dimen/video_preview_pip_max_size : @dimen/video_preview_max_size}"
+                android:visibility="@{controlsViewModel.isVideoEnabled &amp;&amp; !callsViewModel.currentCallData.isRemotelyPaused &amp;&amp; !callsViewModel.currentCallData.isPaused ? View.VISIBLE : View.GONE}"
                 app:alignTopRight="true"
                 app:displayMode="black_bars"
                 app:layout_constraintBottom_toTopOf="@id/bottom_barrier"
@@ -210,6 +213,7 @@
                 android:padding="10dp"
                 android:src="@drawable/icon_call_camera_switch"
                 android:visibility="@{controlsViewModel.isSendingVideo &amp;&amp; !callsViewModel.currentCallData.isRemotelyPaused &amp;&amp; !callsViewModel.currentCallData.isPaused &amp;&amp; controlsViewModel.isSwitchCameraAvailable &amp;&amp; !controlsViewModel.pipMode ? View.VISIBLE : View.GONE, default=gone}"
+                tools:visibility="visible"
                 app:layout_constraintEnd_toEndOf="@id/local_preview_video_surface"
                 app:layout_constraintTop_toTopOf="@id/local_preview_video_surface" />
 

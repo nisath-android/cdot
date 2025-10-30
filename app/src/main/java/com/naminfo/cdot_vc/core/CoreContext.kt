@@ -1131,19 +1131,26 @@ class CoreContext(
             if (camera != currentDevice && camera != "StaticImage: Static picture") {
                 android.util.Log.i("CDOT_VC","[Context] New camera device will be $camera")
                 core.videoDevice = camera
+
+                // ✅ Force camera refresh (recommended in 5.4.43)
+                core.currentCall?.isCameraEnabled = false
+                core.currentCall?.isCameraEnabled = true
                 break
             }
         }
 
-        /*val conference = core.conference
-        if (conference == null || !conference.isIn) {
+        // ✅ Use updated API
+        val conference = core.currentCall?.conference
+        if (conference == null||!conference.isIn) {
             val call = core.currentCall
             if (call == null) {
                 Log.w("[Context] Switching camera while not in call")
                 return
             }
+            // Still valid
             call.update(null)
-        }*/
+        }
+        core.reloadVideoDevices()
     }
 
     fun showSwitchCameraButton(): Boolean {

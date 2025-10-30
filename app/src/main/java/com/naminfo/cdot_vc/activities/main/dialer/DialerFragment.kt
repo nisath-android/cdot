@@ -163,7 +163,6 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
         viewModel.transferVisibility.value = sharedViewModel.pendingCallTransfer
 
         viewModel.autoInitiateVideoCalls.value = coreContext.core.videoActivationPolicy.automaticallyInitiate
-
         checkForUpdate()
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
     }

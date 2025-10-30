@@ -18,6 +18,7 @@ import com.naminfo.cdot_vc.R
 import com.naminfo.cdot_vc.activities.*
 import com.naminfo.cdot_vc.activities.main.MainActivity
 import com.naminfo.cdot_vc.activities.voip.viewmodels.CallsViewModel
+import com.naminfo.cdot_vc.activities.voip.viewmodels.ConferenceViewModel
 import com.naminfo.cdot_vc.activities.voip.viewmodels.ControlsViewModel
 import com.naminfo.cdot_vc.activities.voip.viewmodels.StatisticsListViewModel
 import com.naminfo.cdot_vc.compatibility.Compatibility
@@ -33,7 +34,7 @@ class CallActivity : ProximitySensorActivity() {
     private lateinit var binding: ActivityCallBinding
     private lateinit var controlsViewModel: ControlsViewModel
     private lateinit var callsViewModel: CallsViewModel
-    //private lateinit var conferenceViewModel: ConferenceViewModel
+    private lateinit var conferenceViewModel: ConferenceViewModel
     private lateinit var statsViewModel: StatisticsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +77,7 @@ class CallActivity : ProximitySensorActivity() {
 
         callsViewModel = ViewModelProvider(navControllerStoreOwner)[CallsViewModel::class.java]
 
-        //conferenceViewModel = ViewModelProvider(navControllerStoreOwner)[ConferenceViewModel::class.java]
+        conferenceViewModel = ViewModelProvider(navControllerStoreOwner)[ConferenceViewModel::class.java]
 
         statsViewModel = ViewModelProvider(navControllerStoreOwner)[StatisticsListViewModel::class.java]
 
@@ -111,11 +112,11 @@ class CallActivity : ProximitySensorActivity() {
         controlsViewModel.isVideoEnabled.observe(
             this
         ) { enabled ->
-            /*Compatibility.enableAutoEnterPiP(
+            Compatibility.enableAutoEnterPiP(
                 this,
                 enabled,
                 conferenceViewModel.conferenceExists.value == true
-            )*/
+            )
         }
 
         controlsViewModel.callStatsVisible.observe(
@@ -184,7 +185,7 @@ class CallActivity : ProximitySensorActivity() {
 
         if (coreContext.core.currentCall?.currentParams?.isVideoEnabled == true) {
             Log.i("[Call Activity] Entering PiP mode")
-            //Compatibility.enterPipMode(this, conferenceViewModel.conferenceExists.value == true)
+            Compatibility.enterPipMode(this, conferenceViewModel.conferenceExists.value == true)
         }
     }
 
@@ -206,7 +207,7 @@ class CallActivity : ProximitySensorActivity() {
 
     override fun onResume() {
         super.onResume()
-        // coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
+        coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
         coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
         coreContext.core.isVideoCaptureEnabled = true // Enable video capture
         coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
