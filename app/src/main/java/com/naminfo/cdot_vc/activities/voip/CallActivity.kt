@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,7 @@ import org.linphone.core.tools.Log
 import com.naminfo.cdot_vc.databinding.ActivityCallBinding
 import org.linphone.mediastream.Version
 import com.naminfo.cdot_vc.utils.PermissionHelper
+import com.naminfo.cdot_vc.utils.StatusBarUtils
 
 class CallActivity : ProximitySensorActivity() {
     private lateinit var binding: ActivityCallBinding
@@ -46,6 +48,20 @@ class CallActivity : ProximitySensorActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_call)
         binding.lifecycleOwner = this
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            StatusBarUtils.setStatusBar(
+                this@CallActivity,
+                R.color.systembar_primary_color,
+                lightIcons = false // white icons
+            )
+            StatusBarUtils.showSystemBars(this@CallActivity)
+        } else {
+            @Suppress("DEPRECATION")
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {

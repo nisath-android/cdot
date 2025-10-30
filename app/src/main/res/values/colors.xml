@@ -20,6 +20,7 @@
     <color name="primary_light_color">#33d5dd</color>
     <color name="primary_color_disabled">#4D1E88E5</color>
     <color name="background_color">#ffffff</color>
+    <color name="systembar_primary_color">@color/voip_dark_color</color>
     <color name="text_primary_color">#212121</color>
     <color name="text_secondary_color">#757575</color>
     <color name="notification_led_color">#ff8000</color>

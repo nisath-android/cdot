@@ -3,11 +3,11 @@ package com.naminfo.cdot_vc.activities.main.dialer
 import android.content.Context
 import android.os.Vibrator
 import android.text.Editable
+import android.util.Log
 import android.widget.EditText
 import androidx.lifecycle.MutableLiveData
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
-import com.naminfo.cdot_vc.R
 import com.naminfo.cdot_vc.activities.main.viewmodels.LogsUploadViewModel
 import com.naminfo.cdot_vc.compatibility.Compatibility
 import com.naminfo.cdot_vc.utils.Event
@@ -17,7 +17,6 @@ import org.linphone.core.Call
 import org.linphone.core.Core
 import org.linphone.core.CoreListenerStub
 import org.linphone.core.RegistrationState
-import android.util.Log
 
 class DialerViewModel  : LogsUploadViewModel() {
     val enteredUri = MutableLiveData<String>()

@@ -163,10 +163,10 @@ class MainActivity : GenericActivity(), SnackBarActivity, NavController.OnDestin
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 StatusBarUtils.setStatusBar(
                     this@MainActivity,
-                    R.color.primary_dark_color,
+                    R.color.systembar_primary_color,
                     lightIcons = false // white icons
                 )
-                StatusBarUtils.showStatusBar(this@MainActivity)
+                StatusBarUtils.showSystemBars(this@MainActivity)
             } else {
                 @Suppress("DEPRECATION")
                 window.setFlags(

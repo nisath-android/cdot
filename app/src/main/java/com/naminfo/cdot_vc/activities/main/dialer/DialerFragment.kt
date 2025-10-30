@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -36,6 +37,8 @@ import com.naminfo.cdot_vc.utils.DialogUtils
 import com.naminfo.cdot_vc.utils.Event
 import com.naminfo.cdot_vc.utils.PermissionHelper
 import android.util.Log
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import org.linphone.mediastream.Version
 
 class DialerFragment : SecureFragment<FragmentDialerBinding>() {
@@ -55,6 +58,7 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
 
         useMaterialSharedAxisXForwardAnimation = false
         checkPermissions()
+        dialpadManagement()
         /*sharedViewModel.updateDialerAnimationsBasedOnDestination.observe(
             viewLifecycleOwner
         ) {
@@ -364,4 +368,45 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
 
         dialog.show()
     }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.sipUriInput.windowToken, 0)
+    }
+    private fun hideDialPad() {
+        // Example: if you have a layout for dialpad
+        binding.numpad.root.visibility = View.VISIBLE
+    }
+    fun dialpadManagement() {
+        val editText = binding.sipUriInput
+        // Disable keyboard popup
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            editText.showSoftInputOnFocus = false
+        } else {
+            editText.setOnTouchListener { v, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    v.performClick() // ✅ Accessibility safe
+                   hideKeyboard()
+                }
+                true
+            }
+        }
+
+        // Show cursor but not keyboard
+        editText.isCursorVisible = true
+
+        // Handle touch for hiding dialpad/keyboard
+        editText.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                v.performClick() // ✅ Required for accessibility
+                hideDialPad()
+                hideKeyboard()
+            }
+            false
+        }
+    }
+
+
+
+
 }

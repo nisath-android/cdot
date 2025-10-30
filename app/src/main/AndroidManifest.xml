@@ -69,9 +69,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/mobion_icon"
+        android:icon="@drawable/cdot_splash_rounded"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/mobion_icon"
+        android:roundIcon="@drawable/cdot_splash_rounded"
         android:supportsRtl="true"
         android:theme="@style/BaseAppTheme"
         tools:targetApi="31">
