@@ -25,8 +25,6 @@ import com.naminfo.cdot_vc.activities.navigateToAccountSettings
 import com.naminfo.cdot_vc.databinding.FragmentSettingsBinding
 import org.linphone.core.tools.Log
 
-
-
 class SettingsFragment : SecureFragment<FragmentSettingsBinding>() {
     private lateinit var viewModel: SettingsViewModel
 

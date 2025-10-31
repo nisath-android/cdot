@@ -1,6 +1,7 @@
 package com.naminfo.cdot_vc.core
 
 import android.content.Context
+import android.content.SharedPreferences
 //import android.content.SharedPreferences
 //import androidx.security.crypto.EncryptedSharedPreferences
 //import androidx.security.crypto.MasterKey
@@ -31,8 +32,8 @@ class CorePreferences constructor(private val context: Context) {
 
         private const val encryptedSharedPreferencesFile = "encrypted.pref"
     }
-
-    /*val encryptedSharedPreferences: SharedPreferences? by lazy {
+/*
+    val encryptedSharedPreferences: SharedPreferences? by lazy {
         val masterKey: MasterKey = MasterKey.Builder(
             context,
             MasterKey.DEFAULT_MASTER_KEY_ALIAS
@@ -53,9 +54,9 @@ class CorePreferences constructor(private val context: Context) {
             Log.e("[VFS] Exception: $e")
             null
         }
-    }*/
+    }
 
-    /*var vfsEnabled: Boolean
+    var vfsEnabled: Boolean
         get() = encryptedSharedPreferences?.getBoolean("vfs_enabled", false) ?: false
         set(value) {
             val preferences = encryptedSharedPreferences
@@ -74,7 +75,7 @@ class CorePreferences constructor(private val context: Context) {
             // TODO: decide if we do it
             // logcatLogsOutput = false
         }*/
-
+var vfsEnabled: Boolean =false
     /* App settings */
 
     var debugLogs: Boolean

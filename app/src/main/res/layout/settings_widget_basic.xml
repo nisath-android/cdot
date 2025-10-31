@@ -28,7 +28,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/icon"
+            android:id="@+id/iconView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
@@ -51,7 +51,7 @@
             android:layout_marginTop="15dp"
             android:layout_marginLeft="@dimen/settings_margin"
             android:layout_marginRight="@dimen/settings_margin"
-            android:layout_toRightOf="@id/icon"
+            android:layout_toRightOf="@id/iconView"
             style="@style/settings_item_font"
             app:autoSizeTextType="uniform"
             app:autoSizeMinTextSize="@dimen/setting_title_min_size"
@@ -70,7 +70,7 @@
             android:layout_below="@id/settings_title"
             android:layout_marginLeft="@dimen/settings_margin"
             android:layout_marginRight="@dimen/settings_margin"
-            android:layout_toRightOf="@id/icon"
+            android:layout_toRightOf="@id/iconView"
             style="@style/settings_item_subtitle_font"
             app:autoSizeTextType="uniform"
             app:autoSizeMinTextSize="@dimen/setting_subtitle_min_size"

@@ -206,9 +206,12 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp"
+                android:paddingTop="22dp"
+                android:foregroundGravity="center"
                 android:layout_gravity="center"
                 android:src="@drawable/numpad_star"
+                android:scaleY="1.6"
+                android:scaleX="1.6"
                 android:contentDescription="@string/content_description_numpad_star"
                 android:onClick="@{() -> keyListener.handleClick('*')}" />
         </androidx.cardview.widget.CardView>
@@ -250,7 +253,9 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp"
+                android:paddingTop="16dp"
+                android:scaleY="1.0"
+                android:scaleX="1.0"
                 android:src="@drawable/numpad_hash"
                 android:contentDescription="@string/content_description_numpad_3"
                 android:onClick="@{() -> keyListener.handleClick('#')}" />
