@@ -19,8 +19,7 @@ import com.naminfo.cdot_vc.activities.navigateToDialer
 import com.naminfo.cdot_vc.databinding.FragmentTabsBinding
 import com.naminfo.cdot_vc.utils.Event
 
-
-class TabsFragment: GenericFragment<FragmentTabsBinding>(), NavController.OnDestinationChangedListener {
+class TabsFragment : GenericFragment<FragmentTabsBinding>(), NavController.OnDestinationChangedListener {
     private lateinit var viewModel: TabsViewModel
 
     override fun getLayoutId(): Int = R.layout.fragment_tabs
@@ -48,7 +47,7 @@ class TabsFragment: GenericFragment<FragmentTabsBinding>(), NavController.OnDest
             navigateToCallHistory()
         }
 
-       binding.setContactsClickListener {
+        binding.setContactsClickListener {
             when (findNavController().currentDestination?.id) {
                 R.id.dialerFragment -> sharedViewModel.updateDialerAnimationsBasedOnDestination.value = Event(
                     R.id.masterContactsFragment
@@ -71,6 +70,8 @@ class TabsFragment: GenericFragment<FragmentTabsBinding>(), NavController.OnDest
             )
             navigateToDialer()
         }
+
+        /**No need for this CDot projects*/
 
        /* binding.setChatClickListener {
             when (findNavController().currentDestination?.id) {
@@ -102,19 +103,30 @@ class TabsFragment: GenericFragment<FragmentTabsBinding>(), NavController.OnDest
     ) {
         if (corePreferences.enableAnimations) {
             when (destination.id) {
-                R.id.masterContactsFragment ->
-                    binding.motionLayout.transitionToState(R.id.contacts_set)
-
-                R.id.dialerFragment ->
-                    binding.motionLayout.transitionToState(R.id.dialer_set)
+                R.id.masterCallLogsFragment -> binding.motionLayout.transitionToState(
+                    R.id.call_history
+                )
+                R.id.masterContactsFragment -> binding.motionLayout.transitionToState(R.id.contacts)
+                R.id.dialerFragment -> binding.motionLayout.transitionToState(R.id.dialer)
+//                R.id.masterChatRoomsFragment -> binding.motionLayout.transitionToState(
+//                    R.id.chat_rooms
+//                )
             }
         } else {
             when (destination.id) {
-                R.id.masterContactsFragment ->
-                    binding.motionLayout.setTransition(R.id.contacts_set, R.id.contacts_set)
-
-                R.id.dialerFragment ->
-                    binding.motionLayout.setTransition(R.id.dialer_set, R.id.dialer_set)
+                R.id.masterCallLogsFragment -> binding.motionLayout.setTransition(
+                    R.id.call_history,
+                    R.id.call_history
+                )
+                R.id.masterContactsFragment -> binding.motionLayout.setTransition(
+                    R.id.contacts,
+                    R.id.contacts
+                )
+                R.id.dialerFragment -> binding.motionLayout.setTransition(R.id.dialer, R.id.dialer)
+//                R.id.masterChatRoomsFragment -> binding.motionLayout.setTransition(
+//                    R.id.chat_rooms,
+//                    R.id.chat_rooms
+//                )
             }
         }
     }

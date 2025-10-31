@@ -33,21 +33,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="@{viewModel.leftAnchor, default=0.25}" />
+            layout_constraintGuide_percent="@{viewModel.leftAnchor, default=0.25}" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineMiddle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="@{viewModel.middleAnchor, default=0.5}" />
+            layout_constraintGuide_percent="@{viewModel.middleAnchor, default=0.5}" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="@{viewModel.rightAnchor, default=0.75}" />
+            layout_constraintGuide_percent="@{viewModel.rightAnchor, default=0.75}" />
 
         <ImageView
             android:id="@+id/history"

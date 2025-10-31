@@ -132,7 +132,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/main_activity_top_bar_size"
                 android:layout_alignTop="@id/top_bar"
-                tools:layout="@layout/list_edit_top_bar_fragment" />
+                tools:layout="@layout/fragment_list_edit_top_bar" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/callLogsList"
