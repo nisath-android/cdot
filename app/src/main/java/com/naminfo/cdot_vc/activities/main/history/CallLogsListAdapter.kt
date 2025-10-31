@@ -1,5 +1,6 @@
 package com.naminfo.cdot_vc.activities.main.history
 
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
@@ -21,6 +23,7 @@ import com.naminfo.cdot_vc.activities.main.viewmodels.ListTopBarViewModel
 import com.naminfo.cdot_vc.databinding.GenericListHeaderBinding
 import com.naminfo.cdot_vc.databinding.HistoryListCellBinding
 import com.naminfo.cdot_vc.utils.*
+import org.linphone.core.tools.Log
 
 class CallLogsListAdapter(
     selectionVM: ListTopBarViewModel,
@@ -28,23 +31,25 @@ class CallLogsListAdapter(
 ) : SelectionListAdapter<GroupedCallLogData, RecyclerView.ViewHolder>(
     selectionVM,
     CallLogDiffCallback()
-),
-    HeaderAdapter {
-    val gson: Gson by lazy { Gson() }
+), HeaderAdapter {
 
-    val sipListType: Type =
-        object : TypeToken<ArrayList<MasterContactsViewModel.SipContact>>() {}.type
-    val sipContactList: ArrayList<MasterContactsViewModel.SipContact> = gson.fromJson(
-        LinphoneApplication.corePreferences.sipContactsSaved?.toString() ?: "[]", // Default to an empty list
-        sipListType
-    ) ?: arrayListOf()
-    val selectedCallLogEvent: MutableLiveData<Event<GroupedCallLogData>> by lazy {
-        MutableLiveData<Event<GroupedCallLogData>>()
+    private val gson by lazy { Gson() }
+    private val sipListType: Type = object : TypeToken<ArrayList<MasterContactsViewModel.SipContact>>() {}.type
+
+    private val sipContactList: ArrayList<MasterContactsViewModel.SipContact> by lazy {
+        try {
+            gson.fromJson(
+                LinphoneApplication.corePreferences.sipContactsSaved?.toString() ?: "[]",
+                sipListType
+            ) ?: arrayListOf()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            arrayListOf()
+        }
     }
 
-    val startCallToEvent: MutableLiveData<Event<GroupedCallLogData>> by lazy {
-        MutableLiveData<Event<GroupedCallLogData>>()
-    }
+    val selectedCallLogEvent = MutableLiveData<Event<GroupedCallLogData>>()
+    val startCallToEvent = MutableLiveData<Event<GroupedCallLogData>>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding: HistoryListCellBinding = DataBindingUtil.inflate(
@@ -61,75 +66,98 @@ class CallLogsListAdapter(
     }
 
     inner class ViewHolder(
-        val binding: HistoryListCellBinding
+        private val binding: HistoryListCellBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(callLogGroup: GroupedCallLogData) {
-            with(binding) {
-                val callLogViewModel = callLogGroup.lastCallLogViewModel
-                viewModel = callLogViewModel
-                lifecycleOwner = viewLifecycleOwner
-                // This is for item selection through ListTopBarFragment
-                selectionListViewModel = selectionViewModel
-                selectionViewModel.isEditionEnabled.observe(
-                    viewLifecycleOwner
-                ) {
-                    position = bindingAdapterPosition
+        private fun showSafeSnackbar(message: String) {
+            try {
+                val activity = itemView.context as? Activity
+                val rootView = activity?.findViewById<View>(android.R.id.content)
+                if (rootView != null) {
+                    Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show()
+                } else {
+                    Log.w("CallLogsAdapter", "Root view not found for Snackbar")
                 }
+            } catch (e: Exception) {
+                Log.e("CallLogsAdapter", "Failed to show Snackbar", e)
+            }
+        }
 
-                if (callLogGroup.lastCallLogViewModel.displayName.value.toString().startsWith(
-                        "sip:",
-                        0,
-                        true
-                    )
-                ) {
-                    callLogGroup.lastCallLogViewModel.displayName.value = LinphoneApplication.corePreferences.getCallerName
-                }
-                // var phoneNumber = 0
-                sipContactList.forEach {
-                    if (it.name == callLogGroup.lastCallLogViewModel.displayName.value) {
-                        callLogGroup.lastCallLogViewModel.contactNumber.value = it.mobileNumber
-                    }
-                }
-                setClickListener {
-                    if (selectionViewModel.isEditionEnabled.value == true) {
-                        selectionViewModel.onToggleSelect(bindingAdapterPosition)
-                    } else {
-                        startCallToEvent.value = Event(callLogGroup)
-                    }
-                }
+        fun bind(callLogGroup: GroupedCallLogData) = with(binding) {
+            val context = root.context
+            val viewModel = callLogGroup.lastCallLogViewModel
 
-                setLongClickListener {
-                    if (selectionViewModel.isEditionEnabled.value == false) {
-                        selectionViewModel.isEditionEnabled.value = true
-                        // Selection will be handled by click listener
-                        true
-                    }
-                    false
-                }
+            if (viewModel == null) {
+                showSafeSnackbar("⚠️ Missing call log data")
+                return
+            }
 
-                // This listener is disabled when in edition mode
-                setDetailsClickListener {
+            // Safe data binding
+            this.viewModel = viewModel
+            lifecycleOwner = viewLifecycleOwner
+            selectionListViewModel = selectionViewModel
+
+            // Observe only once (avoids multiple observers)
+            selectionViewModel.isEditionEnabled.removeObservers(viewLifecycleOwner)
+            selectionViewModel.isEditionEnabled.observe(viewLifecycleOwner) {
+                position = bindingAdapterPosition
+            }
+
+            // Safe SIP display name replacement
+            val displayName = viewModel.displayName?.value
+            if (!displayName.isNullOrBlank() && displayName.startsWith("sip:", true)) {
+                val callerName = LinphoneApplication.corePreferences.getCallerName
+                if (!callerName.isNullOrBlank()) {
+                    viewModel.displayName.value = callerName
+                }else{
+                   // showSafeSnackbar("⚠️ No display name found")
+                }
+            }else{
+               // showSafeSnackbar("⚠️ No display name found")
+            }
+
+            // Match contact number from local SIP contact list
+            sipContactList.firstOrNull { it.name == viewModel.displayName?.value }?.let {
+                viewModel.contactNumber?.value = it.mobileNumber
+            }
+
+            // Click listener (single click)
+            setClickListener {
+                if (selectionViewModel.isEditionEnabled.value == true) {
+                    selectionViewModel.onToggleSelect(bindingAdapterPosition)
+                } else {
+                    startCallToEvent.value = Event(callLogGroup)
+                }
+            }
+
+            // Long press to enable multi-selection
+            setLongClickListener {
+                if (selectionViewModel.isEditionEnabled.value == false) {
+                    selectionViewModel.isEditionEnabled.value = true
+                    true
+                } else false
+            }
+
+            // Details button click
+            setDetailsClickListener {
+                if (selectionViewModel.isEditionEnabled.value == false) {
                     selectedCallLogEvent.value = Event(callLogGroup)
                 }
-
-                groupCount = callLogGroup.callLogs.size
-
-                executePendingBindings()
             }
+
+            groupCount = callLogGroup.callLogs.size
+            executePendingBindings()
         }
     }
 
+    // --- Header management ---
     override fun displayHeaderForPosition(position: Int): Boolean {
         if (position >= itemCount) return false
-        val callLogGroup = getItem(position)
-        val date = callLogGroup.lastCallLogStartTimestamp
-        val previousPosition = position - 1
-        return if (previousPosition >= 0) {
-            val previousItemDate = getItem(previousPosition).lastCallLogStartTimestamp
-            !TimestampUtils.isSameDay(date, previousItemDate)
-        } else {
-            true
-        }
+        val date = getItem(position).lastCallLogStartTimestamp
+        val prevPos = position - 1
+        return if (prevPos >= 0) {
+            val prevDate = getItem(prevPos).lastCallLogStartTimestamp
+            !TimestampUtils.isSameDay(date, prevDate)
+        } else true
     }
 
     override fun getHeaderViewForPosition(context: Context, position: Int): View {
@@ -147,27 +175,21 @@ class CallLogsListAdapter(
     }
 
     private fun formatDate(context: Context, date: Long): String {
-        if (TimestampUtils.isToday(date)) {
-            return context.getString(R.string.today)
-        } else if (TimestampUtils.isYesterday(date)) {
-            return context.getString(R.string.yesterday)
+        return when {
+            TimestampUtils.isToday(date) -> context.getString(R.string.today)
+            TimestampUtils.isYesterday(date) -> context.getString(R.string.yesterday)
+            else -> TimestampUtils.toString(date, onlyDate = true, shortDate = false, hideYear = false)
         }
-        return TimestampUtils.toString(date, onlyDate = true, shortDate = false, hideYear = false)
     }
 }
 
 private class CallLogDiffCallback : DiffUtil.ItemCallback<GroupedCallLogData>() {
-    override fun areItemsTheSame(
-        oldItem: GroupedCallLogData,
-        newItem: GroupedCallLogData
-    ): Boolean {
+    override fun areItemsTheSame(oldItem: GroupedCallLogData, newItem: GroupedCallLogData): Boolean {
         return oldItem.lastCallLogId == newItem.lastCallLogId
     }
 
-    override fun areContentsTheSame(
-        oldItem: GroupedCallLogData,
-        newItem: GroupedCallLogData
-    ): Boolean {
-        return oldItem.callLogs.size == newItem.callLogs.size
+    override fun areContentsTheSame(oldItem: GroupedCallLogData, newItem: GroupedCallLogData): Boolean {
+        return oldItem.callLogs.size == newItem.callLogs.size &&
+                oldItem.lastCallLogViewModel?.displayName?.value == newItem.lastCallLogViewModel?.displayName?.value
     }
 }

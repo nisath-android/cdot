@@ -18,7 +18,7 @@
         android:id="@+id/sliding_pane"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context="com.naminfo.cdot_vc.activities.main.MainActivity">
 
         <RelativeLayout
             android:layout_width="@dimen/master_fragment_width"

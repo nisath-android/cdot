@@ -16,9 +16,9 @@
         android:id="@+id/rootLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/colorSurface"
+        android:background="#F8F5F5"
         android:padding="16dp"
-        tools:context=".DialerFragment">
+        tools:context="com.naminfo.cdot_vc.activities.main.MainActivity">
 
         <!-- 3D Logo Card -->
         <androidx.cardview.widget.CardView
