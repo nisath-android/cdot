@@ -1,10 +1,12 @@
 package com.naminfo.cdot_vc.core
 
 import android.content.Intent
+import androidx.core.app.NotificationCompat
 import com.naminfo.cdot_vc.LinphoneApplication
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.ensureCoreExists
+import com.naminfo.cdot_vc.R
 import org.linphone.core.tools.Log
 import org.linphone.core.tools.service.CoreService
 
@@ -12,6 +14,7 @@ class CoreService : CoreService() {
     override fun onCreate() {
         super.onCreate()
         Log.i("[Service] Created")
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

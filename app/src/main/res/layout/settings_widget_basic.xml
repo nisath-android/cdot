@@ -2,13 +2,10 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     >
 
     <data>
-
         <import type="android.view.View" />
-
         <variable
             name="title"
             type="String" />
@@ -37,9 +34,9 @@
         android:layout_marginHorizontal="16dp"
         app:customCardBackground="@{backgroundColor}"
         android:enabled="@{enabled ?? true}"
-        android:foreground="?attr/selectableItemBackground"
-        android:onClick="@{() -> listener.onClicked()}"
 
+        android:onClick="@{() -> listener.onClicked()}"
+        app:cardBackgroundColor="?attr/colorSurface"
         app:cardCornerRadius="16dp"
         app:cardElevation="3dp"
         app:cardPreventCornerOverlap="true"

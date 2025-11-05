@@ -3,11 +3,11 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="CDOT_VC.app">
-        <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2025-10-30T11:52:49.205025900Z">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-11-05T09:51:47.059712900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R9ZY30GCYYE" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=1271726c0000" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -15,7 +15,7 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=RZCW504S35A" />
+                <DeviceId pluginId="PhysicalDevice" identifier="serial=1271726c0000" />
               </handle>
             </Target>
             <Target type="DEFAULT_BOOT">

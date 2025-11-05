@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import java.lang.NumberFormatException
 import kotlin.collections.ArrayList
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
@@ -13,6 +14,8 @@ import com.naminfo.cdot_vc.activities.main.settings.SettingListenerStub
 import org.linphone.core.*
 import org.linphone.core.tools.Log
 import com.naminfo.cdot_vc.utils.Event
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AccountSettingsViewModelFactory(private val identity: String) :
     ViewModelProvider.NewInstanceFactory() {
@@ -233,14 +236,18 @@ class AccountSettingsViewModel(val account: Account) : GenericSettingsViewModel(
         val authInfo = account.findAuthInfo()
         if (authInfo != null) {
             Log.i("[Account Settings] Found auth info $authInfo, removing it.")
-            core.removeAuthInfo(authInfo)
+            coreContext.core.removeAuthInfo(authInfo)
         } else {
             Log.w("[Account Settings] Couldn't find matching auth info...")
         }
 
-        core.removeAccount(account)
+        coreContext.core.removeAccount(account)
         accountToDelete = null
-        accountRemovedEvent.value = Event(true)
+        viewModelScope.launch {
+            delay(1000)
+            accountRemovedEvent.value = Event(true)
+        }
+
     }
 
     val deleteAccountRequiredEvent: MutableLiveData<Event<Boolean>> by lazy {

@@ -207,30 +207,19 @@ class CallActivity : ProximitySensorActivity() {
 
     override fun onResume() {
         super.onResume()
-        coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
-        coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
-        coreContext.core.isVideoCaptureEnabled = true // Enable video capture
-        coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
-        updateVideoActivationPolicy(true)
+       try {
+          // coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
+         //  coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
+           coreContext.core.isVideoCaptureEnabled = true // Enable video capture
+           coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
 
-        if (coreContext.core.callsNb == 0) {
-            Log.w("[Call Activity] Resuming but no call found...")
-            if (isTaskRoot) {
-                // When resuming app from recent tasks make sure MainActivity will be launched if there is no call
-                val intent = Intent()
-                intent.setClass(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            } else {
-                finish()
-            }
-            return
-        }
-        coreContext.removeCallOverlay()
+           updateVideoActivationPolicy(true)
+       }catch (e: Exception){}
+
+           coreContext.removeCallOverlay()
 
         val currentCall = coreContext.core.currentCall
         Log.i("Incoming - Accept early media - ${corePreferences.acceptEarlyMedia}")
-        // Log.i("Incoming - Current Call state - ${Call.State.IncomingEarlyMedia}")
 
         when (currentCall?.state) {
             Call.State.OutgoingInit, Call.State.OutgoingEarlyMedia, Call.State.OutgoingProgress, Call.State.OutgoingRinging -> {
@@ -244,6 +233,19 @@ class CallActivity : ProximitySensorActivity() {
                 navigateToIncomingCall(earlyMediaVideoEnabled)
             }
             else -> {}
+        }
+        if (coreContext.core.callsNb == 0) {
+            Log.w("[Call Activity] Resuming but no call found...")
+            if (isTaskRoot) {
+                // When resuming app from recent tasks make sure MainActivity will be launched if there is no call
+                val intent = Intent()
+                intent.setClass(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            } else {
+                finish()
+            }
+            return
         }
     }
 

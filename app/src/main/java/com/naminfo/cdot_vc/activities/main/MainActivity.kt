@@ -180,15 +180,20 @@ class MainActivity : GenericActivity(), SnackBarActivity, NavController.OnDestin
             this
         ) {
             it.consume {
-                if (binding.sideMenu.isDrawerOpen(Gravity.LEFT)) {
-                    Log.i("[Main Activity] isDrawerOpen")
-                    sideMenuFragment.isDrawerClosed(true)
-                    binding.sideMenu.closeDrawer(binding.sideMenuContent, true)
-                } else {
-                    Log.i("[Main Activity] isDrawerClosed")
-                    sideMenuFragment.isDrawerClosed(false)
-                    binding.sideMenu.openDrawer(binding.sideMenuContent, true)
+                try{
+                    if (binding?.sideMenu?.isDrawerOpen(Gravity.LEFT) == true) {
+                        Log.i("[Main Activity] isDrawerOpen")
+                        sideMenuFragment.isDrawerClosed(true)
+                        binding.sideMenu.closeDrawer(binding.sideMenuContent, true)
+                    } else {
+                        Log.i("[Main Activity] isDrawerClosed")
+                        sideMenuFragment.isDrawerClosed(false)
+                        binding.sideMenu.openDrawer(binding.sideMenuContent, true)
+                    }
+                }catch (e: Exception){
+
                 }
+
             }
         }
 

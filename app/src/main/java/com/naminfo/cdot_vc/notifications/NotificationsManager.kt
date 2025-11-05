@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
@@ -594,7 +595,11 @@ class NotificationsManager(private val context: Context) {
             )
             try {
                 currentForegroundServiceNotificationId = notificationId
-
+                if (Build.VERSION.SDK_INT >= 26) {
+                    ContextCompat.startForegroundService(context, Intent(service, CoreService::class.java))
+                } else {
+                    context.startService(Intent(context, CoreService::class.java))
+                }
                 Compatibility.startCallForegroundService(
                     coreService,
                     currentForegroundServiceNotificationId,

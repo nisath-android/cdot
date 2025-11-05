@@ -6,6 +6,7 @@ import android.view.View
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.naminfo.cdot_vc.LinphoneApplication
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
 import com.naminfo.cdot_vc.R
@@ -14,9 +15,13 @@ import com.naminfo.cdot_vc.activities.main.settings.viewmodels.AccountSettingsVi
 import com.naminfo.cdot_vc.activities.main.viewmodels.DialogViewModel
 //import com.naminfo.cdot_vc.activities.navigateToPhoneLinking
 import com.naminfo.cdot_vc.databinding.FragmentAccountSettingsBinding
+import com.naminfo.cdot_vc.utils.AppUtils
 import org.linphone.core.tools.Log
 import com.naminfo.cdot_vc.utils.DialogUtils
 import com.naminfo.cdot_vc.utils.Event
+import com.naminfo.cdot_vc.utils.LinphoneUtils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBinding>() {
     private lateinit var viewModel: AccountSettingsViewModel
@@ -71,12 +76,21 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
         ) {
             it.consume {
                 sharedViewModel.accountRemoved.value = true
-                Log.i("[Side Menu] Stopping Core Context")
                 LinphoneApplication.coreContext.notificationsManager.stopForegroundNotification()
+                Log.i("[Side Menu] Stopping Core Context")
+               LinphoneUtils.restartAppMain(requireActivity())
+             /*   lifecycleScope.launch {
+                    delay(2000)
+                }
+                requireActivity().finishAndRemoveTask()*/
+                Log.i("[Side Menu] Quitting app")
+              /*  lifecycleScope.launch {
+                    delay(5000)
+                }*/
+
                 LinphoneApplication.coreContext.stop()
                 // goBack()
-                Log.i("[Side Menu] Quitting app")
-                requireActivity().finishAndRemoveTask()
+
 
 
             }

@@ -18,7 +18,9 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.naminfo.cdot_vc.core.CoreService
 import java.util.*
 import org.linphone.core.Call
 import org.linphone.core.ChatRoom
@@ -278,6 +280,7 @@ class Compatibility {
             notif: Notification,
             isCallActive: Boolean
         ) {
+
             if (Version.sdkAboveOrEqual(Version.API34_ANDROID_14_UPSIDE_DOWN_CAKE)) {
                 Api34Compatibility.startCallForegroundService(service, notifId, notif, isCallActive)
             } else {

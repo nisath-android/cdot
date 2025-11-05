@@ -1,10 +1,19 @@
 package com.naminfo.cdot_vc.utils
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityManager
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.os.Handler
+import android.os.Looper
+import android.os.Process
 import android.telephony.TelephonyManager.*
+import androidx.annotation.RequiresPermission
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.text.DateFormat
@@ -14,8 +23,10 @@ import okhttp3.internal.and
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
 import com.naminfo.cdot_vc.R
+import com.naminfo.cdot_vc.activities.main.MainActivity
 import org.linphone.core.*
 import org.linphone.core.tools.Log
+import kotlin.system.exitProcess
 
 /**
  * Various utility methods for Linphone SDK
@@ -323,5 +334,65 @@ class LinphoneUtils {
 
             return text
         }
+        fun isCoreServiceRunning(context: Context): Boolean {
+            val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            return manager.getRunningServices(Int.MAX_VALUE)
+                .any { it.service.className == com.naminfo.cdot_vc.core.CoreService::class.java.name }
+        }
+        fun restartApp(context: Context) {
+            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+            intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+            Runtime.getRuntime().exit(0)
+        }
+        fun restartAppMain(context: Context) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            context.startActivity(intent)
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
+        fun restartAppWithDelay(context: Context) {
+            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+            val restartIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.set(
+                AlarmManager.RTC,
+                System.currentTimeMillis() + 2000,
+                restartIntent
+            )
+            android.os.Process.killProcess(android.os.Process.myPid())
+           // Runtime.getRuntime().exit(0)
+        }
+        @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
+        fun restartAppWithDelayTime(context: Context) {
+            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+            val restartIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.setExact(
+                AlarmManager.RTC,
+                System.currentTimeMillis() + 2000,
+                restartIntent
+            )
+
+            // Give OS time to write logs before full kill
+            Handler(Looper.getMainLooper()).postDelayed({
+                Process.killProcess(Process.myPid())
+                exitProcess(0)
+            }, 500)
+        }
+
+
     }
 }

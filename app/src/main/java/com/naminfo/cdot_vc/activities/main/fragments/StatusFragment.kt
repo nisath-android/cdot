@@ -38,11 +38,11 @@ class StatusFragment : GenericFragment<FragmentStatusBinding>() {
             }
         }
 
-        binding.setMenuClickListener {
+        binding?.setMenuClickListener {
             sharedViewModel.toggleDrawerEvent.value = Event(true)
         }
 
-        binding.setRefreshClickListener {
+        binding?.setRefreshClickListener {
             viewModel.refreshRegister()
         }
     }

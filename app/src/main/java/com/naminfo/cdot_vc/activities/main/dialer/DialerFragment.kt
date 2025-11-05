@@ -125,7 +125,8 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
         }
 
         if (corePreferences.firstStart) {
-            Log.i("Dialer",
+            Log.i(
+                "Dialer",
                 "[Dialer] First start detected, wait for assistant to be finished to check for update & request permissions"
             )
             return
@@ -133,23 +134,28 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
 
         if (arguments?.containsKey("URI") == true) {
             val address = arguments?.getString("URI") ?: ""
-            Log.i("Dialer","[Dialer] Found URI to call: $address")
+            Log.i("Dialer", "[Dialer] Found URI to call: $address")
             val skipAutoCall = arguments?.getBoolean("SkipAutoCallStart") ?: false
 
             if (corePreferences.skipDialerForNewCallAndTransfer) {
                 if (sharedViewModel.pendingCallTransfer) {
-                    Log.i("Dialer",
+                    Log.i(
+                        "Dialer",
                         "[Dialer] We were asked to skip dialer so starting new call to [$address] now"
                     )
                     viewModel.transferCallTo(address)
                 } else {
-                    Log.i("Dialer",
+                    Log.i(
+                        "Dialer",
                         "[Dialer] We were asked to skip dialer so starting transfer to [$address] now"
                     )
                     viewModel.directCall(address)
                 }
             } else if (corePreferences.callRightAway && !skipAutoCall) {
-                Log.i("Dialer","[Dialer] Call right away setting is enabled, start the call to [$address]")
+                Log.i(
+                    "Dialer",
+                    "[Dialer] Call right away setting is enabled, start the call to [$address]"
+                )
                 viewModel.directCall(address)
             } else {
                 sharedViewModel.dialerUri = address
@@ -157,17 +163,21 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
         }
         arguments?.clear()
 
-        Log.i("Dialer","[Dialer] Pending call transfer mode = ${sharedViewModel.pendingCallTransfer}")
+        Log.i(
+            "Dialer",
+            "[Dialer] Pending call transfer mode = ${sharedViewModel.pendingCallTransfer}"
+        )
         viewModel.transferVisibility.value = sharedViewModel.pendingCallTransfer
 
-        viewModel.autoInitiateVideoCalls.value = coreContext.core.videoActivationPolicy.automaticallyInitiate
+        viewModel.autoInitiateVideoCalls.value =
+            coreContext.core.videoActivationPolicy.automaticallyInitiate
         checkForUpdate()
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
     }
 
     private val backCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-           requireActivity().finishAffinity() // closes app
+            requireActivity().finishAffinity() // closes app
             //requireActivity().finishAndRemoveTask() // closes app
         }
     }
@@ -185,8 +195,13 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
 //            coreContext.core.nativePreviewWindowId = binding.videoPreviewWindow
 //        }
 
-        viewModel.updateShowVideoPreview()
-        viewModel.autoInitiateVideoCalls.value = coreContext.core.videoActivationPolicy.automaticallyInitiate
+        try {
+            viewModel.updateShowVideoPreview()
+            viewModel.autoInitiateVideoCalls.value =
+                coreContext.core.videoActivationPolicy.automaticallyInitiate
+        } catch (e: Exception) {
+
+        }
         uploadLogsInitiatedByUs = false
 
         viewModel.enteredUri.value = sharedViewModel.dialerUri
@@ -200,7 +215,7 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
     ) {
         if (requestCode == 0) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.i("Dialer","[Dialer] READ_PHONE_STATE permission has been granted")
+                Log.i("Dialer", "[Dialer] READ_PHONE_STATE permission has been granted")
                 coreContext.initPhoneStateListener()
                 // If first permission has been granted, continue to ask for permissions,
                 // otherwise don't do it or it will loop indefinitely
@@ -214,14 +229,17 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
                 }
             }
             if (allGranted) {
-                Log.i("Dialer","[Dialer] Telecom Manager permission have been granted")
+                Log.i("Dialer", "[Dialer] Telecom Manager permission have been granted")
                 enableTelecomManager()
             } else {
-                Log.w("Dialer","[Dialer] Telecom Manager permission have been denied (at least one of them)")
+                Log.w(
+                    "Dialer",
+                    "[Dialer] Telecom Manager permission have been denied (at least one of them)"
+                )
             }
         } else if (requestCode == 2) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.i("Dialer","[Dialer] POST_NOTIFICATIONS permission has been granted")
+                Log.i("Dialer", "[Dialer] POST_NOTIFICATIONS permission has been granted")
             }
             checkTelecomManagerPermissions()
         }
@@ -230,11 +248,11 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
 
     private fun checkPermissions() {
         if (!PermissionHelper.get().hasReadPhoneStatePermission()) {
-            Log.i("Dialer","[Dialer] Asking for READ_PHONE_STATE permission")
+            Log.i("Dialer", "[Dialer] Asking for READ_PHONE_STATE permission")
             requestPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE), 0)
         } else if (!PermissionHelper.get().hasPostNotificationsPermission()) {
             // Don't check the following the previous permission is being asked
-            Log.i("Dialer","[Dialer] Asking for POST_NOTIFICATIONS permission")
+            Log.i("Dialer", "[Dialer] Asking for POST_NOTIFICATIONS permission")
             Compatibility.requestPostNotificationsPermission(this, 2)
         } else if (Version.sdkAboveOrEqual(Version.API26_O_80)) {
             // Don't check the following the previous permissions are being asked
@@ -246,7 +264,8 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
             val fullScreenIntentPermission = Compatibility.hasFullScreenIntentPermission(
                 requireContext()
             )
-            Log.i("Dialer",
+            Log.i(
+                "Dialer",
                 "[Dialer] Android 14 or above detected: full-screen intent permission is ${if (fullScreenIntentPermission) "granted" else "not granted"}"
             )
             if (!fullScreenIntentPermission) {
@@ -263,37 +282,38 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
     @TargetApi(Version.API26_O_80)
     private fun checkTelecomManagerPermissions() {
         if (!corePreferences.useTelecomManager) {
-            Log.i("Dialer","[Dialer] Telecom Manager feature is disabled")
+            Log.i("Dialer", "[Dialer] Telecom Manager feature is disabled")
             if (corePreferences.manuallyDisabledTelecomManager) {
-                Log.w("Dialer","[Dialer] User has manually disabled Telecom Manager feature")
+                Log.w("Dialer", "[Dialer] User has manually disabled Telecom Manager feature")
             } else {
                 if (Compatibility.hasTelecomManagerPermissions(requireContext())) {
                     enableTelecomManager()
                 } else {
-                    Log.i("Dialer","[Dialer] Asking for Telecom Manager permissions")
+                    Log.i("Dialer", "[Dialer] Asking for Telecom Manager permissions")
                     Compatibility.requestTelecomManagerPermissions(requireActivity(), 1)
                 }
             }
         } else {
-            Log.i("Dialer","[Dialer] Telecom Manager feature is already enabled")
+            Log.i("Dialer", "[Dialer] Telecom Manager feature is already enabled")
         }
     }
 
     @TargetApi(Version.API26_O_80)
     private fun enableTelecomManager() {
-        Log.i("Dialer","[Dialer] Telecom Manager permissions granted")
+        Log.i("Dialer", "[Dialer] Telecom Manager permissions granted")
         if (!TelecomHelper.exists()) {
-            Log.i("Dialer","[Dialer] Creating Telecom Helper")
+            Log.i("Dialer", "[Dialer] Creating Telecom Helper")
             if (Compatibility.hasTelecomManagerFeature(requireContext())) {
                 TelecomHelper.create(requireContext())
             } else {
-                Log.e("Dialer",
+                Log.e(
+                    "Dialer",
                     "[Dialer] Telecom Helper can't be created, device doesn't support connection service!"
                 )
                 return
             }
         } else {
-            Log.e("Dialer","[Dialer] Telecom Manager was already created ?!")
+            Log.e("Dialer", "[Dialer] Telecom Manager was already created ?!")
         }
         corePreferences.useTelecomManager = true
     }
@@ -313,13 +333,16 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
                 getString(R.string.debug_popup_disable_logs) -> {
                     corePreferences.debugLogs = false
                 }
+
                 getString(R.string.debug_popup_enable_logs) -> {
                     corePreferences.debugLogs = true
                 }
+
                 getString(R.string.debug_popup_send_logs) -> {
                     uploadLogsInitiatedByUs = true
                     viewModel.uploadLogs()
                 }
+
                 getString(R.string.debug_popup_show_config_file) -> {
                     //navigateToConfigFileViewer()
                 }
@@ -335,7 +358,7 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
         val interval: Int = corePreferences.checkUpdateAvailableInterval
         if (lastTimestamp == 0 || currentTimeStamp - lastTimestamp >= interval) {
             val currentVersion = BuildConfig.VERSION_NAME
-            Log.i("Dialer","[Dialer] Checking for update using current version [$currentVersion]")
+            Log.i("Dialer", "[Dialer] Checking for update using current version [$currentVersion]")
             coreContext.core.checkForUpdate(currentVersion)
             corePreferences.lastUpdateAvailableCheckTimestamp = currentTimeStamp
         }
@@ -355,7 +378,10 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     startActivity(browserIntent)
                 } catch (ise: IllegalStateException) {
-                    Log.e("Dialer","[Dialer] Can't start ACTION_VIEW intent, IllegalStateException: $ise")
+                    Log.e(
+                        "Dialer",
+                        "[Dialer] Can't start ACTION_VIEW intent, IllegalStateException: $ise"
+                    )
                 } finally {
                     dialog.dismiss()
                 }
@@ -367,13 +393,16 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
     }
 
     private fun hideKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.sipUriInput.windowToken, 0)
     }
+
     private fun hideDialPad() {
         // Example: if you have a layout for dialpad
         binding.numpad.root.visibility = View.VISIBLE
     }
+
     fun dialpadManagement() {
         val editText = binding.sipUriInput
         // Disable keyboard popup
@@ -383,7 +412,7 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
             editText.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     v.performClick() // ✅ Accessibility safe
-                   hideKeyboard()
+                    hideKeyboard()
                 }
                 true
             }
@@ -402,8 +431,6 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
             false
         }
     }
-
-
 
 
 }
