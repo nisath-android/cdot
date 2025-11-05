@@ -40,7 +40,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:onClick="@{() -> data.startCall()}"
+                android:onClick="@{() -> data.startCall(data)}"
                 android:contentDescription="@string/content_description_start_call"
                 android:layout_width="60dp"
                 android:layout_height="60dp"

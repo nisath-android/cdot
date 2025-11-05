@@ -94,7 +94,10 @@ class DialerViewModel  : LogsUploadViewModel() {
             state: Call.State,
             message: String
         ) {
-            atLeastOneCall.value = core.callsNb > 0
+            val isCall = core.callsNb > 0
+            atLeastOneCall.value = isCall
+            isAudioClickable.value = !isCall
+            isVideoClickable.value = !isCall
         }
 
         override fun onTransferStateChanged(core: Core, transfered: Call, callState: Call.State) {
@@ -136,9 +139,11 @@ class DialerViewModel  : LogsUploadViewModel() {
 
     init {
         coreContext.core.addListener(listener)
-
+        val isCall = coreContext.core.callsNb > 0
         enteredUri.value = ""
-        atLeastOneCall.value = coreContext.core.callsNb > 0
+        atLeastOneCall.value = isCall
+        isAudioClickable.value = !isCall
+        isVideoClickable.value = !isCall
         transferVisibility.value = false
         hideAddContactButton.value = corePreferences.readOnlyNativeContacts
 
@@ -225,6 +230,7 @@ class DialerViewModel  : LogsUploadViewModel() {
         if (addressToCall.isNotEmpty()) {
             // Enable video for the call
             Log.i("Dialer","[Dialer] video enable: ${coreContext.core.isVideoEnabled}")
+
             coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
             coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
             coreContext.core.isVideoCaptureEnabled = true // Enable video capture

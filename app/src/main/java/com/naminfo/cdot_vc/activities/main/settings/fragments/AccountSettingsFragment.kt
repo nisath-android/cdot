@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.doOnPreDraw
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.naminfo.cdot_vc.LinphoneApplication
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
@@ -43,7 +44,9 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
             return
         }
         binding.viewModel = viewModel
+        viewModel.audioCardColor.value = "#ff0000"
 
+        Log.e("[Account Settings] ${viewModel.displayUsernameInsteadOfIdentity}|| ${viewModel.displayName.value} || ${viewModel.identity.value}")
         viewModel.linkPhoneNumberEvent.observe(
             viewLifecycleOwner
         ) {
@@ -68,13 +71,14 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
         ) {
             it.consume {
                 sharedViewModel.accountRemoved.value = true
+                Log.i("[Side Menu] Stopping Core Context")
+                LinphoneApplication.coreContext.notificationsManager.stopForegroundNotification()
+                LinphoneApplication.coreContext.stop()
                 // goBack()
                 Log.i("[Side Menu] Quitting app")
                 requireActivity().finishAndRemoveTask()
 
-                Log.i("[Side Menu] Stopping Core Context")
-                LinphoneApplication.coreContext.notificationsManager.stopForegroundNotification()
-                LinphoneApplication.coreContext.stop()
+
             }
         }
 

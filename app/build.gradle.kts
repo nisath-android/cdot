@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
-
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation(libs.linphone)
     implementation ("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")

@@ -171,13 +171,13 @@ internal fun TabsFragment.navigateToCallHistory() {
     )
 }
 
-internal fun MasterContactsFragment.navigateToContact() {
+internal fun MasterContactsFragment.navigateToContact(bundle: Bundle?=null) {
     if (findNavController().currentDestination?.id == R.id.masterContactsFragment) {
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.contacts_nav_container) as NavHostFragment
         navHostFragment.navController.navigate(
             R.id.action_global_detailContactFragment,
-            null,
+            bundle,
             popupTo(R.id.emptyContactFragment, false)
         )
     }

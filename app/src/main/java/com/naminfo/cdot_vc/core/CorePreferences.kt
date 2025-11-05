@@ -564,10 +564,10 @@ var vfsEnabled: Boolean =false
     /* Default values related */
 
     val defaultDomain: String
-        get() = config.getString("app", "default_domain", "sip.linphone.org")!!
+        get() = config.getString("app", "default_domain", "192.168.1.50")!!
 
     val defaultRlsUri: String
-        get() = config.getString("sip", "rls_uri", "sips:rls@sip.linphone.org")!!
+        get() = config.getString("sip", "rls_uri", "sips:rls@192.168.1.50")!!
 
     val debugPopupCode: String
         get() = config.getString("app", "debug_popup_magic", "#1234#")!!
@@ -580,14 +580,14 @@ var vfsEnabled: Boolean =false
         get() = config.getString(
             "app",
             "default_conference_factory_uri",
-            "sip:conference-factory@sip.linphone.org"
+            "sip:conference-factory@192.168.1.50"
         )!!
 
     val audioVideoConferenceServerUri: String
         get() = config.getString(
             "app",
             "default_audio_video_conference_factory_uri",
-            "sip:videoconference-factory@sip.linphone.org"
+            "sip:videoconference-factory@192.168.1.50"
         )!!
 
     val limeServerUrl: String

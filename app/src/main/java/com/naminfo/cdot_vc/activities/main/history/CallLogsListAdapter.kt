@@ -27,7 +27,8 @@ import org.linphone.core.tools.Log
 
 class CallLogsListAdapter(
     selectionVM: ListTopBarViewModel,
-    private val viewLifecycleOwner: LifecycleOwner
+    private val viewLifecycleOwner: LifecycleOwner,
+    private val rootView: View
 ) : SelectionListAdapter<GroupedCallLogData, RecyclerView.ViewHolder>(
     selectionVM,
     CallLogDiffCallback()
@@ -70,17 +71,25 @@ class CallLogsListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         private fun showSafeSnackbar(message: String) {
             try {
+                // Try to get the Activity root first
                 val activity = itemView.context as? Activity
-                val rootView = activity?.findViewById<View>(android.R.id.content)
-                if (rootView != null) {
-                    Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show()
-                } else {
-                    Log.w("CallLogsAdapter", "Root view not found for Snackbar")
+                val rootView = activity?.window?.decorView?.findViewById<View>(android.R.id.content)
+
+                val validParent = when {
+                    rootView != null -> rootView
+                    itemView.rootView != null -> itemView.rootView
+                    else -> itemView
                 }
+
+                Snackbar
+                    .make(validParent, message, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(validParent.findViewById<View>(R.id.root_coordinator_layout) ?: validParent)
+                    .show()
             } catch (e: Exception) {
-                Log.e("CallLogsAdapter", "Failed to show Snackbar", e)
+                Log.e("CallLogsAdapter", "⚠️ Snackbar error: ${e.message}", e)
             }
         }
+
 
         fun bind(callLogGroup: GroupedCallLogData) = with(binding) {
             val context = root.context

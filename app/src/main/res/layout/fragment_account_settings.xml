@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:linphone="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/tools">
+    xmlns:bind="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <import type="android.view.View"/>
@@ -112,6 +113,8 @@
                 <include
                     android:id="@+id/delete"
                     layout="@layout/settings_widget_basic"
+                    app:backgroundColor="@{viewModel.audioCardColor}"
+                    linphone:icon="@{@drawable/delete_account}"
                     linphone:title="@{@string/account_settings_delete_title}"
                     linphone:listener="@{viewModel.deleteListener}"/>
 

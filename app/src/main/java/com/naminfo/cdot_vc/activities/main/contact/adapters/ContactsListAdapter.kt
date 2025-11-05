@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.naminfo.cdot_vc.R
@@ -18,6 +19,8 @@ import com.naminfo.cdot_vc.databinding.GenericListHeaderBinding
 import com.naminfo.cdot_vc.utils.AppUtils
 import com.naminfo.cdot_vc.utils.Event
 import com.naminfo.cdot_vc.utils.HeaderAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.linphone.core.Friend
 import org.linphone.core.tools.Log
 
@@ -48,31 +51,44 @@ class ContactsListAdapter(
     }
 
     inner class ViewHolder(
-        val binding: ContactListCellBinding
+        private val binding: ContactListCellBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(contactViewModel: ContactViewModel) {
             with(binding) {
                 viewModel = contactViewModel
                 lifecycleOwner = viewLifecycleOwner
-                // This is for item selection through ListTopBarFragment
                 selectionListViewModel = selectionViewModel
-                selectionViewModel.isEditionEnabled.observe(
-                    viewLifecycleOwner
-                ) {
+
+                // Observe selection changes
+                selectionViewModel.isEditionEnabled.observe(viewLifecycleOwner) {
                     position = bindingAdapterPosition
                 }
+
+                // Handle item click safely
                 setClickListener {
-                    val friend = contactViewModel.contact.value
-                    Log.i(
-                        "ContactsListAdapter -> Selected item in list changed: ${friend.name}"
-                    )
-                    if (friend != null) selectedContactEvent.value = Event(friend)
+                    // Always switch to main thread safely
+                    lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) {
+                        try {
+                            val friend = contactViewModel.contact.value
+                            friend?.let {
+                                Log.i(
+                                    "CDOT_VC",
+                                    "ContactsListAdapter -> Selected item in list changed: ${it.name}"
+                                )
+                                selectedContactEvent.value = Event(it)
+                            }
+                        } catch (e: Exception) {
+                            Log.e("CDOT_VC", "Error selecting contact: ${e.message}", e)
+                        }
+                    }
                 }
 
                 executePendingBindings()
             }
         }
     }
+
 
     override fun displayHeaderForPosition(position: Int): Boolean {
         if (position >= itemCount) return false

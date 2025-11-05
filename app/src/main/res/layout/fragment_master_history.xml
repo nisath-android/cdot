@@ -126,13 +126,7 @@
 
             </LinearLayout>
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/list_edit_top_bar_fragment"
-                android:name="com.naminfo.cdot_vc.activities.main.fragments.ListTopBarFragment"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/main_activity_top_bar_size"
-                android:layout_alignTop="@id/top_bar"
-                tools:layout="@layout/fragment_list_edit_top_bar" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/callLogsList"
@@ -169,7 +163,13 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:background="?attr/dividerColor" />
-
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/list_edit_top_bar_fragment"
+                android:name="com.naminfo.cdot_vc.activities.main.fragments.ListTopBarFragment"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/main_activity_top_bar_size"
+                android:layout_alignTop="@id/top_bar"
+                tools:layout="@layout/fragment_list_edit_top_bar" />
         </RelativeLayout>
 
         <androidx.fragment.app.FragmentContainerView

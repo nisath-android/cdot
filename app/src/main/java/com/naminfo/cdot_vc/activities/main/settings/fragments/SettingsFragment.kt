@@ -56,6 +56,7 @@ class SettingsFragment : SecureFragment<FragmentSettingsBinding>() {
             }
         }
 
+
         sharedViewModel.layoutChangedEvent.observe(
             viewLifecycleOwner
         ) {

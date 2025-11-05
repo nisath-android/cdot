@@ -137,9 +137,10 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="horizontal">
-
+<!-- android:onClick="@{() -> viewModel.startCall(data)}"-->
                         <ImageView
-                            android:onClick="@{() -> data.startCall()}"
+                            android:id="@+id/startCall"
+
                             android:contentDescription="@string/content_description_start_call"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
@@ -147,8 +148,10 @@
                             android:background="@drawable/round_orange_button_background"
                             android:src="@drawable/call_start_default" />
 
+                        <!-- android:onClick="@{() -> data.startVideoCall()}"-->
                         <ImageView
-                            android:onClick="@{() -> data.startVideoCall()}"
+                            android:id="@+id/startVideoCall"
+
                             android:contentDescription="@string/content_description_video_start_call"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
@@ -157,15 +160,7 @@
                             android:background="@drawable/round_orange_button_background"
                             android:src="@drawable/call_video_start" />
 
-                        <ImageView
-                            android:onClick="@{() -> data.startChat(false)}"
-                            android:visibility="@{data.chatAllowed &amp;&amp; !data.hidePlainChat ? View.VISIBLE : View.GONE}"
-                            android:contentDescription="@string/content_description_start_chat"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_margin="10dp"
-                            android:background="@drawable/round_orange_button_background"
-                            android:src="@drawable/chat_start_default" />
+
 
 
                     </LinearLayout>

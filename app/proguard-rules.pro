@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep public class * extends androidx.fragment.app.Fragment { *; }
+-dontwarn com.google.errorprone.annotations.Immutable
+-keep class com.naminfo.cdot_vc.activities.main.fragments.ListTopBarFragment { *; }
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**

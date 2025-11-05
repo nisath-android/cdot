@@ -95,13 +95,16 @@ class CoreService : CoreService() {
 
         super.onTaskRemoved(rootIntent)
     }
-
     override fun onDestroy() {
         if (LinphoneApplication.contextExists()) {
+            try {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             Log.i("[Service] Stopping")
             coreContext.notificationsManager.serviceDestroyed()
         }
-
         super.onDestroy()
     }
 }

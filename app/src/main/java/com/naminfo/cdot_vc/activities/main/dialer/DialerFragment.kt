@@ -80,8 +80,6 @@ class DialerFragment : SecureFragment<FragmentDialerBinding>() {
             }
         }*/
 
-
-
         viewModel.enteredUri.observe(
             viewLifecycleOwner
         ) {

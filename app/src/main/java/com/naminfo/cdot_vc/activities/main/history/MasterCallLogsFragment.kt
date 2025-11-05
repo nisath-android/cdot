@@ -97,7 +97,7 @@ class MasterCallLogsFragment : MasterFragment<FragmentMasterHistoryBinding, Call
 
         /* End of shared view model & sliding pane related */
 
-        _adapter = CallLogsListAdapter(listSelectionViewModel, viewLifecycleOwner)
+        _adapter = CallLogsListAdapter(listSelectionViewModel, viewLifecycleOwner,requireView())
         // SubmitList is done on a background thread
         // We need this adapter data observer to know when to scroll
         adapter.registerAdapterDataObserver(observer)

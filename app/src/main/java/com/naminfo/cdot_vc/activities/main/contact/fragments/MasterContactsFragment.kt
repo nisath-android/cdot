@@ -91,10 +91,32 @@ class MasterContactsFragment : MasterFragment<FragmentMasterContactsBinding, Con
                 Log.i("CDOT_VC",
                     " onViewCreated=> selectedContactEvent -> Selected item in list changed: ${contact.name}"
                 )
-                sharedViewModel.selectedContact.value = contact
-                corePreferences.getCallerName = contact.name
+
                 (requireActivity() as MainActivity).hideKeyboard()
-                navigateToContact()
+               /* if (android.util.Patterns.PHONE.matcher(contact.name?:"").matches()) {
+                    val contact = coreContext.contactsManager.findContactByPhoneNumber(contact.name!!)
+                    }*/
+                val friend = contact  // type: Friend
+
+                val id = friend.address?.username ?: "unknown"
+                val name = friend.name ?: "Unnamed"
+                val number = friend.address?.asStringUriOnly() ?: "N/A"
+
+                Log.i("CDOT_VC", "Selected Friend => id=$id, name=$name, number=$number")
+
+                sharedViewModel.selectedContact.value = friend
+                corePreferences.getCallerName = name
+                (requireActivity() as MainActivity).hideKeyboard()
+
+                val bundle = Bundle().apply {
+                    putString("id", null)
+                    putString("name", name)
+                    putString("number", number)
+                }
+
+                // Example navigation
+              //  findNavController().navigate(R.id.action_global_detailContactFragment, bundle)
+                navigateToContact(bundle)
                 binding.slidingPane.openPane()
 
                 /*if (editOnClick) {
@@ -346,7 +368,4 @@ class MasterContactsFragment : MasterFragment<FragmentMasterContactsBinding, Con
             Toast.makeText(requireContext(), "Selected: $selectedOption", Toast.LENGTH_SHORT).show()
         }.show()
     }
-
-
-
 }

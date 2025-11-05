@@ -1,9 +1,11 @@
-
+@file:JvmName("DataBindingUtilsKt")
 package com.naminfo.cdot_vc.utils
+
 import com.naminfo.cdot_vc.R
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
@@ -13,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Guideline
 import androidx.core.view.ViewCompat
@@ -43,6 +46,7 @@ import kotlinx.coroutines.*
 import org.linphone.core.ConsolidatedPresence
 import org.linphone.core.tools.Log
 import kotlin.text.toInt
+import androidx.core.graphics.toColorInt
 
 
 /**
@@ -155,7 +159,7 @@ fun setLayoutToLeftOf(view: View, oldTargetId: Int, newTargetId: Int) {
     view.layoutParams = layoutParams
 }
 
-@BindingAdapter("android:layout_gravity")
+@BindingAdapter("layout_gravity")
 fun setLayoutGravity(view: View, gravity: Int) {
     val layoutParams = view.layoutParams as LinearLayout.LayoutParams
     layoutParams.gravity = gravity
@@ -248,18 +252,7 @@ fun setInflatedViewStubLifecycleOwner(view: View, enable: Boolean) {
     }
 }
 
-@BindingAdapter("entries")
-fun setEntries(
-    viewGroup: ViewGroup,
-    entries: List<ViewDataBinding>?
-) {
-    viewGroup.removeAllViews()
-    if (entries != null) {
-        for (i in entries) {
-            viewGroup.addView(i.root)
-        }
-    }
-}
+
 
 private fun <T> setEntries(
     viewGroup: ViewGroup,
@@ -293,35 +286,27 @@ private fun <T> setEntries(
 }
 
 
-@BindingAdapter(value = ["layout", "itemsh"], requireAll = true)
-fun <T> bindItems(
-    parent: ViewGroup,
-    layoutId: Int,
-    liveItems: List<T>?
-) {
-    val context = parent.context
+@BindingAdapter("itemsh", "layout", requireAll = true)
+fun <T> setEntriesData(viewGroup: ViewGroup, items: Any?, layoutId: Int) {
+    val context = viewGroup.context
+    val inflater = LayoutInflater.from(context)
+    viewGroup.removeAllViews()
 
-    fun updateViews(items: List<T>?) {
-        parent.removeAllViews()
-        if (items.isNullOrEmpty()) return
-
-        val inflater = LayoutInflater.from(context)
-        for (item in items) {
-            val binding: ViewDataBinding =
-                DataBindingUtil.inflate(inflater, layoutId, parent, false)
-            binding.setVariable(BR.data, item)
-            binding.executePendingBindings()
-            parent.addView(binding.root)
-        }
+    val data: List<T>? = when (items) {
+        is MutableLiveData<*> -> (items.value as? List<T>)
+        is LiveData<*> -> (items.value as? List<T>)
+        is List<*> -> (items as? List<T>)
+        else -> null
     }
 
-    // remove any previous observer to prevent leak
-    val lifecycleOwner = (context as? LifecycleOwner)
-    /*if (lifecycleOwner != null && liveItems != null) {
-        liveItems.observe(lifecycleOwner) { updateViews(it) }
-    } else {
-        updateViews(liveItems?.value)
-    }*/
+    if (data.isNullOrEmpty()) return
+
+    for (item in data) {
+        val binding = DataBindingUtil.inflate<ViewDataBinding>(inflater, layoutId, viewGroup, false)
+        binding.setVariable(BR.viewModel, item)
+        binding.executePendingBindings()
+        viewGroup.addView(binding.root)
+    }
 }
 
 
@@ -329,7 +314,6 @@ fun <T> bindItems(
 
 
 
-/*
 @BindingAdapter("entries", "layout")
 fun <T> setEntries(
     viewGroup: ViewGroup,
@@ -337,8 +321,19 @@ fun <T> setEntries(
     layoutId: Int
 ) {
     setEntries(viewGroup, entries, layoutId, null, null)
-}*/
-
+}
+@BindingAdapter("entries")
+fun setEntries(
+    viewGroup: ViewGroup,
+    entries: List<ViewDataBinding>?
+) {
+    viewGroup.removeAllViews()
+    if (entries != null) {
+        for (i in entries) {
+            viewGroup.addView(i.root)
+        }
+    }
+}
 @BindingAdapter("entries", "layout", "onLongClick")
 fun <T> setEntries(
     viewGroup: ViewGroup,
@@ -984,6 +979,58 @@ fun ImageView.setPresenceIcon(presence: ConsolidatedPresence?) {
     }
     setContentDescription(contentDescription)
 }
+
+/*@BindingAdapter("customCardBackground")
+fun setCustomCardBackground(cardView: CardView, colorString: String?) {
+    val color = try {
+        colorString?.toColorInt() ?: Color.parseColor("#E3F2FD")
+    } catch (e: Exception) {
+        Color.parseColor("#E3F2FD")
+    }
+    cardView.setCardBackgroundColor(color)
+}*/
+
+@BindingAdapter("customCardBackground")
+fun setCustomCardBackground(cardView: CardView, colorString: String?) {
+    android.util.Log.d("TAG", "setCustomCardBackground: ")
+    val random = java.util.Random()
+    val randomLightFogColor = Color.rgb(
+        180 + random.nextInt(50),  // R: 180–230
+        200 + random.nextInt(55),  // G: 200–255
+        220 + random.nextInt(35)   // B: 220–255 (more blue)
+    )
+
+
+    val color = try {
+        if (!colorString.isNullOrEmpty()) {
+            // Use given color if available, else random
+            colorString.toColorInt()
+        } else {
+            randomLightFogColor
+        }
+    } catch (e: Exception) {
+        randomLightFogColor
+    }
+
+    cardView.setCardBackgroundColor(color)
+}
+
+
+@BindingAdapter("customCardBackground")
+fun setCustomCardBackground(cardView: CardView, colorLiveData: LiveData<String>?) {
+    val colorString = colorLiveData?.value
+    try {
+        if (!colorString.isNullOrEmpty()) {
+            cardView.setCardBackgroundColor(colorString.toColorInt())
+        } else {
+            cardView.setCardBackgroundColor("#ff0000".toColorInt())
+        }
+    } catch (e: Exception) {
+        cardView.setCardBackgroundColor(Color.parseColor("#ff0000"))
+    }
+}
+
+
 
 
 

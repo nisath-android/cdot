@@ -2,6 +2,8 @@ package com.naminfo.cdot_vc.utils
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import com.naminfo.cdot_vc.compatibility.Compatibility
 import org.linphone.core.tools.Log
 import org.linphone.mediastream.Version
@@ -60,5 +62,18 @@ class PermissionHelper private constructor(private val context: Context) {
 
     fun hasPostNotificationsPermission(): Boolean {
         return Compatibility.hasPostNotificationsPermission(context)
+    }
+    fun hasNetworkPermission(context: Context): Boolean {
+        val internetPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.INTERNET
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val networkStatePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_NETWORK_STATE
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return internetPermission && networkStatePermission
     }
 }

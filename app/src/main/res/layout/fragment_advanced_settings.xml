@@ -178,19 +178,22 @@
                     android:layout_height="wrap_content"/>
 
                 <include
-                    layout="@layout/settings_widget_basic"
+                    layout="@layout/advsettings_widget_basic"
                     android:visibility="@{viewModel.batterySettingsVisibility ? View.VISIBLE : View.GONE}"
+                    linphone:icon="@{@drawable/battery_optimize}"
                     linphone:listener="@{viewModel.goToBatterySettingsListener}"
                     linphone:title="@{@string/advanced_settings_go_to_battery_optimization_settings}" />
 
                 <include
-                    layout="@layout/settings_widget_basic"
+                    layout="@layout/advsettings_widget_basic"
                     android:visibility="@{viewModel.powerManagerSettingsVisibility ? View.VISIBLE : View.GONE}"
+                    linphone:icon="@{@drawable/powermanager_settings}"
                     linphone:listener="@{viewModel.goToPowerManagerSettingsListener}"
                     linphone:title="@{@string/advanced_settings_go_to_power_manager_settings}" />
 
                 <include
-                    layout="@layout/settings_widget_basic"
+                    layout="@layout/advsettings_widget_basic"
+                    linphone:icon="@{@drawable/android_app_settings}"
                     linphone:listener="@{viewModel.goToAndroidSettingsListener}"
                     linphone:title="@{@string/advanced_settings_go_to_android_app_settings}" />
 

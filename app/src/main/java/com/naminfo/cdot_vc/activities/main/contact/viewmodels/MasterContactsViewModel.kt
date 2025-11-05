@@ -352,7 +352,7 @@ class MasterContactsViewModel : ViewModel() {
         viewModelScope.launch {
             if (domainMain != null) {
                 val contactsBc = withContext(Dispatchers.IO) {
-                    if (corePreferences.getCurrentUserPhoneNumber == "9176066606") {
+                    if (corePreferences.getCurrentUserPhoneNumber == "9874563211") {
                         fetchBcContacts1(context, domainMain)
                     } else {
                         emptyList()

@@ -214,7 +214,8 @@
                     linphone:enabled="@{!viewModel.useTelecomManager}"/>-->
 
                 <include
-                    layout="@layout/settings_widget_basic"
+                    layout="@layout/advsettings_widget_basic"
+                    linphone:icon="@{@drawable/notification_settings}"
                     linphone:listener="@{viewModel.goToAndroidNotificationSettingsListener}"
                     linphone:title="@{@string/call_settings_go_to_android_notification_settings}" />
 

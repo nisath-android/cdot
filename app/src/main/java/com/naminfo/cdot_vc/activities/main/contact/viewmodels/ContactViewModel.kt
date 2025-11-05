@@ -35,6 +35,7 @@ import com.naminfo.cdot_vc.utils.PhoneNumberUtils
 import com.naminfo.cdot_vc.BR
 
 
+
 class ContactViewModelFactory(private val friend: Friend) :
     ViewModelProvider.NewInstanceFactory() {
 
@@ -58,19 +59,19 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
     val numbersAndAddresses = MutableLiveData<ArrayList<ContactNumberOrAddressData>>()
 
     val sendSmsToEvent: MutableLiveData<Event<String>> by lazy {
-        MutableLiveData<Event<String>>()
+        MutableLiveData< Event<String>>()
     }
 
-    val startCallToEvent: MutableLiveData<Event<Address>> by lazy {
+    val startCallToEvent: MutableLiveData< Event<Address>> by lazy {
         MutableLiveData<Event<Address>>()
     }
 
-    val startVideoCallToEvent: MutableLiveData<Event<Address>> by lazy {
-        MutableLiveData<Event<Address>>()
+    val startVideoCallToEvent: MutableLiveData< Event<Address>> by lazy {
+        MutableLiveData< Event<Address>>()
     }
 
-    val chatRoomCreatedEvent: MutableLiveData<Event<ChatRoom>> by lazy {
-        MutableLiveData<Event<ChatRoom>>()
+    val chatRoomCreatedEvent: MutableLiveData< Event<ChatRoom>> by lazy {
+        MutableLiveData< Event<ChatRoom>>()
     }
 
     val waitForChatRoomCreation = MutableLiveData<Boolean>()
@@ -91,7 +92,7 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
                 Log.e("[Contact Detail] Group chat room creation has failed !")
                 chatRoom.removeListener(this)
                 waitForChatRoomCreation.value = false
-                onMessageToNotifyEvent.value = Event(R.string.chat_room_creation_failed_snack)
+                onMessageToNotifyEvent.value = Event( R.string.chat_room_creation_failed_snack)
             }
         }
     }
@@ -99,7 +100,7 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
     private val contactsListener = object : ContactsUpdatedListenerStub() {
         override fun onContactUpdated(friend: Friend) {
             if (friend.refKey == contact.value?.refKey) {
-                Log.i("[Contact Detail] Friend has been updated!")
+                Log.i("CDOT_CALL","[Contact Detail] Friend has been updated!")
                 contact.value = friend
                 displayName.value = friend.name
                 isNativeContact.value = friend.refKey != null
@@ -108,7 +109,7 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
         }
     }
 
-    private val listener = object : ContactNumberOrAddressClickListener {
+     val listener = object : ContactNumberOrAddressClickListener {
         override fun onCall(address: Address) {
             startCallToEvent.value = Event(address)
         }
@@ -133,7 +134,7 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
             } else {
                 waitForChatRoomCreation.value = false
                 Log.e("[Contact Detail] Couldn't create chat room with address $address")
-                onMessageToNotifyEvent.value = Event(R.string.chat_room_creation_failed_snack)
+                onMessageToNotifyEvent.value = Event( R.string.chat_room_creation_failed_snack)
             }
         }
 
@@ -212,7 +213,29 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
             }
         }
     }
+    fun getContactNumberOrAddressData(myFriend: Friend):ContactNumberOrAddressData{
+       val friend =myFriend
+        val friendAddress =myFriend.address
 
+        val value = friendAddress?.asStringUriOnly()
+        val presenceModel = friend.getPresenceModelForUriOrTel(value!!)
+        val hasPresence = presenceModel?.basicStatus == PresenceBasicStatus.Open
+        val isMe = coreContext.core.defaultAccount?.params?.identityAddress?.weakEqual(friendAddress!!) ?: false
+        val hasLimeCapability = corePreferences.allowEndToEndEncryptedChatWithoutPresence || (
+                friend.getPresenceModelForUriOrTel(
+                    value
+                )?.hasCapability(Friend.Capability.LimeX3Dh) ?: false
+                )
+        val secureChatAllowed = LinphoneUtils.isEndToEndEncryptedChatAvailable() && !isMe && hasLimeCapability
+        val displayValue = if (coreContext.core.defaultAccount?.params?.domain == friendAddress?.domain) (friendAddress?.username ?: value) else value
+        return  ContactNumberOrAddressData(
+            friendAddress,
+            hasPresence,
+            displayValue!!,
+            showSecureChat = secureChatAllowed,
+            listener = listener
+        )
+    }
     fun updateNumbersAndAddresses() {
         val list = arrayListOf<ContactNumberOrAddressData>()
         val friend = contact.value ?: return
@@ -226,10 +249,10 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
             val hasPresence = presenceModel?.basicStatus == PresenceBasicStatus.Open
             val isMe = coreContext.core.defaultAccount?.params?.identityAddress?.weakEqual(address) ?: false
             val hasLimeCapability = corePreferences.allowEndToEndEncryptedChatWithoutPresence || (
-                friend.getPresenceModelForUriOrTel(
-                    value
-                )?.hasCapability(Friend.Capability.LimeX3Dh) ?: false
-                )
+                    friend.getPresenceModelForUriOrTel(
+                        value
+                    )?.hasCapability(Friend.Capability.LimeX3Dh) ?: false
+                    )
             val secureChatAllowed = LinphoneUtils.isEndToEndEncryptedChatAvailable() && !isMe && hasLimeCapability
             val displayValue = if (coreContext.core.defaultAccount?.params?.domain == address.domain) (address.username ?: value) else value
             val noa = ContactNumberOrAddressData(
@@ -260,10 +283,10 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
                 false
             }
             val hasLimeCapability = corePreferences.allowEndToEndEncryptedChatWithoutPresence || (
-                friend.getPresenceModelForUriOrTel(
-                    number
-                )?.hasCapability(Friend.Capability.LimeX3Dh) ?: false
-                )
+                    friend.getPresenceModelForUriOrTel(
+                        number
+                    )?.hasCapability(Friend.Capability.LimeX3Dh) ?: false
+                    )
             val secureChatAllowed = LinphoneUtils.isEndToEndEncryptedChatAvailable() && !isMe && hasLimeCapability
             val label = PhoneNumberUtils.vcardParamStringToAddressBookLabel(
                 coreContext.context.resources,
@@ -280,6 +303,14 @@ class ContactViewModel(friend: Friend) : MessageNotifierViewModel(), ContactData
             )
             list.add(noa)
         }
+        android.util.Log.d("[CDOT_CALL]", "updateNumbersAndAddresses: list=${list.toString()}")
         numbersAndAddresses.postValue(list)
     }
+    fun startCall(data:ContactNumberOrAddressData){
+        android.util.Log.d("ContactViewModel-", "startCall: ${data.address?.asStringUriOnly()}")
+       val address=  data?.address ?: return
+        listener.onCall(address!!)
+    }
+
+
 }

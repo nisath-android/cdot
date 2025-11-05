@@ -154,7 +154,7 @@ class TelecomHelper private constructor(context: Context) {
         // and user will have to do a factory reset...
         val identity = coreContext.core.defaultAccount?.params?.identityAddress?.asStringUriOnly()
             ?: coreContext.core.createPrimaryContactParsed()?.asStringUriOnly()
-            ?: "sip:linphone.android@sip.linphone.org"
+            ?: "sip:linphone.android@192.168.1.50"
 
         val address = Uri.parse(identity)
             ?: throw Exception("[Telecom Helper] Identity address for phone account is null!")

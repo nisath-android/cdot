@@ -1,5 +1,6 @@
 package com.naminfo.cdot_vc.activities.main.settings.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -245,6 +246,8 @@ class AccountSettingsViewModel(val account: Account) : GenericSettingsViewModel(
     val deleteAccountRequiredEvent: MutableLiveData<Event<Boolean>> by lazy {
         MutableLiveData<Event<Boolean>>()
     }
+    var audioCardColor: MutableLiveData<String> = MutableLiveData("#FFFFF")
+
     val deleteListener = object : SettingListenerStub() {
         override fun onClicked() {
             deleteAccountRequiredEvent.value = Event(true)
