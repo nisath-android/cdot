@@ -231,6 +231,7 @@ class Api31Compatibility {
             }
 
             if (!corePreferences.preventInterfaceFromShowingUp) {
+
                 builder.setContentIntent(pendingIntent)
             }
 

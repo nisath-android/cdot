@@ -897,6 +897,7 @@ fun setConstraintLayoutTopMargin(view: View, margins: Float) {
     view.layoutParams = params
 }
 
+
 @BindingAdapter("android:layout_marginBottom")
 fun setConstraintLayoutBottomMargin(view: View, margins: Float) {
     val params = view.layoutParams as ConstraintLayout.LayoutParams
@@ -1018,7 +1019,14 @@ fun setCustomCardBackground(cardView: CardView, colorString: String?) {
 
     cardView.setCardBackgroundColor(color)
 }*/
-
+@BindingAdapter("titleTextColor")
+fun setTitleTextColor(view: TextView, color: Int) {
+    view.setTextColor(color)
+}
+@BindingAdapter("titleTextSizes")
+fun setTitleTextSize(view: TextView, size: Float) {
+    view.setTextSize(size)
+}
 @BindingAdapter("customCardBackground")
 fun setCustomCardBackground(cardView: CardView, colorString: String?) {
     android.util.Log.d("TAG", "setCustomCardBackground: ")

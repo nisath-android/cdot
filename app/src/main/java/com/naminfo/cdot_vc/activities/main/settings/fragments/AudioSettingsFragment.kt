@@ -88,7 +88,7 @@ class AudioSettingsFragment : GenericSettingFragment<FragmentAudioSettingsBindin
             )
             binding.setVariable(BR.title, payload.mimeType)
             binding.setVariable(BR.subtitle, "${payload.clockRate} Hz")
-            //binding.setVariable(BR.checked, payload.enabled())
+            binding.setVariable(BR.checked, payload.enabled())
             binding.setVariable(
                 BR.listener,
                 object : SettingListenerStub() {

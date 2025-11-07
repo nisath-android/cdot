@@ -113,11 +113,13 @@
                 <include
                     android:id="@+id/delete"
                     android:layout_marginTop="20dp"
-                    layout="@layout/settings_widget_basic"
+                    layout="@layout/settings_widget_basic_delete"
                     app:backgroundColor="@{viewModel.audioCardColor}"
                     linphone:icon="@{@drawable/delete_account}"
                     linphone:title="@{@string/account_settings_delete_title}"
-                    linphone:listener="@{viewModel.deleteListener}"/>
+                    linphone:listener="@{viewModel.deleteListener}"
+
+                    />
 
 
             </LinearLayout>

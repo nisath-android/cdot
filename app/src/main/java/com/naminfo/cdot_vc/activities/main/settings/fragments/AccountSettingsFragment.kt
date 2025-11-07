@@ -52,7 +52,7 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
         binding.viewModel = viewModel
         val colorInt = requireContext()?.let { ContextCompat.getColor(it, R.color.test) }
         val colorString = String.format("#%06X", 0xFFFFFF and colorInt!!)
-        viewModel.audioCardColor.value = colorString ?:"#b30000"
+        viewModel.audioCardColor.value = colorString ?:"#fa8072"
 
         Log.e("[Account Settings] ${viewModel.displayUsernameInsteadOfIdentity}|| ${viewModel.displayName.value} || ${viewModel.identity.value}")
         viewModel.linkPhoneNumberEvent.observe(

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <data>
-
         <import type="android.view.View" />
-
         <variable
             name="title"
             type="String" />
@@ -21,64 +21,69 @@
         <variable
             name="icon"
             type="android.graphics.drawable.Drawable" />
-
+        <variable name="backgroundColor" type="String" />
         <variable
             name="listener"
             type="com.naminfo.cdot_vc.activities.main.settings.SettingListener" />
     </data>
 
     <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
         android:layout_columnWeight="1"
-        android:layout_margin="1dp"
-        android:background="@drawable/bg_rounded_card_outline"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="60dp"
+        app:customCardBackground="@{backgroundColor}"
         android:enabled="@{enabled ?? true}"
-        android:foreground="?attr/selectableItemBackground"
-        android:onClick="@{() -> listener.onClicked()}"
 
+        android:onClick="@{() -> listener.onClicked()}"
+        app:cardBackgroundColor="?attr/colorSurface"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        app:cardElevation="3dp"
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true"
-        app:contentPadding="1dp">
+        app:contentPadding="2dp"
+        android:layout_gravity="center|top">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:layout_margin="4dp">
 
             <!-- Icon -->
             <ImageView
                 android:id="@+id/iconView"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_margin="4dp"
                 android:contentDescription="@null"
-                android:padding="4dp"
+                android:padding="2dp"
                 android:src="@{icon}"
-                android:visibility="@{icon != null ? View.VISIBLE : View.GONE}"
+
+                android:visibility="@{icon != null ? View.GONE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/black_color" />
+                app:tint="@color/white_color" />
 
             <!-- Title -->
             <TextView
                 android:id="@+id/settings_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_margin="8dp"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
                 android:text="@{title}"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
+                android:textColor="@color/white_color"
                 app:layout_constraintBottom_toBottomOf="@id/iconView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@id/iconView"
                 app:layout_constraintTop_toTopOf="@id/iconView"
                 app:layout_constraintVertical_bias="0.5" />

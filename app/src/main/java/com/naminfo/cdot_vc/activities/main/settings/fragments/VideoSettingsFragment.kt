@@ -64,16 +64,19 @@ class VideoSettingsFragment : GenericSettingFragment<FragmentVideoSettingsBindin
                 null,
                 false
             )
-            /*binding.setVariable(BR.switch_title, payload.mimeType)
+            binding.setVariable(BR.switch_title, payload.mimeType)
             binding.setVariable(BR.switch_subtitle, "")
             binding.setVariable(BR.text_title, "recv-fmtp")
-            binding.setVariable(BR.text_subtitle, "")*/
+            binding.setVariable(BR.text_subtitle, "")
             binding.setVariable(BR.defaultValue, payload.recvFmtp)
             binding.setVariable(BR.checked, payload.enabled())
+            android.util.Log.i("CDOT_VC=>","Before: payload.mimeType:${payload.mimeType},${payload.recvFmtp},${payload.enabled()}")
             binding.setVariable(
                 BR.listener,
                 object : SettingListenerStub() {
                     override fun onBoolValueChanged(newValue: Boolean) {
+                        Log.d("CDOT_VC=>","onBoolValueChanged payload.mimeType:${payload.mimeType},${payload.recvFmtp},${payload.enabled()}")
+
                         payload.enable(newValue)
                     }
 

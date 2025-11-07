@@ -120,7 +120,7 @@ class CallActivity : ProximitySensorActivity() {
     // region ==== Lifecycle ====
     override fun onResume() {
         super.onResume()
-
+        Log.e("CDOT_VC", " Core unavailable: onResume")
         val core = try {
             coreContext.core
         } catch (e: Exception) {
