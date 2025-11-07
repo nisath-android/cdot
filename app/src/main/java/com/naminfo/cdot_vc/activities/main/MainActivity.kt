@@ -18,7 +18,10 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_SWIPE
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -37,6 +40,7 @@ import androidx.window.layout.FoldingFeature
 import coil.imageLoader
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
+import com.naminfo.cdot_vc.LinphoneApplication.Companion.ensureCoreExists
 import com.naminfo.cdot_vc.R
 import com.naminfo.cdot_vc.activities.GenericActivity
 import com.naminfo.cdot_vc.activities.SnackBarActivity
@@ -45,8 +49,10 @@ import com.naminfo.cdot_vc.activities.main.sidemenu.fragments.SideMenuFragment
 import com.naminfo.cdot_vc.activities.main.viewmodels.CallOverlayViewModel
 import com.naminfo.cdot_vc.activities.main.viewmodels.DialogViewModel
 import com.naminfo.cdot_vc.activities.main.viewmodels.SharedMainViewModel
+import com.naminfo.cdot_vc.compatibility.Compatibility
 import com.naminfo.cdot_vc.contact.ContactsUpdatedListenerStub
 import com.naminfo.cdot_vc.core.CorePreferences
+import com.naminfo.cdot_vc.core.CoreService
 import com.naminfo.cdot_vc.databinding.ActivityMainBinding
 import com.naminfo.cdot_vc.utils.AppUtils
 import com.naminfo.cdot_vc.utils.DialogUtils
@@ -140,6 +146,51 @@ class MainActivity : GenericActivity(), SnackBarActivity, NavController.OnDestin
 
     private val keyboardVisibilityListeners = arrayListOf<AppUtils.KeyboardVisibilityListener>()
     private var isInitialized = false
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                startCoreServiceSafely()
+            } else {
+                Log.e("[MainActivity]", "⚠️ Notification permission denied. CoreService not started.")
+            }
+        }
+    private fun startCoreServiceSafely() {
+        try {
+            val intent = Intent(this, CoreService::class.java).apply {
+                putExtra("StartForeground", true)
+            }
+            Log.i("[MainActivity]", " ✅ Starting CoreService as foreground service ${corePreferences.autoStart}")
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // ✅ Required from Android 8+ for foreground services
+                Log.i("[MainActivity]", " ✅ Starting CoreService as foreground service ${corePreferences.autoStart}")
+               // ContextCompat.startForegroundService(this, intent)
+                if ( corePreferences.autoStart)
+                startService(this@MainActivity)
+            } else {
+                Log.i("[MainActivity]", " ✅ Starting CoreService normally")
+                if ( corePreferences.autoStart) startService(intent)
+            }
+        } catch (e: Exception) {
+            Log.e("[MainActivity]", " ✅ Failed to start CoreService: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
+    private fun startService(context: Context) {
+        val serviceChannel = context.getString(R.string.notification_channel_service_id)
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (Compatibility.getChannelImportance(notificationManager, serviceChannel) == NotificationManagerCompat.IMPORTANCE_NONE) {
+            Log.w("[MainActivity] StartService channel is disabled!")
+            return
+        }
+
+        val serviceIntent = Intent(Intent.ACTION_MAIN).setClass(context, CoreService::class.java)
+        serviceIntent.putExtra("StartForeground", true)
+        Compatibility.startForegroundService(context, serviceIntent)
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -175,6 +226,17 @@ class MainActivity : GenericActivity(), SnackBarActivity, NavController.OnDestin
                 )
             }
 
+        }
+
+        // Start CoreService when app launches
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            startCoreServiceSafely()
         }
         sharedViewModel.toggleDrawerEvent.observe(
             this
@@ -253,7 +315,7 @@ class MainActivity : GenericActivity(), SnackBarActivity, NavController.OnDestin
 
     override fun onPause() {
         coreContext.core.removeListener(coreListener)
-        coreContext.contactsManager.removeListener(listener)
+      coreContext.contactsManager.removeListener(listener)
         super.onPause()
     }
 

@@ -721,7 +721,7 @@ class NotificationsManager(private val context: Context) {
     fun getPerson(friend: Friend?, displayName: String, picture: Bitmap?): Person {
         return friend?.getPerson()
             ?: Person.Builder()
-                .setName(displayName)
+                .setName(displayName?:"Unknown")
                 .setIcon(
                     if (picture != null) {
                         IconCompat.createWithAdaptiveBitmap(picture)

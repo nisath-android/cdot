@@ -9,6 +9,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.naminfo.cdot_vc.LinphoneApplication
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
 import com.naminfo.cdot_vc.activities.main.contact.data.BroadcastContact
@@ -16,6 +17,7 @@ import com.naminfo.cdot_vc.activities.main.contact.data.GroupSettingsContact
 import com.naminfo.cdot_vc.activities.main.contact.data.MockContactList
 import com.naminfo.cdot_vc.contact.ContactsUpdatedListenerStub
 import com.naminfo.cdot_vc.utils.Event
+import com.naminfo.cdot_vc.utils.LinphoneUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -33,6 +35,9 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.UnknownHostException
+
+
+
 
 class MasterContactsViewModel : ViewModel() {
     val bcContactsSelected = MutableLiveData<Boolean>().apply { value = false }
@@ -90,14 +95,14 @@ class MasterContactsViewModel : ViewModel() {
 
     private val contactsUpdatedListener = object : ContactsUpdatedListenerStub() {
         override fun onContactsUpdated() {
-            Log.i("CDOT_VC"," onContactsUpdated=> before  updateContactsList clearcahe =true")
+            Log.i("CDOT_VC", " onContactsUpdated=> before  updateContactsList clearcahe =true")
             updateContactsList(true)
         }
     }
 
     private val magicSearchListener = object : MagicSearchListenerStub() {
         override fun onSearchResultsReceived(magicSearch: MagicSearch) {
-            Log.i("CDOT_VC"," onSearchResultsReceived=> 3-Magic search contacts available")
+            Log.i("CDOT_VC", " onSearchResultsReceived=> 3-Magic search contacts available")
             viewModelScope.launch {
                 searchResultsPending = false
                 withContext(Dispatchers.Main) {
@@ -111,7 +116,7 @@ class MasterContactsViewModel : ViewModel() {
         }
 
         override fun onLdapHaveMoreResults(magicSearch: MagicSearch, ldap: Ldap) {
-            Log.i("CDOT_VC"," onLdapHaveMoreResults=> 4-Magic search contacts available")
+            Log.i("CDOT_VC", " onLdapHaveMoreResults=> 4-Magic search contacts available")
             moreResultsAvailableEvent.value = Event(true)
         }
     }
@@ -134,7 +139,7 @@ class MasterContactsViewModel : ViewModel() {
     }
 
     override fun onCleared() {
-        Log.i("CDOT_VC"," onCleared ")
+        Log.i("CDOT_VC", " onCleared ")
         contactsList.value.orEmpty().forEach(ContactViewModel::destroy)
         coreContext.contactsManager.magicSearch.removeListener(magicSearchListener)
         coreContext.contactsManager.removeListener(contactsUpdatedListener)
@@ -167,7 +172,8 @@ class MasterContactsViewModel : ViewModel() {
         val aggregation = MagicSearch.Aggregation.Friend
         searchResultsPending = true
         fastFetchJob?.cancel()
-        Log.i("CDOT_VC",
+        Log.i(
+            "CDOT_VC",
 
             " updateContactsList=> Asking Magic search for contacts matching filter [$filterValue], domain [$domain] and in sources [$sources]"
         )
@@ -192,7 +198,10 @@ class MasterContactsViewModel : ViewModel() {
     }
 
     private fun processMagicSearchResults(results: Array<SearchResult>) {
-        Log.i("CDOT_VC", " [Contacts] processMagicSearchResults=> Processing ${results.size} results")
+        Log.i(
+            "CDOT_VC",
+            " [Contacts] processMagicSearchResults=> Processing ${results.size} results"
+        )
         contactsList.value.orEmpty().forEach(ContactViewModel::destroy)
         // contactsList.value = arrayListOf()
 
@@ -234,15 +243,19 @@ class MasterContactsViewModel : ViewModel() {
         list.addAll(MockContactList.fetchSipMockContacts())
         list.forEachIndexed { index, contactViewModel ->
 
-            Log.i("CDOT_VC",
+            Log.i(
+                "CDOT_VC",
 
-                " [Contacts] Processed fullName:${ contactViewModel.fullName} , displayName:${ contactViewModel.displayName.value},contact.name:${ contactViewModel.contact.value?.name}"
+                " [Contacts] Processed fullName:${contactViewModel.fullName} , displayName:${contactViewModel.displayName.value},contact.name:${contactViewModel.contact.value?.name}"
             )
         }
         viewModelScope.launch {
             contactsList.postValue(list)
         }
-        Log.i("CDOT_VC", " processMagicSearchResults=> [Contacts] Processed ${results.size} results")
+        Log.i(
+            "CDOT_VC",
+            " processMagicSearchResults=> [Contacts] Processed ${results.size} results"
+        )
         Log.i("CDOT_VC", " processMagicSearchResults=>  Processed ${list.size} unique results")
     }
 
@@ -267,12 +280,16 @@ class MasterContactsViewModel : ViewModel() {
                         withContext(Dispatchers.IO) {
                             saveContacts(contacts, domainMain)
                         }
-                        Log.i("CDOT_VC"," fetchSipContacts = Contacts saved locally successfully")
+                        Log.i("CDOT_VC", " fetchSipContacts = Contacts saved locally successfully")
                     } else {
-                        Log.w( " fetchSipContacts =>", "No contacts to save")
+                        Log.w(" fetchSipContacts =>", "No contacts to save")
                     }
                 } catch (e: Exception) {
-                    Log.e("CDOT_VC"," fetchSipContacts => Error fetching contacts: ${e.message}", e)
+                    Log.e(
+                        "CDOT_VC",
+                        " fetchSipContacts => Error fetching contacts: ${e.message}",
+                        e
+                    )
                 }
             }
         }
@@ -282,7 +299,7 @@ class MasterContactsViewModel : ViewModel() {
     private suspend fun fetchSipContactList(context: Context, domainVal: String): List<SipContact> {
         return withContext(Dispatchers.IO) {
             if (!isNetworkAvailable(context)) {
-                Log.e("CDOT_VC","  fetchSipContactList=> No internet connection")
+                Log.e("CDOT_VC", "  fetchSipContactList=> No internet connection")
                 withContext(Dispatchers.Main) { isNetwork.value = true }
                 return@withContext emptyList() // Return empty list if no internet connection
             } else {
@@ -290,7 +307,7 @@ class MasterContactsViewModel : ViewModel() {
             }
 
             val domain = "http://192.168.1.31/fs_webservice/WebService.asmx/Get_MobionNumber"
-            Log.e("CDOT_VC","  fetchSipContactList=> api call ->> $domain")
+            Log.e("CDOT_VC", "  fetchSipContactList=> api call ->> $domain")
             val url = URL(domain)
             val connection = url.openConnection() as HttpURLConnection
 
@@ -301,10 +318,10 @@ class MasterContactsViewModel : ViewModel() {
                     parseSipXml(parser)
                 }
             } catch (e: UnknownHostException) {
-                Log.e("CDOT_VC"," fetchSipContactList=>  Host unreachable: ${e.message}")
+                Log.e("CDOT_VC", " fetchSipContactList=>  Host unreachable: ${e.message}")
                 emptyList() // Handle error gracefully
             } catch (e: Exception) {
-                Log.e("CDOT_VC"," fetchSipContactList=> Error: ${e.message}")
+                Log.e("CDOT_VC", " fetchSipContactList=> Error: ${e.message}")
                 emptyList() // Handle other errors gracefully
             } finally {
                 connection.disconnect()
@@ -335,7 +352,10 @@ class MasterContactsViewModel : ViewModel() {
                 XmlPullParser.END_TAG -> {
                     if (parser.name == "Table" && currentContact != null) {
                         // Only add if name is not null
-                        Log.e("CDOT_VC"," fetchSipContactList=> END_TAG->Name: ${currentContact.name}")
+                        Log.e(
+                            "CDOT_VC",
+                            " fetchSipContactList=> END_TAG->Name: ${currentContact.name}"
+                        )
                         if (!currentContact.name.isNullOrEmpty()) {
                             contacts.add(currentContact)
                         }
@@ -366,7 +386,10 @@ class MasterContactsViewModel : ViewModel() {
         }
     }
 
-    private suspend fun fetchBcContacts1(context: Context, domainMain: String): List<BroadcastContact> {
+    private suspend fun fetchBcContacts1(
+        context: Context,
+        domainMain: String
+    ): List<BroadcastContact> {
         // Simulate delay like real network call
         viewModelScope.launch { delay(500) }
 
@@ -456,9 +479,9 @@ class MasterContactsViewModel : ViewModel() {
     ): List<GroupSettingsContact> {
         return withContext(Dispatchers.IO) {
             val number = coreContext.core.authInfoList[0].username
-            Log.e("CDOT_VC"," fetchGroupSettingsContacts=> Number - $number")
+            Log.e("CDOT_VC", " fetchGroupSettingsContacts=> Number - $number")
             if (!isNetworkAvailable(context)) {
-                Log.e("CDOT_VC"," fetchGroupSettingsContacts=> No internet connection")
+                Log.e("CDOT_VC", " fetchGroupSettingsContacts=> No internet connection")
                 withContext(Dispatchers.Main) { isNetwork.value = true }
                 return@withContext emptyList() // Return empty list or handle as you see fit
             } else {
@@ -466,7 +489,7 @@ class MasterContactsViewModel : ViewModel() {
             }
             val domain =
                 "http://192.168.1.31/fs_webservice/WebService.asmx/GroupSetting_View?number=$number"
-            Log.i("CDOT_VC"," fetchGroupSettingsContacts=> group contact-api = $domain")
+            Log.i("CDOT_VC", " fetchGroupSettingsContacts=> group contact-api = $domain")
             val url = URL(domain)
             val connection = url.openConnection() as HttpURLConnection
 
@@ -477,10 +500,10 @@ class MasterContactsViewModel : ViewModel() {
                     parseGroupSettingsXml(parser)
                 }
             } catch (e: UnknownHostException) {
-                Log.e("CDOT_VC"," fetchGroupSettingsContacts=>  Host unreachable: ${e.message}")
+                Log.e("CDOT_VC", " fetchGroupSettingsContacts=>  Host unreachable: ${e.message}")
                 emptyList() // Handle error gracefully
             } catch (e: Exception) {
-                Log.e("CDOT_VC","  fetchGroupSettingsContacts=> Error: ${e.message}")
+                Log.e("CDOT_VC", "  fetchGroupSettingsContacts=> Error: ${e.message}")
                 emptyList() // Handle other errors gracefully
             } finally {
                 connection.disconnect()
@@ -514,9 +537,15 @@ class MasterContactsViewModel : ViewModel() {
                     if (parser.name == "Table" && currentContact != null) {
                         if (currentContact.groupName?.isNotEmpty() == true) {
                             groupContacts.add(currentContact)
-                            Log.e("CDOT_VC"," parseGroupSettingsXml=> Group Name - ${currentContact.groupName}" )
+                            Log.e(
+                                "CDOT_VC",
+                                " parseGroupSettingsXml=> Group Name - ${currentContact.groupName}"
+                            )
                         } else {
-                            Log.e("CDOT_VC","  parseGroupSettingsXml=> Group Name - ${currentContact.groupName}")
+                            Log.e(
+                                "CDOT_VC",
+                                "  parseGroupSettingsXml=> Group Name - ${currentContact.groupName}"
+                            )
                         }
                     }
                 }
@@ -538,8 +567,9 @@ class MasterContactsViewModel : ViewModel() {
         )
     }
 
+
     fun startCall(number: String) {
-        Log.i("CDOT_VC", " startCall=> Audio Call")
+      /*  org.linphone.core.tools.Log.i("CDOT_VC", " startCall=> Audio Call")
         coreContext.core.videoActivationPolicy.automaticallyInitiate =
             false // Disable video initiation
         coreContext.core.videoActivationPolicy.automaticallyAccept =
@@ -547,28 +577,77 @@ class MasterContactsViewModel : ViewModel() {
         coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
         coreContext.core.isVideoDisplayEnabled = false
         // val addrPbx = "sip:$number@$domainMain"
-        coreContext.startCall(number)
+        coreContext.startCall(number)*/
+        startCall1(number)
     }
 
     fun startVideoCall(number: String) {
-        Log.i("CDOT_VC", " startVideoCall=>  video Call")
-        Log.i("CDOT_VC", " startVideoCall=> before-> video enable: ${coreContext.core.isVideoEnabled}")
+       /* org.linphone.core.tools.Log.i("CDOT_VC", " startVideoCall=>  video Call")
+        org.linphone.core.tools.Log.i("CDOT_VC", " startVideoCall=> before-> video enable: ${coreContext.core.isVideoEnabled}")
         coreContext.core.videoActivationPolicy.automaticallyInitiate =
             true // Enable video initiation
         coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
         coreContext.core.isVideoCaptureEnabled = true // Enable video capture
         coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
-        Log.i("CDOT_VC", " startVideoCall=>  after-> video enable :  ${coreContext.core.isVideoEnabled}")
+        org.linphone.core.tools.Log.i("CDOT_VC", " startVideoCall=>  after-> video enable :  ${coreContext.core.isVideoEnabled}")
+        val addrPbx = "sip:$number@$domainMain"
+        coreContext.startCall(addrPbx)*/
+        startVideoCall1(number)
+    }
+    fun startCall1(number: String) {
+        Log.i("CDOT_VC", " startCall=> Audio Call")
+        val core = LinphoneApplication.coreContext.core
+        // Defensive checks before proceeding
+        if (core == null  || core.defaultAccount == null ) {
+            Log.e("CDOT_VC", "Invalid or unregistered core instance, cannot start call")
+            // Optionally update your error event/message here
+
+            return
+        }
+      /*  val policy = core.videoActivationPolicy.clone() // make writable copy
+        policy.automaticallyInitiate = false
+        policy.automaticallyAccept = false
+        core.videoActivationPolicy = policy*/
+        updateVideoActivationPolicy(false)
+
+        core.isVideoCaptureEnabled = false
+        core.isVideoDisplayEnabled = false
+        val peerAddress = coreContext.core.interpretUrl(
+            number,
+            false
+        )
+        val addrPbx = "sip:$number@$domainMain"
+        coreContext.startCall(addrPbx)
+        //coreContext.startCall(number)
+    }
+
+    fun startVideoCall1(number: String) {
+        Log.i("CDOT_VC", "startVideoCall => Video Call")
+        val core = coreContext.core
+
+      /*  val policy = core.videoActivationPolicy.clone()
+        policy.automaticallyInitiate = true
+        policy.automaticallyAccept = true
+        core.videoActivationPolicy = policy*/
+        updateVideoActivationPolicy(true)
+
+        core.isVideoCaptureEnabled = true
+        core.isVideoDisplayEnabled = true
+       core.nativePreviewWindowId = null
+        core.nativeVideoWindowId = null
+
+        Log.i("CDOT_VC", "startVideoCall => after video enabled: ${core.isVideoEnabled}")
         val addrPbx = "sip:$number@$domainMain"
         coreContext.startCall(addrPbx)
     }
 
     fun startBcAudioCall(number: String) {
-        Log.i("CDOT_VC", " startCall=> Audio Call")
-        coreContext.core.videoActivationPolicy.automaticallyInitiate =
-            false // Disable video initiation
-        coreContext.core.videoActivationPolicy.automaticallyAccept =
-            false // Disable video acceptance
+        Log.i("CDOT_VC", " startBcAudioCall=> Audio Call")
+//        coreContext.core.videoActivationPolicy.automaticallyInitiate =
+//            false // Disable video initiation
+//        coreContext.core.videoActivationPolicy.automaticallyAccept =
+//            false // Disable video acceptance
+        updateVideoActivationPolicy(false)
         coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
         coreContext.core.isVideoDisplayEnabled = false
         // val addrPbx = "sip:$number@$domainMain"
@@ -577,25 +656,37 @@ class MasterContactsViewModel : ViewModel() {
 
     fun startBcVideoCall(number: String) {
         Log.i("CDOT_VC", " startVideoCall=>  video Call")
-        Log.i("CDOT_VC", " startVideoCall=> before-> video enable: ${coreContext.core.isVideoEnabled}")
-        coreContext.core.videoActivationPolicy.automaticallyInitiate =
-            true // Enable video initiation
-        coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
+        Log.i(
+            "CDOT_VC",
+            " startVideoCall=> before-> video enable: ${coreContext.core.isVideoEnabled}"
+        )
+        updateVideoActivationPolicy(true)
+//        coreContext.core.videoActivationPolicy.automaticallyInitiate =
+//            true // Enable video initiation
+//        coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
         coreContext.core.isVideoCaptureEnabled = true // Enable video capture
         coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
         coreContext.core.nativePreviewWindowId = null
         coreContext.core.nativeVideoWindowId = null
-        Log.i("CDOT_VC", " startVideoCall=>  after-> video enable :  ${coreContext.core.isVideoEnabled}")
+        Log.i(
+            "CDOT_VC",
+            " startVideoCall=>  after-> video enable :  ${coreContext.core.isVideoEnabled}"
+        )
         // val addrPbx = "sip:$number@$domainMain"
         coreContext.startCall(number)
     }
-
+    private fun updateVideoActivationPolicy(enable: Boolean) {
+        val policy = coreContext.core.videoActivationPolicy
+        policy.automaticallyInitiate = enable
+        policy.automaticallyAccept = enable
+        coreContext.core.videoActivationPolicy = policy
+    }
     companion object SipContacts {
         var tempAllSipContacts: List<SipContact> = emptyList()
     }
 
     fun saveContacts(contactList: List<SipContact>, domainVal: String) {
-        Log.i("CDOT_VC"," saveContacts=> contactList: size=> ${contactList.size}")
+        Log.i("CDOT_VC", " saveContacts=> contactList: size=> ${contactList.size}")
         for (sipContact in contactList) {
             val friend = coreContext.core.createFriend()
             friend.name = sipContact.name.orEmpty()
@@ -610,7 +701,7 @@ class MasterContactsViewModel : ViewModel() {
             // Save friend to the default friend list
             coreContext.core.defaultFriendList?.addLocalFriend(friend)
 
-            Log.i("CDOT_VC"," saveContacts=> Friends: ${friend.name}")
+            Log.i("CDOT_VC", " saveContacts=> Friends: ${friend.name}")
         }
     }
 

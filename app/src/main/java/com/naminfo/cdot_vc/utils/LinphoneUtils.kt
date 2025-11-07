@@ -345,6 +345,13 @@ class LinphoneUtils {
             context.startActivity(intent)
             Runtime.getRuntime().exit(0)
         }
+        fun restartAppMyPid(context: Context) {
+            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+            intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+           // Runtime.getRuntime().exit(0)
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
         fun restartAppMain(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

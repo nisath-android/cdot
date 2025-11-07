@@ -49,6 +49,7 @@ class CoreService : CoreService() {
             }
             coreContext.checkIfForegroundServiceNotificationCanBeRemovedAfterDelay(5000)
         } else {
+            Log.i("[CDOT_VC]","[Service] Starting as ensureCoreExists")
             ensureCoreExists(
                 applicationContext,
                 pushReceived = false,

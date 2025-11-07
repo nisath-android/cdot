@@ -81,7 +81,10 @@
         tools:targetApi="34">
         <activity
             android:name=".activities.voip.CallActivity"
-            android:exported="false"
+            android:exported="true"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|uiMode"
             />
         <activity
             android:name=".activities.main.MainActivity"

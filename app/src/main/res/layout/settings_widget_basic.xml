@@ -29,9 +29,10 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="85dp"
+        android:layout_height="65dp"
         android:layout_columnWeight="1"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="36dp"
         app:customCardBackground="@{backgroundColor}"
         android:enabled="@{enabled ?? true}"
 
@@ -46,16 +47,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:layout_margin="2dp">
 
             <!-- Icon -->
             <ImageView
                 android:id="@+id/iconView"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_margin="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
                 android:contentDescription="@null"
-                android:padding="8dp"
+                android:padding="2dp"
                 android:src="@{icon}"
                 android:visibility="@{icon != null ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"

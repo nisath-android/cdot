@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
@@ -18,6 +19,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Guideline
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
@@ -990,6 +992,33 @@ fun setCustomCardBackground(cardView: CardView, colorString: String?) {
     cardView.setCardBackgroundColor(color)
 }*/
 
+/*@BindingAdapter("customCardBackground")
+fun setCustomCardBackground(cardView: CardView, colorString: String?) {
+    android.util.Log.d("TAG", "setCustomCardBackground: ")
+
+    val colors = listOf(
+        Color.rgb(255, 204, 153), // #ffcc99
+        Color.rgb(204, 204, 255), // #ccccff
+        Color.rgb(153, 255, 153), // #99ff99
+        Color.rgb(255, 153, 153)  // #ff9999
+    )
+
+    val random = java.util.Random()
+    val randomLightFogColor = colors[random.nextInt(colors.size)]
+
+    val color = try {
+        if (!colorString.isNullOrEmpty()) {
+            colorString.toColorInt()
+        } else {
+            randomLightFogColor
+        }
+    } catch (e: Exception) {
+        randomLightFogColor
+    }
+
+    cardView.setCardBackgroundColor(color)
+}*/
+
 @BindingAdapter("customCardBackground")
 fun setCustomCardBackground(cardView: CardView, colorString: String?) {
     android.util.Log.d("TAG", "setCustomCardBackground: ")
@@ -1014,6 +1043,51 @@ fun setCustomCardBackground(cardView: CardView, colorString: String?) {
 
     cardView.setCardBackgroundColor(color)
 }
+
+
+/*@BindingAdapter("customCardBackground")
+fun setCustomCardBackground(cardView: CardView, colorString: String?) {
+    val context = cardView.context
+    android.util.Log.d("TAG", "setCustomCardBackground: Brand Gradient")
+
+    // Brand palette
+    val primary = ContextCompat.getColor(context, R.color.primary_color)
+    val dark = ContextCompat.getColor(context, R.color.primary_dark_color)
+    val light = ContextCompat.getColor(context, R.color.primary_light_color)
+
+    // Optionally, slightly brighten/darken for depth
+    fun adjustColorBrightness(color: Int, factor: Float): Int {
+        val r = ((Color.red(color) * factor).coerceAtMost(255f)).toInt()
+        val g = ((Color.green(color) * factor).coerceAtMost(255f)).toInt()
+        val b = ((Color.blue(color) * factor).coerceAtMost(255f)).toInt()
+        return Color.rgb(r, g, b)
+    }
+
+    val startColor = colorString?.toColorInt() ?: light
+    val centerColor = adjustColorBrightness(primary, 0.9f)
+    val endColor = adjustColorBrightness(dark, 0.8f)
+
+    // Luxurious 3-stop gradient: top-left → bottom-right
+    val gradient = GradientDrawable(
+        GradientDrawable.Orientation.TL_BR,
+        intArrayOf(startColor, centerColor, endColor)
+    ).apply {
+        cornerRadius = cardView.radius
+        gradientType = GradientDrawable.LINEAR_GRADIENT
+    }
+
+    // Use gradient as the visible layer
+    cardView.setCardBackgroundColor(Color.TRANSPARENT)
+    cardView.background = gradient
+
+    // Optional subtle elevation polish (makes gradient pop)
+   // cardView.cardElevation = 8f
+}*/
+
+
+
+
+
 
 
 @BindingAdapter("customCardBackground")

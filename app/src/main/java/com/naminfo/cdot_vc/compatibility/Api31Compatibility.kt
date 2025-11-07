@@ -66,7 +66,7 @@ class Api31Compatibility {
 
                 val person = notificationsManager.getPerson(contact, displayName, roundPicture)
                 Person.Builder()
-                    .setName(person.name)
+                    .setName(person.name?:"Unknown")
                     .setIcon(person.icon?.toIcon(context))
                     .setUri(person.uri)
                     .setKey(person.key)
@@ -80,7 +80,7 @@ class Api31Compatibility {
                                 R.string.conference_incoming_title
                             )
                         } else {
-                            conferenceInfo.subject
+                            conferenceInfo.subject?:"Unknown"
                         }
                     )
                     .setIcon(coreContext.contactsManager.groupAvatar.toIcon(context))
@@ -170,7 +170,7 @@ class Api31Compatibility {
 
                 val person = notificationsManager.getPerson(contact, displayName, roundPicture)
                 Person.Builder()
-                    .setName(person.name)
+                    .setName(person.name?:"Unknown")
                     .setIcon(person.icon?.toIcon(context))
                     .setUri(person.uri)
                     .setKey(person.key)
@@ -178,7 +178,7 @@ class Api31Compatibility {
                     .build()
             } else {
                 Person.Builder()
-                    .setName(conferenceInfo.subject)
+                    .setName(conferenceInfo.subject?:"Unknown")
                     .setIcon(coreContext.contactsManager.groupAvatar.toIcon(context))
                     .setImportant(false)
                     .build()

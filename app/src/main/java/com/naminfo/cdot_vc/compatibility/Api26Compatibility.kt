@@ -270,7 +270,7 @@ class Api26Compatibility {
                 title = conferenceInfo.subject ?: context.getString(R.string.conference)
                 roundPicture = coreContext.contactsManager.groupBitmap
                 person = Person.Builder()
-                    .setName(title)
+                    .setName(title?:"Unknown")
                     .setIcon(IconCompat.createWithBitmap(roundPicture))
                     .build()
             }

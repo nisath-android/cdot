@@ -212,10 +212,11 @@ class DialerViewModel  : LogsUploadViewModel() {
         if (addressToCall.isNotEmpty()) {
             // Ensure only audio is enabled before making the call
             Log.i("Dialer","[Dialer] video enable: ${coreContext.core.isVideoEnabled}")
-            coreContext.core.videoActivationPolicy.automaticallyInitiate = false // Disable video initiation
-            coreContext.core.videoActivationPolicy.automaticallyAccept = false // Disable video acceptance
+           // coreContext.core.videoActivationPolicy.automaticallyInitiate = false // Disable video initiation
+         //   coreContext.core.videoActivationPolicy.automaticallyAccept = false // Disable video acceptance
             coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
             coreContext.core.isVideoDisplayEnabled = false
+            updateVideoActivationPolicy(false)
             Log.i("Dialer","[Dialer] video enable after disabling: ${coreContext.core.isVideoEnabled}")
             Log.i("Dialer","[Dialer] SIP Address - $addressToCall")
             coreContext.startCall(addressToCall)
@@ -231,10 +232,11 @@ class DialerViewModel  : LogsUploadViewModel() {
             // Enable video for the call
             Log.i("Dialer","[Dialer] video enable: ${coreContext.core.isVideoEnabled}")
 
-            coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
-            coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
+           // coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
+          //  coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
             coreContext.core.isVideoCaptureEnabled = true // Enable video capture
             coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
+            updateVideoActivationPolicy(true)
             Log.i("Dialer","[Dialer] video enable after enabling:  ${coreContext.core.isVideoEnabled}")
             // coreContext.switchCamera()
             coreContext.startCall(addressToCall)

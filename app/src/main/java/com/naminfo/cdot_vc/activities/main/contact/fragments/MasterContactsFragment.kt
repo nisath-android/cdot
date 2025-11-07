@@ -154,7 +154,10 @@ class MasterContactsFragment : MasterFragment<FragmentMasterContactsBinding, Con
                     Log.w("CDOT_VC","[Contacts] No contact found matching id [$id] after callback")
                 }
             }
-            adapter.submitList(it)
+            if (it.isNotEmpty()) {
+                adapter.submitList(it)
+            }
+
             Log.i("CDOT_VC","[Contacts] Contact List Observe")
         }
 

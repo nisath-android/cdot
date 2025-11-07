@@ -24,4 +24,6 @@
         android:id="@+id/outgoingCallFragment"
         android:name="com.naminfo.cdot_vc.activities.voip.fragments.OutgoingCallFragment"
         android:label="OutgoingCallFragment" /><action android:id="@+id/action_global_outgoingCallFragment" app:destination="@id/outgoingCallFragment"/>
+
+
 </navigation>

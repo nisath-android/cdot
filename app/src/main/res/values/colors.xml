@@ -91,4 +91,6 @@
     <color name="ptt_wave_circle_mic">#964CAF50</color>
     <color name="ptt_nav_bottom_active_color">@color/primary_color</color>
     <color name="ptt_nav_bottom_inactive_color">@color/grey_color</color>
+    <color name="test">#b30000</color>
+
 </resources>

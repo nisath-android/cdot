@@ -427,7 +427,7 @@ fun Friend.getPictureUri(thumbnailPreferred: Boolean = false): Uri? {
 }
 
 fun Friend.getPerson(): Person {
-    val personBuilder = Person.Builder().setName(name)
+    val personBuilder = Person.Builder().setName(name?:"Unknown")
 
     val bm: Bitmap? =
         ImageUtils.getRoundBitmapFromUri(

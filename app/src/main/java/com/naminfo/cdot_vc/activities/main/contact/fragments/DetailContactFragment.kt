@@ -85,11 +85,10 @@ class DetailContactFragment : GenericFragment<FragmentDetailContactBinding>() {
         ) {
             it.consume { address ->
                 org.linphone.core.tools.Log.i("[Contact] video enable: ${coreContext.core.isVideoEnabled}")
-                coreContext.core.videoActivationPolicy.automaticallyInitiate = false // Disable video initiation
-                coreContext.core.videoActivationPolicy.automaticallyAccept = false // Disable video acceptance
+
                 coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
                 coreContext.core.isVideoDisplayEnabled = false
-                updateVideoActivationPolicy(true)
+                updateVideoActivationPolicy(false)
                 org.linphone.core.tools.Log.i(
                     "[Contact] video enable after disabling: ${coreContext.core.isVideoEnabled}"
                 )
@@ -111,15 +110,9 @@ class DetailContactFragment : GenericFragment<FragmentDetailContactBinding>() {
                     ) // If auto start call setting is enabled, ignore it
                     navigateToDialer(args)
                 } else {
+                    Log.i("CDOT_VC", "onViewCreated: startCallToEvent=> startCall address passed")
                     coreContext.startCall(address)
-                    /*if (address.username != null) {
-                        showCustomDialog(
-                            address.username ?: "",
-                            address.displayName ?: "",
-                            address,
-                            false
-                        )
-                    }*/
+
                 }
             }
         }
@@ -129,8 +122,7 @@ class DetailContactFragment : GenericFragment<FragmentDetailContactBinding>() {
         ) {
             it.consume { address ->
                 org.linphone.core.tools.Log.i("[xxxContact] video enable: ${coreContext.core.isVideoEnabled}")
-                coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
-                coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
+
                 coreContext.core.isVideoCaptureEnabled = true // Enable video capture
                 coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
                 updateVideoActivationPolicy(true)
@@ -164,6 +156,10 @@ class DetailContactFragment : GenericFragment<FragmentDetailContactBinding>() {
                             true
                         )
                     }*/
+                    android.util.Log.i(
+                        "CDOT_VC",
+                        "⚠\uFE0F DetailFragment SIP Username ${address.username}"
+                    )
                     coreContext.startCall(address)
                 }
             }
@@ -244,7 +240,6 @@ class DetailContactFragment : GenericFragment<FragmentDetailContactBinding>() {
             it.forEachIndexed { index, data ->
                 Log.i("CDOT_CALL", "✅ numbersAndAddresses: ${index}-${data.address?.asStringUriOnly()}")
             }
-
         }
 
 
@@ -261,11 +256,12 @@ class DetailContactFragment : GenericFragment<FragmentDetailContactBinding>() {
     }
 
     private fun updateVideoActivationPolicy(enable: Boolean) {
-        val policy = coreContext.core.videoActivationPolicy
+        val policy = coreContext.core.videoActivationPolicy.clone() // clone it first to get a mutable copy
         policy.automaticallyInitiate = enable
         policy.automaticallyAccept = enable
         coreContext.core.videoActivationPolicy = policy
     }
+
 
     override fun onResume() {
         super.onResume()

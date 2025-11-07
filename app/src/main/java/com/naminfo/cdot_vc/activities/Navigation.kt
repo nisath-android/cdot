@@ -21,6 +21,7 @@ import com.naminfo.cdot_vc.activities.main.sidemenu.fragments.SideMenuFragment
 import com.naminfo.cdot_vc.activities.voip.CallActivity
 import com.naminfo.cdot_vc.activities.voip.fragments.IncomingCallFragment
 import com.naminfo.cdot_vc.activities.voip.fragments.OutgoingCallFragment
+import com.naminfo.cdot_vc.activities.voip.fragments.SingleCallFragment
 /*import org.linphone.activities.assistant.fragments.*
 import org.linphone.activities.main.MainActivity
 import org.linphone.activities.main.about.AboutFragment
@@ -221,7 +222,15 @@ internal fun OutgoingCallFragment.navigateToActiveCall() {
         popupTo(R.id.outgoingCallFragment, true)
     )
 }
-
+internal fun CallActivity.navigateToConferenceCall() {
+    if (findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.singleCallFragment) {
+        findNavController(R.id.nav_host_fragment).navigate(
+            R.id.action_global_singleCallFragment,
+            null,
+            popupTo(R.id.incomingCallFragment, true)
+        )
+    }
+}
 internal fun CallActivity.navigateToActiveCall() {
     if (findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.singleCallFragment) {
         findNavController(R.id.nav_host_fragment).navigate(
@@ -239,7 +248,16 @@ internal fun CallActivity.navigateToOutgoingCall() {
         popupTo(R.id.singleCallFragment, true)
     )
 }
-
+internal fun SingleCallFragment.navigateToOutgoingCall() {
+    Log.i("[Navigation-SingleCallFragment-outgoingCallFragment]")
+    if (findNavController().currentDestination?.id == R.id.singleCallFragment) {
+        findNavController().navigate(
+            R.id.action_global_outgoingCallFragment,
+            null,
+            popupTo(R.id.singleCallFragment, true)
+        )
+    }
+}
 internal fun CallActivity.navigateToIncomingCall(earlyMediaVideoEnabled: Boolean) {
     val args = Bundle()
     args.putBoolean("earlyMediaVideo", earlyMediaVideoEnabled)

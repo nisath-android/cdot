@@ -3,6 +3,7 @@ package com.naminfo.cdot_vc.activities.main.settings.fragments
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -49,7 +50,9 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
             return
         }
         binding.viewModel = viewModel
-        viewModel.audioCardColor.value = "#ff0000"
+        val colorInt = requireContext()?.let { ContextCompat.getColor(it, R.color.test) }
+        val colorString = String.format("#%06X", 0xFFFFFF and colorInt!!)
+        viewModel.audioCardColor.value = colorString ?:"#b30000"
 
         Log.e("[Account Settings] ${viewModel.displayUsernameInsteadOfIdentity}|| ${viewModel.displayName.value} || ${viewModel.identity.value}")
         viewModel.linkPhoneNumberEvent.observe(
@@ -78,7 +81,7 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
                 sharedViewModel.accountRemoved.value = true
                 LinphoneApplication.coreContext.notificationsManager.stopForegroundNotification()
                 Log.i("[Side Menu] Stopping Core Context")
-               LinphoneUtils.restartAppMain(requireActivity())
+               LinphoneUtils.restartAppMyPid(requireActivity())
              /*   lifecycleScope.launch {
                     delay(2000)
                 }

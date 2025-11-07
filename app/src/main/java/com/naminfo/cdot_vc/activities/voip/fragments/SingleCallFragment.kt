@@ -77,6 +77,7 @@ class SingleCallFragment : GenericVideoPreviewFragment<FragmentSingleCallVoipBin
                         Log.i(
                             "[Single Call] is video enables ${call.currentParams.isVideoEnabled}"
                         )
+
                         //navigateToOutgoingCall()
                     }
                     else -> {

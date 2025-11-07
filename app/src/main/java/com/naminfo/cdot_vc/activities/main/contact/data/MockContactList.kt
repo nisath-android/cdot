@@ -66,7 +66,7 @@ object MockContactList {
                 "9874563212",
                 "Cdot-2"
             ),
-            createMockSipContacts(
+           /* createMockSipContacts(
                 "9874563213",
                 "Cdot-3"
             ),
@@ -93,7 +93,7 @@ object MockContactList {
             createMockSipContacts(
                 "9874563219",
                 "Cdot-9"
-            )
+            )*/
 
         )
     }

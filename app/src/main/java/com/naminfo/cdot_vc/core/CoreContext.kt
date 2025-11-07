@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap
 import androidx.lifecycle.*
 import androidx.loader.app.LoaderManager
 import com.naminfo.cdot_vc.BuildConfig
+import com.naminfo.cdot_vc.LinphoneApplication.Companion.coreContext
 //import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.io.File
 import java.math.BigInteger
@@ -119,8 +120,9 @@ class CoreContext(
 
     private val listener: CoreListenerStub = object : CoreListenerStub() {
         override fun onGlobalStateChanged(core: Core, state: GlobalState, message: String) {
-            android.util.Log.i("CDOT_VC","[Context] Global state changed [$state]")
-            android.util.Log.i("CDOT_VC","[Contacts-LoaderManager] Global state changed [$state]")
+            android.util.Log.i("CDOT_VC", "[Context] Global state changed [$state]")
+            android.util.Log.i("CDOT_VC", "[Contacts-LoaderManager] Global state changed [$state]")
+
             if (state == GlobalState.On) {
                 if (corePreferences.disableVideo) {
                     // if video has been disabled, don't forget to tell the Core to disable it as well
@@ -146,7 +148,8 @@ class CoreContext(
             state: RegistrationState?,
             message: String
         ) {
-            android.util.Log.i("CDOT_VC",
+            android.util.Log.i(
+                "CDOT_VC",
                 "[Context] Account [${account.params.identityAddress?.asStringUriOnly()}] registration state changed [$state]"
             )
             if (state == RegistrationState.Ok && account == core.defaultAccount) {
@@ -155,7 +158,7 @@ class CoreContext(
         }
 
         override fun onPushNotificationReceived(core: Core, payload: String?) {
-            android.util.Log.i("CDOT_VC","[Context] Push notification received: $payload")
+            android.util.Log.i("CDOT_VC", "[Context] Push notification received: $payload")
         }
 
         override fun onCallStateChanged(
@@ -164,7 +167,7 @@ class CoreContext(
             state: Call.State,
             message: String
         ) {
-            android.util.Log.i("CDOT_VC","[Context] Call state changed [$state]")
+            android.util.Log.i("CDOT_VC", "[Context] Call state changed [$state]")
             val sdp = call.currentParams.getRtpProfile().toString()
             android.util.Log.i("CDOT_VC", "Generated SDP: $sdp")
             if (state == Call.State.IncomingReceived || state == Call.State.IncomingEarlyMedia) {
@@ -184,7 +187,8 @@ class CoreContext(
                         Log.w("[Context] Auto answering call immediately")
                         answerCall(call)
                     } else {
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] Scheduling auto answering in $autoAnswerDelay milliseconds"
                         )
                         handler.postDelayed(
@@ -198,12 +202,12 @@ class CoreContext(
                 }
             } else if (state == Call.State.OutgoingProgress) {
                 val sdp = call.currentParams.toString()
-                android.util.Log.i("CDOT_VC","Generated SDP: $sdp")
+                android.util.Log.i("CDOT_VC", "1-Generated SDP: $sdp,${call.remoteAddress} ${call.remoteContactAddress}")
                 val conferenceInfo = core.findConferenceInformationFromUri(call.remoteAddress)
                 // Do not show outgoing call view for conference calls, wait for connected state
                 if (conferenceInfo == null) {
                     onOutgoingStarted()
-                }
+              }
 
                 if (core.callsNb == 1 && corePreferences.routeAudioToBluetoothIfAvailable) {
                     AudioRouteUtils.routeAudioToBluetooth(call)
@@ -216,7 +220,8 @@ class CoreContext(
                     // Do not automatically route audio to bluetooth after first call
                     if (core.callsNb == 1) {
                         // Only try to route bluetooth / headphone / headset when the call is in StreamsRunning for the first time
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] First call going into StreamsRunning state for the first time, trying to route audio to headset or bluetooth if available"
                         )
                         if (AudioRouteUtils.isHeadsetAudioRouteAvailable()) {
@@ -229,7 +234,8 @@ class CoreContext(
                     // Only start call recording when the call is in StreamsRunning for the first time
                     if (corePreferences.automaticallyStartCallRecording && !call.params.isRecording) {
                         if (call.conference == null) { // TODO: FIXME: We disabled conference recording for now
-                            android.util.Log.i("CDOT_VC",
+                            android.util.Log.i(
+                                "CDOT_VC",
                                 "[Context] We were asked to start the call recording automatically"
                             )
                             call.startRecording()
@@ -248,13 +254,16 @@ class CoreContext(
                         Reason.NotAcceptable -> context.getString(
                             R.string.call_error_incompatible_media_params
                         )
+
                         Reason.NotFound -> context.getString(R.string.call_error_user_not_found)
                         Reason.ServerTimeout -> context.getString(
                             R.string.call_error_server_timeout
                         )
+
                         Reason.TemporarilyUnavailable -> context.getString(
                             R.string.call_error_temporarily_unavailable
                         )
+
                         else -> context.getString(R.string.call_error_generic).format(
                             "${call.errorInfo.protocolCode} / ${call.errorInfo.phrase}"
                         )
@@ -269,12 +278,12 @@ class CoreContext(
                     call.errorInfo.reason == Reason.Declined &&
                     core.callsNb == 0
                 ) {
-                    android.util.Log.i("CDOT_VC","[Context] Call has been declined")
+                    android.util.Log.i("CDOT_VC", "[Context] Call has been declined")
                     val toastMessage = context.getString(R.string.call_error_declined)
                     callErrorMessageResourceId.value = Event(toastMessage)
                 } else if (state == Call.State.OutgoingInit) {
                     val sdp = call.currentParams.toString()
-                    android.util.Log.i("CDOT_VC","Generated SDP: $sdp")
+                    android.util.Log.i("CDOT_VC", "Generated SDP: $sdp")
 
                     // You can now create Content object for SDP and add XML to send as multipart if needed
                 }
@@ -284,7 +293,7 @@ class CoreContext(
         }
 
         override fun onLastCallEnded(core: Core) {
-            android.util.Log.i("CDOT_VC","[Context] Last call has ended")
+            android.util.Log.i("CDOT_VC", "[Context] Last call has ended")
             removeCallOverlay()
             if (!core.isMicEnabled) {
                 Log.w("[Context] Mic was muted in Core, enabling it back for next call")
@@ -331,15 +340,18 @@ class CoreContext(
 
         _lifecycleRegistry.currentState = Lifecycle.State.INITIALIZED
 
-        android.util.Log.i("CDOT_VC","=========================================")
-        android.util.Log.i("CDOT_VC","==== Linphone-android information dump ====")
-        android.util.Log.i("CDOT_VC","VERSION=${BuildConfig.VERSION_NAME} / ${BuildConfig.VERSION_CODE}")
-        android.util.Log.i("CDOT_VC","PACKAGE=${BuildConfig.APPLICATION_ID}")
-        android.util.Log.i("CDOT_VC","BUILD TYPE=${BuildConfig.BUILD_TYPE}")
-        android.util.Log.i("CDOT_VC","=========================================")
+        android.util.Log.i("CDOT_VC", "=========================================")
+        android.util.Log.i("CDOT_VC", "==== Linphone-android information dump ====")
+        android.util.Log.i(
+            "CDOT_VC",
+            "VERSION=${BuildConfig.VERSION_NAME} / ${BuildConfig.VERSION_CODE}"
+        )
+        android.util.Log.i("CDOT_VC", "PACKAGE=${BuildConfig.APPLICATION_ID}")
+        android.util.Log.i("CDOT_VC", "BUILD TYPE=${BuildConfig.BUILD_TYPE}")
+        android.util.Log.i("CDOT_VC", "=========================================")
 
         if (service != null) {
-            android.util.Log.i("CDOT_VC","[Context] Starting foreground service")
+            android.util.Log.i("CDOT_VC", "[Context] Starting foreground service")
             notificationsManager.startForegroundToKeepAppAlive(service, useAutoStartDescription)
         }
 
@@ -349,34 +361,41 @@ class CoreContext(
         _lifecycleRegistry.currentState = Lifecycle.State.CREATED
 
         (context as Application).registerActivityLifecycleCallbacks(activityMonitor)
-        android.util.Log.i("CDOT_VC","[Context] Ready")
+        android.util.Log.i("CDOT_VC", "[Context] Ready")
     }
 
     private val audioDeviceCallback = object : AudioDeviceCallback() {
         override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
             if (!addedDevices.isNullOrEmpty()) {
-                android.util.Log.i("CDOT_VC","[Context] [${addedDevices.size}] new device(s) have been added")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    "[Context] [${addedDevices.size}] new device(s) have been added"
+                )
                 core.reloadSoundDevices()
             }
         }
 
         override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) {
             if (!removedDevices.isNullOrEmpty()) {
-                android.util.Log.i("CDOT_VC","[Context] [${removedDevices.size}] existing device(s) have been removed")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    "[Context] [${removedDevices.size}] existing device(s) have been removed"
+                )
                 core.reloadSoundDevices()
             }
         }
     }
 
     fun start() {
-        android.util.Log.i("CDOT_VC","[Context] Starting")
+        android.util.Log.i("CDOT_VC", "[Context] Starting")
 
         core.addListener(listener)
 
         // CoreContext listener must be added first!
         if (Version.sdkAboveOrEqual(Version.API26_O_80) && corePreferences.useTelecomManager) {
             if (Compatibility.hasTelecomManagerPermissions(context)) {
-                android.util.Log.i("CDOT_VC",
+                android.util.Log.i(
+                    "CDOT_VC",
                     "[Context] Creating Telecom Helper, disabling audio focus requests in AudioHelper"
                 )
                 core.config.setBool("audio", "android_disable_audio_focus_requests", true)
@@ -412,7 +431,10 @@ class CoreContext(
         }*/
 
         if (corePreferences.keepServiceAlive) {
-            android.util.Log.i("CDOT_VC","[Context] Background mode setting is enabled, starting Service")
+            android.util.Log.i(
+                "CDOT_VC",
+                "[Context] Background mode setting is enabled, starting Service"
+            )
             notificationsManager.startForeground()
         }
 
@@ -420,11 +442,11 @@ class CoreContext(
 
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.registerAudioDeviceCallback(audioDeviceCallback, handler)
-        android.util.Log.i("CDOT_VC","[Context] Started")
+        android.util.Log.i("CDOT_VC", "[Context] Started")
     }
 
     fun stop() {
-        android.util.Log.i("CDOT_VC","[Context] Stopping")
+        android.util.Log.i("CDOT_VC", "[Context] Stopping")
         coroutineScope.cancel()
 
         if (::phoneStateListener.isInitialized) {
@@ -454,7 +476,10 @@ class CoreContext(
         // We can't rely on defaultAccount?.params?.isPublishEnabled
         // as it will be modified by the SDK when changing the presence status
         if (corePreferences.publishPresence) {
-            android.util.Log.i("CDOT_VC","[Context] App is in foreground, PUBLISHING presence as Online")
+            android.util.Log.i(
+                "CDOT_VC",
+                "[Context] App is in foreground, PUBLISHING presence as Online"
+            )
             core.consolidatedPresence = ConsolidatedPresence.Online
         }
     }
@@ -463,7 +488,10 @@ class CoreContext(
         // We can't rely on defaultAccount?.params?.isPublishEnabled
         // as it will be modified by the SDK when changing the presence status
         if (corePreferences.publishPresence) {
-            android.util.Log.i("CDOT_VC","[Context] App is in background, un-PUBLISHING presence info")
+            android.util.Log.i(
+                "CDOT_VC",
+                "[Context] App is in background, un-PUBLISHING presence info"
+            )
             // We don't use ConsolidatedPresence.Busy but Offline to do an unsubscribe,
             // Flexisip will handle the Busy status depending on other devices
             core.consolidatedPresence = ConsolidatedPresence.Offline
@@ -471,7 +499,7 @@ class CoreContext(
     }
 
     private fun configureCore() {
-        android.util.Log.i("CDOT_VC","[Context] Configuring Core")
+        android.util.Log.i("CDOT_VC", "[Context] Configuring Core")
 
         core.staticPicture = corePreferences.staticPicturePath
 
@@ -509,7 +537,8 @@ class CoreContext(
 
         val fiveTwoMigrationRequired = core.config.getBool("app", "migration_5.2_required", true)
         if (fiveTwoMigrationRequired) {
-            android.util.Log.i("CDOT_VC",
+            android.util.Log.i(
+                "CDOT_VC",
                 "[Context] Starting migration of muted chat room from shared preferences to our SDK"
             )
             val sharedPreferences: SharedPreferences = context.getSharedPreferences(
@@ -521,7 +550,10 @@ class CoreContext(
             for (chatRoom in core.chatRooms) {
                 val id = LinphoneUtils.getChatRoomId(chatRoom)
                 if (sharedPreferences.getBoolean(id, false)) {
-                    android.util.Log.i("CDOT_VC","[Context] Migrating muted flag for chat room [$id]")
+                    android.util.Log.i(
+                        "CDOT_VC",
+                        "[Context] Migrating muted flag for chat room [$id]"
+                    )
                     chatRoom.muted = true
                     editor.remove(id)
                 }
@@ -533,10 +565,10 @@ class CoreContext(
                 "migration_5.2_required",
                 false
             )
-            android.util.Log.i("CDOT_VC","[Context] Migration of muted chat room finished")
+            android.util.Log.i("CDOT_VC", "[Context] Migration of muted chat room finished")
 
             core.setVideoCodecPriorityPolicy(CodecPriorityPolicy.Auto)
-            android.util.Log.i("CDOT_VC","[Context] Video codec priority policy updated to Auto")
+            android.util.Log.i("CDOT_VC", "[Context] Video codec priority policy updated to Auto")
         }
 
         val fiveOneMigrationRequired = core.config.getBool("app", "migration_5.1_required", true)
@@ -556,7 +588,8 @@ class CoreContext(
                 if (fiveOneMigrationRequired) {
                     val newExpire = 31536000 // 1 year
                     if (account.params.expires != newExpire) {
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] Updating expire on account ${params.identityAddress?.asString()} from ${account.params.expires} to newExpire"
                         )
                         params.expires = newExpire
@@ -565,7 +598,8 @@ class CoreContext(
 
                     // Enable presence publish/subscribe for new feature
                     if (!account.params.isPublishEnabled) {
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] Enabling presence publish on account ${params.identityAddress?.asString()}"
                         )
                         params.isPublishEnabled = true
@@ -577,7 +611,8 @@ class CoreContext(
                 // Ensure conference factory URI is set on sip.linphone.org accounts
                 if (account.params.conferenceFactoryUri == null) {
                     val uri = corePreferences.conferenceServerUri
-                    android.util.Log.i("CDOT_VC",
+                    android.util.Log.i(
+                        "CDOT_VC",
                         "[Context] Setting conference factory on account ${params.identityAddress?.asString()} to default value: $uri"
                     )
                     params.conferenceFactoryUri = uri
@@ -589,7 +624,8 @@ class CoreContext(
                     val uri = corePreferences.audioVideoConferenceServerUri
                     val address = core.interpretUrl(uri, false)
                     if (address != null) {
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] Setting audio/video conference factory on account ${params.identityAddress?.asString()} to default value: $uri"
                         )
                         params.audioVideoConferenceFactoryAddress = address
@@ -601,7 +637,8 @@ class CoreContext(
 
                 // Enable Bundle mode by default
                 if (!account.params.isRtpBundleEnabled) {
-                    android.util.Log.i("CDOT_VC",
+                    android.util.Log.i(
+                        "CDOT_VC",
                         "[Context] Enabling RTP bundle mode on account ${params.identityAddress?.asString()}"
                     )
                     params.isRtpBundleEnabled = true
@@ -612,7 +649,8 @@ class CoreContext(
                 if (!account.params.isCpimInBasicChatRoomEnabled) {
                     params.isCpimInBasicChatRoomEnabled = true
                     paramsChanged = true
-                    android.util.Log.i("CDOT_VC",
+                    android.util.Log.i(
+                        "CDOT_VC",
                         "[Context] CPIM allowed in basic chat rooms for account ${params.identityAddress?.asString()}"
                     )
                 }
@@ -621,7 +659,8 @@ class CoreContext(
                     if (limeServerUrl.isNotEmpty()) {
                         params.limeServerUrl = limeServerUrl
                         paramsChanged = true
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] Moving Core's LIME X3DH server URL [$limeServerUrl] on account ${params.identityAddress?.asString()}"
                         )
                     } else {
@@ -634,14 +673,17 @@ class CoreContext(
                 }
 
                 if (paramsChanged) {
-                    android.util.Log.i("CDOT_VC","[Context] Account params have been updated, apply changes")
+                    android.util.Log.i(
+                        "CDOT_VC",
+                        "[Context] Account params have been updated, apply changes"
+                    )
                     account.params = params
                 }
             }
         }
         core.config.setBool("app", "migration_5.1_required", false)
 
-        android.util.Log.i("CDOT_VC","[Context] Core configured")
+        android.util.Log.i("CDOT_VC", "[Context] Core configured")
     }
 
     private fun computeUserAgent() {
@@ -667,10 +709,10 @@ class CoreContext(
     }
 
     fun fetchContacts() {
-        android.util.Log.i("CDOT_VC","[Contacts] fetchContacts => Init contacts loader")
+        android.util.Log.i("CDOT_VC", "[Contacts] fetchContacts => Init contacts loader")
         if (corePreferences.enableNativeAddressBookIntegration) {
             if (PermissionHelper.required(context).hasReadContactsPermission()) {
-                android.util.Log.i("CDOT_VC","[Context] Init contacts loader")
+                android.util.Log.i("CDOT_VC", "[Context] Init contacts loader")
                 val manager = LoaderManager.getInstance(this@CoreContext)
                 manager.restartLoader(0, null, contactLoader)
             }
@@ -678,7 +720,8 @@ class CoreContext(
     }
 
     fun newAccountConfigured(isLinphoneAccount: Boolean) {
-        android.util.Log.i("CDOT_VC",
+        android.util.Log.i(
+            "CDOT_VC",
             "[Context] A new ${if (isLinphoneAccount) AppUtils.getString(R.string.app_name) else "third-party"} account has been configured"
         )
 
@@ -691,15 +734,24 @@ class CoreContext(
                 }
             }
             if (core.mediaEncryption == MediaEncryption.None) {
-                android.util.Log.i("CDOT_VC","[Context] Enabling SRTP media encryption instead of None")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    "[Context] Enabling SRTP media encryption instead of None"
+                )
                 core.mediaEncryption = MediaEncryption.SRTP
             }
         } else {
-            android.util.Log.i("CDOT_VC","[Context] Background mode with foreground service automatically enabled")
+            android.util.Log.i(
+                "CDOT_VC",
+                "[Context] Background mode with foreground service automatically enabled"
+            )
             corePreferences.keepServiceAlive = true
             notificationsManager.startForeground()
         }
-        android.util.Log.i("CDOT_VC","[Contact-Context] Background mode with foreground service automatically enabled")
+        android.util.Log.i(
+            "CDOT_VC",
+            "[Contact-Context] Background mode with foreground service automatically enabled"
+        )
         contactsManager.updateLocalContacts()
     }
 
@@ -776,7 +828,7 @@ class CoreContext(
     }
 
     fun answerCall(call: Call) {
-        android.util.Log.i("CDOT_VC","[Context] Answering call ${call.remoteAddress.username}")
+        android.util.Log.i("CDOT_VC", "[Context] Answering call ${call.remoteAddress.username}")
         val params = core.createCallParams(call)
 
         params?.recordFile = LinphoneUtils.getRecordingFilePathForAddress(call.remoteAddress)
@@ -790,13 +842,16 @@ class CoreContext(
             // Prevent incoming group call to start in audio only layout
             // Do the same as the conference waiting room
             params?.isVideoEnabled = true
-            params?.videoDirection = if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
-            android.util.Log.i("CDOT_VC",
+            params?.videoDirection =
+                if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
+            android.util.Log.i(
+                "CDOT_VC",
                 "[Context] Enabling video on call params to prevent audio-only layout when answering"
             )
         }
 
-        android.util.Log.i("CDOT_VC",
+        android.util.Log.i(
+            "CDOT_VC",
             "[Context] Used data : ${call.core.currentCall?.remoteAddress?.username}"
         )
         val sessionType = "private"
@@ -824,7 +879,10 @@ class CoreContext(
         params.addCustomHeader("Privacy", "id")
         params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
 
-        android.util.Log.i("CDOT_VC","[Context] Answering call with params!- ${params.customContents[0].isMultipart}")
+        android.util.Log.i(
+            "CDOT_VC",
+            "[Context] Answering call with params!- ${params.customContents[0].isMultipart}"
+        )
         call.acceptWithParams(params)
     }
 
@@ -833,7 +891,10 @@ class CoreContext(
         if (voiceMailUri != null && corePreferences.redirectDeclinedCallToVoiceMail) {
             val voiceMailAddress = core.interpretUrl(voiceMailUri, false)
             if (voiceMailAddress != null) {
-                android.util.Log.i("CDOT_VC","[Context] Redirecting call $call to voice mail URI: $voiceMailUri")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    "[Context] Redirecting call $call to voice mail URI: $voiceMailUri"
+                )
                 call.redirectTo(voiceMailAddress)
             }
         } else {
@@ -842,13 +903,13 @@ class CoreContext(
             } else {
                 Reason.Declined
             }
-            android.util.Log.i("CDOT_VC","[Context] Declining call [$call] with reason [$reason]")
+            android.util.Log.i("CDOT_VC", "[Context] Declining call [$call] with reason [$reason]")
             call.decline(reason)
         }
     }
 
     fun terminateCall(call: Call) {
-        android.util.Log.i("CDOT_VC","[Context] Terminating call $call")
+        android.util.Log.i("CDOT_VC", "[Context] Terminating call $call")
         call.terminate()
     }
 
@@ -859,7 +920,10 @@ class CoreContext(
         } else {
             val address = core.interpretUrl(addressToCall, LinphoneUtils.applyInternationalPrefix())
             if (address != null) {
-                android.util.Log.i("CDOT_VC","[Context] Transferring current call to $addressToCall")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    "[Context] Transferring current call to $addressToCall"
+                )
                 currentCall.transferTo(address)
                 return true
             }
@@ -904,7 +968,8 @@ class CoreContext(
             }
             if (account != null) {
                 params.account = account
-                android.util.Log.i("CDOT_VC",
+                android.util.Log.i(
+                    "CDOT_VC",
                     "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
                 )
             } else {
@@ -919,18 +984,76 @@ class CoreContext(
         }
 
         // params.isVideoEnabled = true
-        val call = core.inviteAddressWithParams(address, params)
-        android.util.Log.i("CDOT_VC","[Context] Starting call $call")
-        android.util.Log.i("CDOT_VC","[Context] Starting call params ${params.isVideoEnabled}")
+        val call = coreContext.core.inviteAddressWithParams(address, params)
+        android.util.Log.i("CDOT_VC", "[Context] Starting call $call")
+        android.util.Log.i("CDOT_VC", "[Context] Starting call params ${params.isVideoEnabled}")
     }
 
     fun startCall(to: String) {
+        val core = this.core
+        // Defensive checks
+        if (core == null  || core.defaultAccount == null || core.defaultAccount?.state != RegistrationState.Ok) {
+            Log.e("CDOT_VC", "2-Invalid or unregistered core instance, cannot start call")
+            callErrorMessageResourceId.value = Event(
+                context.getString(R.string.call_error_network_unreachable)
+            )
+            return
+        }
         var stringAddress = to.trim()
         if (android.util.Patterns.PHONE.matcher(to).matches()) {
             val contact = contactsManager.findContactByPhoneNumber(to)
             val alias = contact?.getContactForPhoneNumberOrAddress(to)
             if (alias != null) {
-                android.util.Log.i("CDOT_VC","[Context] Found matching alias $alias for phone number $to, using it")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    " \uD83D\uDD36 [Context] Found matching alias $alias for phone number $to, using it"
+                )
+                stringAddress = alias
+            }
+        }
+
+        val address: Address? = core.interpretUrl(
+            stringAddress,
+            LinphoneUtils.applyInternationalPrefix()
+        )
+
+        if (address == null) {
+            Log.e("CDOT_VC",
+                " \uD83D\uDD36 [Context] Failed to parse $stringAddress, abort outgoing call")
+            callErrorMessageResourceId.value = Event(
+                context.getString(R.string.call_error_network_unreachable)
+            )
+            return
+        }
+        android.util.Log.i("CDOT_VC",
+            " \uD83D\uDD36 [Context] called number ${address.username}")
+
+      /*  if (address.username.toString().startsWith("6")) {
+            android.util.Log.i(
+                "CDOT_VC",
+                "\uD83D\uDFE2[Context] called number is broadcast ${address.username}"
+            )
+            startBcCall(address)
+        }*/
+        android.util.Log.i(
+            "CDOT_VC",
+            "\uD83D\uDFE2[Context] called number is normal ${address.username}"
+        )
+        startBcCall(address)
+       // startCall(address)
+    }
+
+
+    /*fun startCall(to: String) {
+        var stringAddress = to.trim()
+        if (android.util.Patterns.PHONE.matcher(to).matches()) {
+            val contact = contactsManager.findContactByPhoneNumber(to)
+            val alias = contact?.getContactForPhoneNumberOrAddress(to)
+            if (alias != null) {
+                android.util.Log.i(
+                    "CDOT_VC",
+                    " \uD83D\uDD36 [Context] Found matching alias $alias for phone number $to, using it"
+                )
                 stringAddress = alias
             }
         }
@@ -942,20 +1065,29 @@ class CoreContext(
         )
 
         if (address == null) {
-            Log.e("[Context] Failed to parse $stringAddress, abort outgoing call")
+            Log.e("CDOT_VC",
+                " \uD83D\uDD36 [Context] Failed to parse $stringAddress, abort outgoing call")
             callErrorMessageResourceId.value = Event(
                 context.getString(R.string.call_error_network_unreachable)
             )
             return
         }
-        android.util.Log.i("CDOT_VC","[Context] called number ${address.username}")
+        android.util.Log.i("CDOT_VC",
+            " \uD83D\uDD36 [Context] called number ${address.username}")
 
         if (address.username.toString().startsWith("6")) {
-            android.util.Log.i("CDOT_VC","[Context] called number is broadcast ${address.username}")
+            android.util.Log.i(
+                "CDOT_VC",
+                "\uD83D\uDFE2[Context] called number is broadcast ${address.username}"
+            )
             startBcCall(address)
         }
-        startCall(address)
-    }
+            android.util.Log.i(
+                "CDOT_VC",
+                "\uD83D\uDFE2[Context] called number is normal ${address.username}"
+            )
+            startCall(address)
+    }*/
 
     fun sendVideoInfoMessage(call: Call) {
         val sessionType = if (call.remoteAddress.username?.length == 4) "conference" else "private"
@@ -984,152 +1116,301 @@ class CoreContext(
         call.sendInfoMessage(infoMessage)
     }
 
-    fun startCall(
-        address: Address,
-        callParams: CallParams? = null,
+/*    fun startCall(
+        dest: Address,
         forceZRTP: Boolean = false,
         localAddress: Address? = null
-
     ) {
-        android.util.Log.i("CDOT_VC",
-            "SIP Username ${address.username}"
-        )
-        android.util.Log.i("CDOT_VC",
-            "SIP Address ${address.asStringUriOnly()}"
-        )
-        if (!core.isNetworkReachable) {
-            Log.e("[Context] Network unreachable, abort outgoing call")
-            callErrorMessageResourceId.value = Event(
-                context.getString(R.string.call_error_network_unreachable)
-            )
+//        val localAddress =
+//            coreContext.core.defaultAccount?.params?.identityAddress?:null
+        val core = coreContext.core ?: run {
+            Log.e("CDOT_VC", "Core is null")
             return
         }
 
-        val params = callParams ?: core.createCallParams(null)
-
-        if (params == null) {
-            val call = core.inviteAddress(address)
-            Log.w("[Context] Starting call $call without params")
+        if (core.globalState != GlobalState.On) {
+            Log.e("CDOT_VC", "Core not ready, global state = ${core.globalState}")
             return
         }
 
-        if (forceZRTP) {
+        // Ensure registered (or at least an account exists)
+        if (core.defaultAccount?.state != RegistrationState.Ok) {
+            Log.w("CDOT_VC", "Default account not registered; cannot start call")
+            // You may still allow direct IP calls depending on your setup
+            return
+        }
+
+        // Create call params
+        val params = core.createCallParams(null) ?: run {
+            Log.e("CDOT_VC", "createCallParams returned null")
+            return
+        }
+
+        // Media options
+        params.isVideoEnabled = true // explicit
+        if (forceZRTP && core.isMediaEncryptionSupported(MediaEncryption.ZRTP)) {
             params.mediaEncryption = MediaEncryption.ZRTP
         }
+
         if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
-            Log.w("[Context] Enabling low bandwidth mode!")
             params.isLowBandwidthEnabled = true
         }
-        params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(address)
 
-        if (localAddress != null) {
-            val account = core.accountList.find { account ->
-                account.params.identityAddress?.weakEqual(localAddress) ?: false
-            }
-            if (account != null) {
-                params.account = account
-                android.util.Log.i("CDOT_VC",
-                    "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
-                )
-            } else {
-                Log.e(
-                    "[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
-                )
-            }
+        // Account binding if requested
+        localAddress?.let { local ->
+            core.accountList.find { acct ->
+                acct.params.identityAddress?.weakEqual(local) == true
+            }?.also { acct ->
+                params.account = acct
+                Log.i("CDOT_VC", "Using account ${acct.params.identityAddress}")
+            } ?: Log.w("CDOT_VC", "No account matching $local")
         }
 
-        if (corePreferences.sendEarlyMedia) {
-            params.isEarlyMediaSendingEnabled = true
-        }
+        // Early media preference
+        params.isEarlyMediaSendingEnabled = corePreferences.sendEarlyMedia
 
-        params.addCustomHeader("To", "<sip:${address.domain}>")
-        params.addCustomHeader("P-Preferred-Identity", "<sip:${address.username}@NamInfoCom.com>")
+        // Add required MCX/3GPP headers (careful: keep them validated)
         params.addCustomHeader("Privacy", "id")
         params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
-        params.addCustomHeader("Accept-Contact", "*;+g.3gpp.mcvideo;require;explicit")
-        params.addCustomHeader(
-            "Accept-Contact",
-            "*;+g.3gpp.icsi-ref=\"urn%3Aurn-7%3A3gpp-service.ims.icsi.mcvideo\";require;explicit"
-        )
-        params.addCustomHeader("Answer-Mode", "Auto")
-        params.addCustomHeader("P-Preferred-Service", "urn:urn-7:3gpp-service.ims.icsi.mcvideo")
-        params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
+        // Combine Accept-Contact tags into one header (example)
+        params.addCustomHeader("Accept-Contact", "*;+g.3gpp.mcvideo;require;explicit;+g.3gpp.icsi-ref=\"urn:urn-7:3gpp-service.ims.icsi.mcvideo\"")
 
-        val recipientUri = address.asStringUriOnly()
-        val addr: Address? = if (address.username?.length == 4) {
-            if (address.username.toString().startsWith('5')) {
-                Factory.instance().createAddress("sip:conference_audio@${address.domain}")
-            } else if (address.username.toString().startsWith('3')) {
-                Factory.instance().createAddress("sip:conference_video@${address.domain}")
-            } else {
-                address
-            }
-        } else {
-            Factory.instance().createAddress("sip:${address.domain}")
-        }
-
-        val isConference = address.username?.length == 4
-
-        val xmlBody: String? = if (!isConference) {
-            """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <resource-lists xmlns="urn:ietf:params:xml/ns/resource-lists"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xmlns:cc="urn:ietf:params/xml/ns/copycontrol">
-          <list>
-            <entry uri="$recipientUri" cc:copyControl="to"/>
-          </list>
-        </resource-lists>
-            """.trimIndent()
-        } else {
-            null
-        }
-
-        val fromHeader = params.fromHeader.toString()
-        val sessionType = if (address.username?.length == 4) "conference" else "private"
-
+        // Build a single Content body to pass to inviteAddressWithParams()
+        // Use the Factory to create a content object and verify the content-type
+        val factory = Factory.instance()
         val videoInfoXml = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <mcvideoinfo xmlns="urn:3gpp:ns:mcvideoInfo:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                <mcvideo-Params>
-                    <session-type>$sessionType</session-type>
-                </mcvideo-Params>
-            </mcvideoinfo>
-        """.trimIndent()
+        <?xml version="1.0" encoding="UTF-8"?>
+        <mcvideoinfo xmlns="urn:3gpp:ns:mcvideoInfo:1.0">
+            <mcvideo-Params><session-type>${if (dest.username?.length == 4) "conference" else "private"}</session-type></mcvideo-Params>
+        </mcvideoinfo>
+    """.trimIndent()
 
-        if (xmlBody != null) {
-            val customXml = Factory.instance().createContent().apply {
-                type = "application"
-                subtype = "resource-lists+xml"
-                encoding = "utf-8"
-                stringBuffer = xmlBody
-            }
-            params.addCustomContent(customXml)
+        val contentType = "application"
+        val contentSubtype = "vnd.3gpp.video-info+xml"
+        val contentTypeFull = "$contentType/$contentSubtype"
+
+        if (!core.isContentTypeSupported(contentTypeFull)) {
+            Log.w("CDOT_VC", "Core does NOT support content type $contentTypeFull; skipping body")
         }
-        // 3GPP Video Info XML
-        val videoInfoContent = Factory.instance().createContent().apply {
-            type = "application"
-            subtype = "vnd.3gpp.video-info+xml"
+
+        val content = factory.createContent().apply {
+            type = contentType
+            subtype = contentSubtype
             encoding = "utf-8"
             stringBuffer = videoInfoXml
         }
-        params.addCustomContent(videoInfoContent)
-        android.util.Log.i("CDOT_VC","[Context] --->>to number - ${addr?.asStringUriOnly()}")
-        val call = core.inviteAddressWithParams(addr!!, params, null, null)
 
-        android.util.Log.i("CDOT_VC","[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
-        android.util.Log.i("CDOT_VC","[Context] --->>From Header - $fromHeader")
+        // If you also need resource-lists XML, either:
+        //  - add it to params via params.addCustomContent(...) (the API supports it),
+        //  - OR build a multipart content (rare) and pass it as single Content.
+        // Example: attach an additional body through params (preferred for Java API):
+        val recipientUri = dest.asStringUriOnly()
+        val resourceXml = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resource-lists xmlns="urn:ietf:params:xml/ns/resource-lists">
+          <list><entry uri="$recipientUri"/></list>
+        </resource-lists>
+    """.trimIndent()
 
-        android.util.Log.i("CDOT_VC","[Context] --->>Starting call params ${params.isVideoEnabled}")
-    }
+        if (resourceXml.isNotEmpty()) {
+            val resourceContent = factory.createContent().apply {
+                type = "application"
+                subtype = "resource-lists+xml"
+                encoding = "utf-8"
+                stringBuffer = resourceXml
+            }
+            // Add as additional body on params (do NOT pass as the single `content` param below)
+            params.addCustomContent(resourceContent)
+        }
+
+        // Finally, pick destination address (avoid creating "sip:domain" without user)
+       *//* val destAddr = when {
+            dest.username?.length == 4 && dest.username?.startsWith('5') == true -> factory.createAddress("sip:conference_audio@${dest.domain}")
+            dest.username?.length == 4 && dest.username?.startsWith('3') == true -> factory.createAddress("sip:conference_video@${dest.domain}")
+            else -> dest
+        }*//*
+
+        // Optional subject
+        val subject = if (dest.username?.length == 4) "MCX Conference" else null
+
+        // Call the API: subject + primary content body
+        val call = try {
+            core.inviteAddressWithParams(dest!!, params, subject, content)
+        } catch (ex: Exception) {
+            Log.e("CDOT_VC", "inviteAddressWithParams threw: ${ex.message}")
+            null
+        }
+
+        if (call == null) {
+            Log.e("CDOT_VC", "inviteAddressWithParams returned null — call not initiated")
+            // inspect: wrong params, unsupported content-type, core/account not ready, or SIP related rejection
+            return
+        }
+
+        // IMPORTANT: keep a strong reference to the Call so Java GC doesn't collect it.
+       val activeCallRef = call // store in a field or CallManager
+        Log.i("CDOT_VC", "Call started -> status=${call.callLog?.status} reason=${call.reason}")
+    }*/
+
+
+       fun startCall(
+           address: Address,
+           callParams: CallParams? = null,
+           forceZRTP: Boolean = false,
+           localAddress: Address? = null
+
+       ) {
+           android.util.Log.i(
+               "CDOT_VC",
+               "⚠\uFE0F SIP Username ${address.username}"
+           )
+           android.util.Log.i(
+               "CDOT_VC",
+               " ⚠\uFE0F SIP Address url ${address.asStringUriOnly()}"
+           )
+           if (!core.isNetworkReachable) {
+               Log.e("CDOT_VC"," \uD83D\uDFE9[Context] Network unreachable, abort outgoing call")
+               callErrorMessageResourceId.value = Event(
+                   context.getString(R.string.call_error_network_unreachable)
+               )
+               return
+           }
+
+           val params = callParams ?: core.createCallParams(null)
+
+           if (params == null) {
+               val call = core.inviteAddress(address)
+               Log.w("CDOT_VC"," \uD83D\uDFE9[Context] Starting call $call without params")
+               return
+           }
+
+           if (forceZRTP) {
+               params.mediaEncryption = MediaEncryption.ZRTP
+           }
+           if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
+               Log.w("CDOT_VC"," \uD83D\uDFE9[Context] Enabling low bandwidth mode!")
+               params.isLowBandwidthEnabled = true
+           }
+           params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(address)
+
+           if (localAddress != null) {
+               val account = core.accountList.find { account ->
+                   account.params.identityAddress?.weakEqual(localAddress) ?: false
+               }
+               if (account != null) {
+                   params.account = account
+                   android.util.Log.i(
+                       "CDOT_VC",
+                       " \uD83D\uDD36[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
+                   )
+               } else {
+                   Log.e(
+                       "CDOT_VC",
+                       " \uD83D\uDD36[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
+                   )
+               }
+           }
+
+           if (corePreferences.sendEarlyMedia) {
+               params.isEarlyMediaSendingEnabled = true
+           }
+
+           params.addCustomHeader("To", "<sip:${address.domain}>")
+           params.addCustomHeader("P-Preferred-Identity", "<sip:${address.username}@NamInfoCom.com>")
+           params.addCustomHeader("Privacy", "id")
+           params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
+           params.addCustomHeader("Accept-Contact", "*;+g.3gpp.mcvideo;require;explicit")
+           params.addCustomHeader(
+               "Accept-Contact",
+               "*;+g.3gpp.icsi-ref=\"urn%3Aurn-7%3A3gpp-service.ims.icsi.mcvideo\";require;explicit"
+           )
+           params.addCustomHeader("Answer-Mode", "Auto")
+           params.addCustomHeader("P-Preferred-Service", "urn:urn-7:3gpp-service.ims.icsi.mcvideo")
+           params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
+
+           val recipientUri = address.asStringUriOnly()
+           val addr: Address? = if (address.username?.length == 4) {
+               when {
+                   address.username?.startsWith('5') == true -> Factory.instance().createAddress("sip:conference_audio@${address.domain}")
+                   address.username?.startsWith('3') == true -> Factory.instance().createAddress("sip:conference_video@${address.domain}")
+                   else -> address
+               }
+           } else {
+               Factory.instance().createAddress("sip:${address.domain}")
+           }
+
+           val isConference = address.username?.length == 4
+
+           val xmlBody: String? = if (!isConference) {
+               """
+           <?xml version="1.0" encoding="UTF-8"?>
+           <resource-lists xmlns="urn:ietf:params:xml/ns/resource-lists"
+                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           xmlns:cc="urn:ietf:params/xml/ns/copycontrol">
+             <list>
+               <entry uri="$recipientUri" cc:copyControl="to"/>
+             </list>
+           </resource-lists>
+               """.trimIndent()
+           } else {
+               null
+           }
+
+           val fromHeader = params.fromHeader.toString()
+           val sessionType = if (address.username?.length == 4) "conference" else "private"
+
+           val videoInfoXml = """
+               <?xml version="1.0" encoding="UTF-8"?>
+               <mcvideoinfo xmlns="urn:3gpp:ns:mcvideoInfo:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                   <mcvideo-Params>
+                       <session-type>$sessionType</session-type>
+                   </mcvideo-Params>
+               </mcvideoinfo>
+           """.trimIndent()
+
+           if (xmlBody != null) {
+               val customXml = Factory.instance().createContent().apply {
+                   type = "application"
+                   subtype = "resource-lists+xml"
+                   encoding = "utf-8"
+                   stringBuffer = xmlBody
+               }
+               params.addCustomContent(customXml)
+           }
+           // 3GPP Video Info XML
+           val videoInfoContent = Factory.instance().createContent().apply {
+               type = "application"
+               subtype = "vnd.3gpp.video-info+xml"
+               encoding = "utf-8"
+               stringBuffer = videoInfoXml
+           }
+           params.addCustomContent(videoInfoContent)
+           android.util.Log.i("CDOT_VC", "[Context] --->>to number - ${addr?.asStringUriOnly()}")
+           if (addr == null) {
+               Log.e("CDOT_VC", "Invalid address for conference call: username=${address.username}, domain=${address.domain}")
+               return
+           }
+
+           val callParamsFinal = params ?: core.createCallParams(null)
+           if (callParamsFinal == null) {
+               Log.e("CDOT_VC", "Unable to create call params for conference call")
+               return
+           }
+
+           val call = core.inviteAddressWithParams(address, callParamsFinal, null, null)
+           if (call == null) {
+               Log.e("CDOT_VC", "core.inviteAddressWithParams failed to start conference call")
+               return
+           }
+       }
 
     fun switchCamera() {
         val currentDevice = core.videoDevice
-        android.util.Log.i("CDOT_VC","[Context] Current camera device is $currentDevice")
+        android.util.Log.i("CDOT_VC", "[Context] Current camera device is $currentDevice")
 
         for (camera in core.videoDevicesList) {
             if (camera != currentDevice && camera != "StaticImage: Static picture") {
-                android.util.Log.i("CDOT_VC","[Context] New camera device will be $camera")
+                android.util.Log.i("CDOT_VC", "[Context] New camera device will be $camera")
                 core.videoDevice = camera
 
                 // ✅ Force camera refresh (recommended in 5.4.43)
@@ -1141,7 +1422,7 @@ class CoreContext(
 
         // ✅ Use updated API
         val conference = core.currentCall?.conference
-        if (conference == null||!conference.isIn) {
+        if (conference == null || !conference.isIn) {
             val call = core.currentCall
             if (call == null) {
                 Log.w("[Context] Switching camera while not in call")
@@ -1221,7 +1502,7 @@ class CoreContext(
     fun onCallOverlayClick() {
         val call = core.currentCall ?: core.calls.firstOrNull()
         if (call != null) {
-            android.util.Log.i("CDOT_VC","[Context] Overlay clicked, go back to call view")
+            android.util.Log.i("CDOT_VC", "[Context] Overlay clicked, go back to call view")
             when (call.state) {
                 Call.State.IncomingReceived, Call.State.IncomingEarlyMedia -> onIncomingReceived()
                 Call.State.OutgoingInit, Call.State.OutgoingProgress, Call.State.OutgoingRinging, Call.State.OutgoingEarlyMedia -> onOutgoingStarted()
@@ -1275,7 +1556,10 @@ class CoreContext(
         if (PermissionHelper.get().hasWriteExternalStoragePermission()) {
             for (content in message.contents) {
                 if (content.isFile && content.filePath != null && content.userData == null) {
-                    android.util.Log.i("CDOT_VC","[Context] Trying to export file [${content.name}] to MediaStore")
+                    android.util.Log.i(
+                        "CDOT_VC",
+                        "[Context] Trying to export file [${content.name}] to MediaStore"
+                    )
                     addContentToMediaStore(content)
                 }
             }
@@ -1299,14 +1583,18 @@ class CoreContext(
         if (PermissionHelper.get().hasWriteExternalStoragePermission()) {
             coroutineScope.launch {
                 val filePath = content.filePath.orEmpty()
-                android.util.Log.i("CDOT_VC","[Context] Trying to export file [$filePath] through Media Store API")
+                android.util.Log.i(
+                    "CDOT_VC",
+                    "[Context] Trying to export file [$filePath] through Media Store API"
+                )
 
                 val extension = FileUtils.getExtensionFromFileName(filePath)
                 val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
                 when (FileUtils.getMimeType(mime)) {
                     FileUtils.MimeType.Image -> {
                         if (Compatibility.addImageToMediaStore(context, content)) {
-                            android.util.Log.i("CDOT_VC",
+                            android.util.Log.i(
+                                "CDOT_VC",
                                 "[Context] Successfully exported image [${content.name}] to Media Store"
                             )
                         } else {
@@ -1315,9 +1603,11 @@ class CoreContext(
                             )
                         }
                     }
+
                     FileUtils.MimeType.Video -> {
                         if (Compatibility.addVideoToMediaStore(context, content)) {
-                            android.util.Log.i("CDOT_VC",
+                            android.util.Log.i(
+                                "CDOT_VC",
                                 "[Context] Successfully exported video [${content.name}] to Media Store"
                             )
                         } else {
@@ -1326,9 +1616,11 @@ class CoreContext(
                             )
                         }
                     }
+
                     FileUtils.MimeType.Audio -> {
                         if (Compatibility.addAudioToMediaStore(context, content)) {
-                            android.util.Log.i("CDOT_VC",
+                            android.util.Log.i(
+                                "CDOT_VC",
                                 "[Context] Successfully exported audio [${content.name}] to Media Store"
                             )
                         } else {
@@ -1337,6 +1629,7 @@ class CoreContext(
                             )
                         }
                     }
+
                     else -> {
                         Log.w(
                             "[Context] File [$filePath] isn't either an image, an audio file or a video [${content.type}/${content.subtype}], can't add it to the Media Store"
@@ -1353,7 +1646,8 @@ class CoreContext(
                 delay(delayInMs)
                 withContext(Dispatchers.Main) {
                     if (core.defaultAccount != null && core.defaultAccount?.state == RegistrationState.Ok) {
-                        android.util.Log.i("CDOT_VC",
+                        android.util.Log.i(
+                            "CDOT_VC",
                             "[Context] Default account is registered, cancel foreground service notification if possible"
                         )
                         notificationsManager.stopForegroundNotificationIfPossible()
@@ -1371,7 +1665,7 @@ class CoreContext(
             return
         }
 
-        android.util.Log.i("CDOT_VC","[Context] Starting IncomingCallActivity")
+        android.util.Log.i("CDOT_VC", "[Context] Starting IncomingCallActivity")
         val intent = Intent(context, CallActivity::class.java)
         // This flag is required to start an Activity from a Service context
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -1384,7 +1678,7 @@ class CoreContext(
             return
         }
 
-        android.util.Log.i("CDOT_VC","[Context] Starting OutgoingCallActivity")
+        android.util.Log.i("CDOT_VC", "[Context] Starting OutgoingCallActivity")
         val intent = Intent(context, CallActivity::class.java)
         // This flag is required to start an Activity from a Service context
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -1397,7 +1691,7 @@ class CoreContext(
             return
         }
 
-        android.util.Log.i("CDOT_VC","[Context] Starting CallActivity")
+        android.util.Log.i("CDOT_VC", "[Context] Starting CallActivity")
         val intent = Intent(context, CallActivity::class.java)
         // This flag is required to start an Activity from a Service context
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
