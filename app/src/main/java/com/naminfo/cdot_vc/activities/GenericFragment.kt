@@ -135,11 +135,24 @@ abstract class GenericFragment<T : ViewDataBinding> : Fragment() {
     protected fun goBack() {
         try {
             requireActivity().onBackPressedDispatcher.onBackPressed()
+  /*           val action = when (findNavController().currentDestination?.id) {
+          R.id.settingsFragment -> R.id.action_global_settingsFragment
+          R.id.accountSettingsFragment -> R.id.action_settingsFragment_to_dialerFragment
+          else -> R.id.action_global_dialerFragment
+      }
+      findNavController().navigate(
+          action,
+          null,
+          popupTo(R.id.dialerFragment, true)
+      )*/
+
         } catch (ise: IllegalStateException) {
             Log.w("[Generic Fragment] ${getFragmentRealClassName()}.goBack() can't go back: $ise")
             onBackPressedCallback.handleOnBackPressed()
         }
     }
+
+
 
     private fun setupBackPressCallback() {
         Log.d("[Generic Fragment] ${getFragmentRealClassName()} setupBackPressCallback")

@@ -40,6 +40,9 @@
         <deepLink
             app:uri="linphone-android://settings/{Identity}"
             android:autoVerify="true" />
+        <action
+            android:id="@+id/action_settingsFragment_to_dialerFragment"
+            app:destination="@id/dialerFragment" />
     </fragment>
     <action
         android:id="@+id/action_global_settingsFragment"
@@ -77,5 +80,7 @@
     <action android:id="@+id/action_global_masterCallLogsFragment"
         app:destination="@id/masterCallLogsFragment" />
 
-
+    <action
+        android:id="@+id/action_global_accountSettingsFragment"
+        app:destination="@id/accountSettingsFragment"/>
 </navigation>

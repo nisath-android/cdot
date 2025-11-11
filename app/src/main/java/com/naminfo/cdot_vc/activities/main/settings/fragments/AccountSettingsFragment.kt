@@ -8,12 +8,15 @@ import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.naminfo.cdot_vc.LinphoneApplication
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
 import com.naminfo.cdot_vc.R
+import com.naminfo.cdot_vc.activities.main.fragments.TabsFragment
 import com.naminfo.cdot_vc.activities.main.settings.viewmodels.AccountSettingsViewModel
 import com.naminfo.cdot_vc.activities.main.settings.viewmodels.AccountSettingsViewModelFactory
 import com.naminfo.cdot_vc.activities.main.viewmodels.DialogViewModel
+import com.naminfo.cdot_vc.activities.popupTo
 //import com.naminfo.cdot_vc.activities.navigateToPhoneLinking
 import com.naminfo.cdot_vc.databinding.FragmentAccountSettingsBinding
 import com.naminfo.cdot_vc.utils.AppUtils
@@ -43,7 +46,10 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
         }
 
         try {
-            viewModel = ViewModelProvider(this, AccountSettingsViewModelFactory(identity))[AccountSettingsViewModel::class.java]
+            viewModel = ViewModelProvider(
+                this,
+                AccountSettingsViewModelFactory(identity)
+            )[AccountSettingsViewModel::class.java]
         } catch (nsee: NoSuchElementException) {
             Log.e("[Account Settings] Failed to find Account object, aborting!")
             goBack()
@@ -52,7 +58,7 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
         binding.viewModel = viewModel
         val colorInt = requireContext()?.let { ContextCompat.getColor(it, R.color.test) }
         val colorString = String.format("#%06X", 0xFFFFFF and colorInt!!)
-        viewModel.audioCardColor.value = colorString ?:"#fa8072"
+        viewModel.audioCardColor.value = colorString ?: "#fa8072"
 
         Log.e("[Account Settings] ${viewModel.displayUsernameInsteadOfIdentity}|| ${viewModel.displayName.value} || ${viewModel.identity.value}")
         viewModel.linkPhoneNumberEvent.observe(
@@ -81,24 +87,28 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
                 sharedViewModel.accountRemoved.value = true
                 LinphoneApplication.coreContext.notificationsManager.stopForegroundNotification()
                 Log.i("[Side Menu] Stopping Core Context")
-               LinphoneUtils.restartAppMyPid(requireActivity())
-             /*   lifecycleScope.launch {
-                    delay(2000)
-                }
-                requireActivity().finishAndRemoveTask()*/
+                LinphoneUtils.restartAppMyPid(requireActivity())
+                /*   lifecycleScope.launch {
+                       delay(2000)
+                   }
+                   requireActivity().finishAndRemoveTask()*/
                 Log.i("[Side Menu] Quitting app")
-              /*  lifecycleScope.launch {
-                    delay(5000)
-                }*/
+                /*  lifecycleScope.launch {
+                      delay(5000)
+                  }*/
 
                 LinphoneApplication.coreContext.stop()
                 // goBack()
 
 
-
             }
         }
+        binding.back.setOnClickListener {
 
+           // requireActivity().onBackPressedDispatcher.onBackPressed()
+            navigateToDialer()
+
+        }
         viewModel.accountDefaultEvent.observe(
             viewLifecycleOwner
         ) {
@@ -111,7 +121,8 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
             viewLifecycleOwner
         ) {
             it.consume {
-                val defaultDomainAccount = viewModel.account.params.identityAddress?.domain == corePreferences.defaultDomain
+                val defaultDomainAccount =
+                    viewModel.account.params.identityAddress?.domain == corePreferences.defaultDomain
                 Log.i(
                     "[Account Settings] User clicked on delete account, showing confirmation dialog for ${if (defaultDomainAccount) "default domain account" else "third party account"}"
                 )
@@ -160,5 +171,20 @@ class AccountSettingsFragment : GenericSettingFragment<FragmentAccountSettingsBi
             // Notifies fragment is ready to be drawn
             sharedViewModel.accountSettingsFragmentOpenedEvent.value = Event(true)
         }
+    }
+    internal fun AccountSettingsFragment.navigateToDialer() {
+       /* val action = when (findNavController().currentDestination?.id) {
+            R.id.masterContactsFragment -> R.id.action_masterContactsFragment_to_dialerFragment
+            R.id.accountSettingsFragment -> R.id.action_settingsFragment_to_dialerFragment
+            else -> R.id.action_global_dialerFragment
+        }
+        findNavController().navigate(
+            action,
+            null,
+            popupTo(R.id.dialerFragment, true)
+        )*/
+        findNavController().navigate(
+            R.id.action_settingsFragment_to_dialerFragment
+        )
     }
 }

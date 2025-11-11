@@ -827,7 +827,7 @@ class CoreContext(
         call.acceptUpdate(params)
     }
 
-    fun answerCall(call: Call) {
+  /*  fun answerCall(call: Call) {
         android.util.Log.i("CDOT_VC", "[Context] Answering call ${call.remoteAddress.username}")
         val params = core.createCallParams(call)
 
@@ -883,10 +883,42 @@ class CoreContext(
             "CDOT_VC",
             "[Context] Answering call with params!- ${params.customContents[0].isMultipart}"
         )
+       // call.acceptWithParams(params)
+        call.accept()
+    }*/
+
+    fun answerCall(call: Call) {
+        Log.i("[Context] Answering call $call")
+        val params = core.createCallParams(call)
+        if (params == null) {
+            Log.w("[Context] Answering call without params!")
+            call.accept()
+            return
+        }
+
+        params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(call.remoteAddress)
+
+        if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
+            Log.w("[Context] Enabling low bandwidth mode!")
+            params.isLowBandwidthEnabled = true
+        }
+
+        if (call.callLog.wasConference()) {
+            // Prevent incoming group call to start in audio only layout
+            // Do the same as the conference waiting room
+            params.isVideoEnabled = true
+            params.videoDirection = if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
+            Log.i("[Context] Enabling video on call params to prevent audio-only layout when answering")
+        }
+
         call.acceptWithParams(params)
     }
 
     fun declineCall(call: Call) {
+        android.util.Log.i(
+            "CDOT_VC",
+            "[Context] Cancel Call"
+        )
         val voiceMailUri = corePreferences.voiceMailUri
         if (voiceMailUri != null && corePreferences.redirectDeclinedCallToVoiceMail) {
             val voiceMailAddress = core.interpretUrl(voiceMailUri, false)
@@ -1044,16 +1076,144 @@ class CoreContext(
     }
 
 
-fun startCall(
-           address: Address,
-           callParams: CallParams? = null,
-           forceZRTP: Boolean = false,
-           localAddress: Address? = null
+    fun startCall(
+        address: Address,
+        callParams: CallParams? = null,
+        forceZRTP: Boolean = false,
+        localAddress: Address? = null
 
-       )= {
+    ) {
+        Log.i(
+            "SIP Username ${address.username}"
+        )
+        Log.i(
+            "SIP Address ${address.asStringUriOnly()}"
+        )
+        if (!core.isNetworkReachable) {
+            Log.e("[Context] Network unreachable, abort outgoing call")
+            callErrorMessageResourceId.value = Event(
+                context.getString(R.string.call_error_network_unreachable)
+            )
+            return
+        }
 
-           startBcCall(address)
-}
+        val params = callParams ?: core.createCallParams(null)
+
+        if (params == null) {
+            val call = core.inviteAddress(address)
+            Log.w("[Context] Starting call $call without params")
+            return
+        }
+
+        if (forceZRTP) {
+            params.mediaEncryption = MediaEncryption.ZRTP
+        }
+        if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
+            Log.w("[Context] Enabling low bandwidth mode!")
+            params.isLowBandwidthEnabled = true
+        }
+        params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(address)
+
+        if (localAddress != null) {
+            val account = core.accountList.find { account ->
+                account.params.identityAddress?.weakEqual(localAddress) ?: false
+            }
+            if (account != null) {
+                params.account = account
+                Log.i(
+                    "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
+                )
+            } else {
+                Log.e(
+                    "[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
+                )
+            }
+        }
+
+        if (corePreferences.sendEarlyMedia) {
+            params.isEarlyMediaSendingEnabled = true
+        }
+
+        params.addCustomHeader("To", "<sip:${address.domain}>")
+        params.addCustomHeader("P-Preferred-Identity", "<sip:${address.username}@NamInfoCom.com>")
+        params.addCustomHeader("Privacy", "id")
+        params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
+        params.addCustomHeader("Accept-Contact", "*;+g.3gpp.mcvideo;require;explicit")
+        params.addCustomHeader(
+            "Accept-Contact",
+            "*;+g.3gpp.icsi-ref=\"urn%3Aurn-7%3A3gpp-service.ims.icsi.mcvideo\";require;explicit"
+        )
+        params.addCustomHeader("Answer-Mode", "Auto")
+        params.addCustomHeader("P-Preferred-Service", "urn:urn-7:3gpp-service.ims.icsi.mcvideo")
+        params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
+
+        val recipientUri = address.asStringUriOnly()
+        val addr: Address? = if (address.username?.length == 4) {
+            if (address.username.toString().startsWith('5')) {
+                Factory.instance().createAddress("sip:conference_audio@${address.domain}")
+            } else if (address.username.toString().startsWith('3')) {
+                Factory.instance().createAddress("sip:conference_video@${address.domain}")
+            } else {
+                address
+            }
+        } else {
+            Factory.instance().createAddress("sip:${address.domain}")
+        }
+
+        val isConference = address.username?.length == 4
+
+        val xmlBody: String? = if (!isConference) {
+            """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <resource-lists xmlns="urn:ietf:params:xml/ns/resource-lists"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xmlns:cc="urn:ietf:params/xml/ns/copycontrol">
+      <list>
+        <entry uri="$recipientUri" cc:copyControl="to"/>
+      </list>
+    </resource-lists>
+        """.trimIndent()
+        } else {
+            null
+        }
+
+        val fromHeader = params.fromHeader.toString()
+        val sessionType = if (address.username?.length == 4) "conference" else "private"
+
+        val videoInfoXml = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <mcvideoinfo xmlns="urn:3gpp:ns:mcvideoInfo:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <mcvideo-Params>
+                <session-type>$sessionType</session-type>
+            </mcvideo-Params>
+        </mcvideoinfo>
+    """.trimIndent()
+
+        if (xmlBody != null) {
+            val customXml = Factory.instance().createContent().apply {
+                type = "application"
+                subtype = "resource-lists+xml"
+                encoding = "utf-8"
+                stringBuffer = xmlBody
+            }
+            params.addCustomContent(customXml)
+        }
+        // 3GPP Video Info XML
+        val videoInfoContent = Factory.instance().createContent().apply {
+            type = "application"
+            subtype = "vnd.3gpp.video-info+xml"
+            encoding = "utf-8"
+            stringBuffer = videoInfoXml
+        }
+        params.addCustomContent(videoInfoContent)
+        Log.i("[Context] --->>to number - ${addr?.asStringUriOnly()}")
+        val call = core.inviteAddressWithParams(addr!!, params, null, null)
+
+        Log.i("[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
+        Log.i("[Context] --->>From Header - $fromHeader")
+
+        Log.i("[Context] --->>Starting call params ${params.isVideoEnabled}")
+    }
 
 
     fun switchCamera() {

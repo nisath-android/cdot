@@ -8,6 +8,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.google.android.material.transition.MaterialSharedAxis
 import com.naminfo.cdot_vc.LinphoneApplication.Companion.corePreferences
@@ -107,7 +108,13 @@ class SettingsFragment : SecureFragment<FragmentSettingsBinding>() {
             arguments?.clear()
             navigateToAccountSettings(identity)
         }
-
+        binding.back.setOnClickListener {
+            //goBack()
+          /*  if (identity != null) {
+                viewModel.accountsSettingsListener.onAccountClicked(identity)
+            }*/
+            navigateToDialer()
+        }
         viewModel.accountsSettingsListener = object : SettingListenerStub() {
             override fun onAccountClicked(identity: String) {
                 Log.i("[Settings] Navigation to settings for account with identity: $identity")
@@ -168,5 +175,27 @@ class SettingsFragment : SecureFragment<FragmentSettingsBinding>() {
                 //navigateToConferencesSettings(binding.slidingPane)
             }
         }
+
+    }
+
+    internal fun SettingsFragment.navigateToDialer() {
+        /* val action = when (findNavController().currentDestination?.id) {
+             R.id.masterContactsFragment -> R.id.action_masterContactsFragment_to_dialerFragment
+             R.id.accountSettingsFragment -> R.id.action_settingsFragment_to_dialerFragment
+             else -> R.id.action_global_dialerFragment
+         }
+         findNavController().navigate(
+             action,
+             null,
+             popupTo(R.id.dialerFragment, true)
+         )*/
+       /* findNavController().navigate(
+            R.id.action_global_accountSettingsFragment
+        )*/
+        findNavController().navigate(
+            R.id.action_global_dialerFragment,
+            null,
+
+        )
     }
 }
