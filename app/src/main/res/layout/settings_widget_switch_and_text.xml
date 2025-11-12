@@ -28,11 +28,12 @@
             type="Boolean" />
         <variable
             name="listener"
-            type="com.naminfo.cdot_vc.activities.main.settings.SettingListener" />
+            type="org.naminfo.activities.main.settings.SettingListener" />
     </data>
 
     <RelativeLayout
         android:enabled="@{enabled ?? true}"
+        onClickToggleSwitch="@{@id/setting_switch}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -105,6 +106,7 @@
                 android:text="@{defaultValue}"
                 android:imeOptions="actionDone"
                 android:inputType="@{InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS}"
+                onValueChanged="@{() -> listener.onTextValueChanged(settingsInput.getText().toString())}"
                 android:maxLines="1"
                 android:background="@color/transparent_color"
                 android:layout_width="match_parent"

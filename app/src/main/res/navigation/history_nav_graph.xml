@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/history_nav_graph"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:startDestination="@id/emptyCallHistoryFragment">
 
     <fragment
         android:id="@+id/emptyCallHistoryFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.fragments.EmptyFragment"
+        android:name="org.naminfo.activities.main.fragments.EmptyFragment"
         tools:layout="@layout/empty_fragment"
         android:label="EmptyCallHistoryFragment" />
-    <action android:id="@+id/action_global_emptyCallHistoryFragment"
-        app:destination="@id/emptyCallHistoryFragment"/>
 
+    <action android:id="@+id/action_global_emptyFragment"
+        app:destination="@id/emptyCallHistoryFragment" />
 
+    <fragment
+        android:id="@+id/detailCallLogFragment"
+        android:name="org.naminfo.activities.main.history.fragments.DetailCallLogFragment"
+        tools:layout="@layout/history_detail_fragment"
+        android:label="DetailCallLogFragment" />
+
+    <fragment
+        android:id="@+id/detailConferenceCallLogFragment"
+        android:name="org.naminfo.activities.main.history.fragments.DetailConferenceCallLogFragment"
+        tools:layout="@layout/history_conf_detail_fragment"
+        android:label="DetailConferenceCallLogFragment" />
+
+    <action
+        android:id="@+id/action_global_detailCallLogFragment"
+        app:destination="@id/detailCallLogFragment" />
+
+    <action
+        android:id="@+id/action_global_detailConferenceCallLogFragment"
+        app:destination="@id/detailConferenceCallLogFragment" />
 
 </navigation>

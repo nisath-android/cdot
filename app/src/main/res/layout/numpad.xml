@@ -1,264 +1,396 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
             name="keyListener"
-            type="com.naminfo.cdot_vc.activities.main.dialer.NumpadDigitListener" />
+            type="org.naminfo.activities.main.dialer.NumpadDigitListener" />
     </data>
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/numpad"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginTop="2dp"
-        android:padding="10dp"
-        android:background="@drawable/cdot_dialpad_box_outline"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="?attr/backgroundColor"
         app:flexWrap="wrap"
         app:justifyContent="space_evenly"
         app:alignItems="center"
-        android:layout_gravity="top"
-        app:alignContent="center"
-        android:textAlignment="center">
+        app:alignContent="space_around">
 
-        <!-- 1 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_one"
+            android:contentDescription="@string/content_description_numpad_1"
+            android:onClick="@{() -> keyListener.handleClick('1')}"
+            android:onLongClick="@{() -> keyListener.handleLongClick('1')}"  />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+        <ImageView
+            style="@style/numpad_digit"
+            android:contentDescription="@string/content_description_numpad_2"
+            android:src="@drawable/numpad_two"
+            android:onClick="@{() -> keyListener.handleClick('2')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:contentDescription="@string/content_description_numpad_3"
+            android:src="@drawable/numpad_three"
+            android:onClick="@{() -> keyListener.handleClick('3')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            app:layout_wrapBefore="true"
+            android:src="@drawable/numpad_four"
+            android:contentDescription="@string/content_description_numpad_4"
+            android:onClick="@{() -> keyListener.handleClick('4')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_five"
+            android:contentDescription="@string/content_description_numpad_5"
+            android:onClick="@{() -> keyListener.handleClick('5')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_six"
+            android:contentDescription="@string/content_description_numpad_6"
+            android:onClick="@{() -> keyListener.handleClick('6')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            app:layout_wrapBefore="true"
+            android:src="@drawable/numpad_seven"
+            android:contentDescription="@string/content_description_numpad_7"
+            android:onClick="@{() -> keyListener.handleClick('7')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_eight"
+            android:contentDescription="@string/content_description_numpad_8"
+            android:onClick="@{() -> keyListener.handleClick('8')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_nine"
+            android:contentDescription="@string/content_description_numpad_9"
+            android:onClick="@{() -> keyListener.handleClick('9')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            app:layout_wrapBefore="true"
+            android:src="@drawable/numpad_star_digit"
+            android:contentDescription="@string/content_description_numpad_star"
+            android:onClick="@{() -> keyListener.handleClick('*')}" />
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_zero"
+            android:onClick="@{() -> keyListener.handleClick('0')}"
+            android:contentDescription="@string/content_description_numpad_0"
+            android:onLongClick="@{() -> keyListener.handleLongClick('+')}"/>
+
+        <ImageView
+            style="@style/numpad_digit"
+            android:src="@drawable/numpad_sharp"
+            android:contentDescription="@string/content_description_numpad_sharp"
+            android:onClick="@{() -> keyListener.handleClick('#')}" />
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+</layout>
+
+
+    <!--<LinearLayout
+        android:id="@+id/numpad"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/backgroundColor"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/textView_num1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:background="@drawable/numpad_button_background"
+            android:gravity="center"
+            android:text="1"
+            android:textColor="@color/black_color"
+            android:textSize="50sp" />
+
+        <Button
+            android:id="@+id/textView_num2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="2"
+            android:background="@drawable/numpad_button_background"
+            android:textColor="@color/black_color"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+        <Button
+            android:id="@+id/textView_num3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="3"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/textView_num4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="4"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+        <Button
+            android:id="@+id/textView_num5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="5"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+        <Button
+            android:id="@+id/textView_num6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="6"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/textView_num7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="7"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+        <Button
+            android:id="@+id/textView_num8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="8"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+
+        <Button
+            android:id="@+id/textView_num9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="9"
+            android:textColor="@color/black_color"
+            android:background="@drawable/numpad_button_background"
+            android:textSize="50sp"
+            android:layout_weight="2"/>
+    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/textView_asterisk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="*"
+                android:textColor="@color/black_color"
+                android:background="@drawable/numpad_button_background"
+                android:textSize="50sp"
+                android:layout_weight="2"/>
+
+            <Button
+                android:id="@+id/textView_num0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0+"
+                android:textColor="@color/black_color"
+                android:background="@drawable/numpad_button_background"
+                android:textSize="50sp"
+                android:layout_weight="2"/>
+
+            <Button
+                android:id="@+id/textView_hash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="#"
+                android:textColor="@color/black_color"
+                android:background="@drawable/numpad_button_background"
+                android:textSize="50sp"
+                android:layout_weight="2"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/button_one"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_one"
                 android:contentDescription="@string/content_description_numpad_1"
                 android:onClick="@{() -> keyListener.handleClick('1')}"
-                android:onLongClick="@{() -> keyListener.handleLongClick('1')}"
-                android:clickable="true"
-                android:focusable="true" />
-        </androidx.cardview.widget.CardView>
+                android:background="@drawable/numpad_button_background" />
 
-        <!-- 2 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_two"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_two"
                 android:contentDescription="@string/content_description_numpad_2"
-                android:onClick="@{() -> keyListener.handleClick('2')}" />
-        </androidx.cardview.widget.CardView>
+                android:onClick="@{() -> keyListener.handleClick('2')}"
+                android:background="@drawable/numpad_button_background"/>
 
-        <!-- 3 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_three"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_three"
                 android:contentDescription="@string/content_description_numpad_3"
-                android:onClick="@{() -> keyListener.handleClick('3')}" />
-        </androidx.cardview.widget.CardView>
+                android:onClick="@{() -> keyListener.handleClick('3')}"
+                android:background="@drawable/numpad_button_background"/>
 
-        <!-- 4 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+        </LinearLayout>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/button_four"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_four"
                 android:contentDescription="@string/content_description_numpad_4"
-                android:onClick="@{() -> keyListener.handleClick('4')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- 5 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+                android:onClick="@{() -> keyListener.handleClick('4')}"
+                android:background="@drawable/numpad_button_background" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_five"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_five"
                 android:contentDescription="@string/content_description_numpad_5"
-                android:onClick="@{() -> keyListener.handleClick('5')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- 6-->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+                android:onClick="@{() -> keyListener.handleClick('5')}"
+                android:background="@drawable/numpad_button_background"
+                 />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_six"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_six"
                 android:contentDescription="@string/content_description_numpad_6"
-                android:onClick="@{() -> keyListener.handleClick('6')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- 7 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+                android:onClick="@{() -> keyListener.handleClick('6')}"
+                android:background="@drawable/numpad_button_background"                 />
+        </LinearLayout>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/button_seven"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_seven"
                 android:contentDescription="@string/content_description_numpad_7"
-                android:onClick="@{() -> keyListener.handleClick('7')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- 8 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+                android:onClick="@{() -> keyListener.handleClick('7')}"
+                android:background="@drawable/numpad_button_background"
+                 />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_eight"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_eight"
                 android:contentDescription="@string/content_description_numpad_8"
-                android:onClick="@{() -> keyListener.handleClick('8')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- 9 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+                android:onClick="@{() -> keyListener.handleClick('8')}"
+                android:background="@drawable/numpad_button_background"
+                 />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_nine"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_nine"
                 android:contentDescription="@string/content_description_numpad_9"
-                android:onClick="@{() -> keyListener.handleClick('9')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- * -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            android:layout_gravity="center"
-            app:cardBackgroundColor="@color/white_color">
+                android:onClick="@{() -> keyListener.handleClick('9')}"
+                android:background="@drawable/numpad_button_background"
+                 />
+        </LinearLayout>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="22dp"
-                android:foregroundGravity="center"
-                android:layout_gravity="center"
-                android:src="@drawable/numpad_star"
-                android:scaleY="1.6"
-                android:scaleX="1.6"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/button_star"
+                style="@style/numpad_digit"
+                android:src="@drawable/numpad_star_digit"
                 android:contentDescription="@string/content_description_numpad_star"
-                android:onClick="@{() -> keyListener.handleClick('*')}" />
-        </androidx.cardview.widget.CardView>
+                android:onClick="@{() -> keyListener.handleClick('*')}"
+                android:background="@drawable/numpad_button_background"
+                 />
 
-
-
-
-        <!-- Repeat for 4–9, *, 0, # -->
-
-        <!-- Example for Zero -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
+            <ImageButton
+                android:id="@+id/button_zero"
+                style="@style/numpad_digit"
                 android:src="@drawable/numpad_zero"
                 android:contentDescription="@string/content_description_numpad_0"
                 android:onClick="@{() -> keyListener.handleClick('0')}"
-                android:onLongClick="@{() -> keyListener.handleLongClick('+')}" />
-        </androidx.cardview.widget.CardView>
-        <!-- # -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/white_color">
+                android:onLongClick="@{() -> keyListener.handleLongClick('+')}"
+                android:background="@drawable/numpad_button_background"
+                 />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="16dp"
-                android:scaleY="1.0"
-                android:scaleX="1.0"
-                android:src="@drawable/numpad_hash"
-                android:contentDescription="@string/content_description_numpad_3"
-                android:onClick="@{() -> keyListener.handleClick('#')}" />
-        </androidx.cardview.widget.CardView>
-    </com.google.android.flexbox.FlexboxLayout>
-</layout>
+            <ImageButton
+                android:id="@+id/button_sharp"
+                style="@style/numpad_digit"
+                android:src="@drawable/numpad_sharp"
+                android:contentDescription="@string/content_description_numpad_sharp"
+                android:onClick="@{() -> keyListener.handleClick('#')}"
+                android:background="@drawable/numpad_button_background"
+                 />
+        </LinearLayout>-->

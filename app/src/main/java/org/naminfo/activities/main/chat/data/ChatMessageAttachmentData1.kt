@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2010-2020 Belledonne Communications SARL.
+ *
+ * This file is part of linphone-android
+ * (see https://www.linphone.org).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.naminfo.activities.main.chat.data
+
+import android.webkit.MimeTypeMap
+import org.naminfo.utils.FileUtils
+
+class ChatMessageAttachmentData1(
+    var path: String,
+    var extURL: String,
+    private val deleteCallback: (attachment: ChatMessageAttachmentData1) -> Unit
+) {
+    val fileName: String = FileUtils.getNameFromFilePath(path)
+    val isImage: Boolean
+    val isVideo: Boolean
+    val isAudio: Boolean
+    val isPdf: Boolean
+
+    init {
+        val extension = FileUtils.getExtensionFromFileName(path)
+        val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+        val mimeType = FileUtils.getMimeType(mime)
+        isImage = mimeType == FileUtils.MimeType.Image
+        isVideo = mimeType == FileUtils.MimeType.Video
+        isAudio = mimeType == FileUtils.MimeType.Audio
+        isPdf = mimeType == FileUtils.MimeType.Pdf
+    }
+
+    fun delete() {
+        deleteCallback(this)
+    }
+
+    fun getURL(): String {
+        return extURL
+    }
+}

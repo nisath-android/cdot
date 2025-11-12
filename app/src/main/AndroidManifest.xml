@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- To be able to display contacts list & match calling/called numbers -->
     <uses-feature
@@ -60,39 +59,35 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:ignore="UnusedAttribute" />
-
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
 
     <application
         android:name=".LinphoneApplication"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/cdot_splash_rounded"
-        android:label="@string/app_name"
-        android:roundIcon="@drawable/cdot_splash_rounded"
-        android:supportsRtl="true"
+        android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
+        android:icon="@drawable/mobion_icon"
+        android:label="${appLabel}"
+        android:usesCleartextTraffic="true"
+        android:localeConfig="@xml/locales_config"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@drawable/mobion_icon"
         android:theme="@style/BaseAppTheme"
-        tools:targetApi="34">
-        <activity
-            android:name=".activities.voip.CallActivity"
+        android:allowNativeHeapPointerTagging="false">
+
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc"/>
+
+        <activity android:name=".activities.main.MainActivity"
             android:exported="true"
-            android:supportsPictureInPicture="true"
-            android:resizeableActivity="true"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|uiMode"
-            />
-        <activity
-            android:name=".activities.main.MainActivity"
-            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppSplashScreenTheme">
+            <nav-graph android:value="@navigation/main_nav_graph" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data
@@ -124,6 +119,13 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="${linphone_address_mime_type}" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.DIAL" />
                 <action android:name="android.intent.action.CALL" />
                 <action android:name="android.intent.action.CALL_BUTTON" />
@@ -147,10 +149,27 @@
                 <data android:scheme="mmsto" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".activities.assistant.AssistantActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
+
+        </activity>
+
+        <activity android:name=".activities.voip.CallActivity"
+            android:launchMode="singleTask"
+            android:turnScreenOn="true"
+            android:showWhenLocked="true"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true" />
+
         <activity
-            android:name=".activities.assistant.AssistantActivity"
-            android:exported="false"
-            android:theme="@style/BaseAppTheme" />
+            android:name=".activities.chat_bubble.ChatBubbleActivity"
+            android:allowEmbedded="true"
+            android:documentLaunchMode="always"
+            android:resizeableActivity="true" />
+
+        <!-- Services -->
 
         <service
             android:name=".core.CoreService"
@@ -158,6 +177,64 @@
             android:foregroundServiceType="phoneCall|camera|microphone|dataSync"
             android:stopWithTask="false"
             android:label="@string/app_name" />
+
+        <service
+            android:name="org.linphone.core.tools.service.PushService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:stopWithTask="false"
+            android:label="@string/app_name" />
+
+        <service android:name="org.linphone.core.tools.firebase.FirebaseMessaging"
+            android:enabled="${firebaseServiceEnabled}"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".contact.DummySyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_adapter" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+
+        <service android:name=".contact.DummyAuthenticationService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <service android:name=".telecom.TelecomConnectionService"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.telecom.ConnectionService" />
+            </intent-filter>
+        </service>
+
+        <!-- Receivers -->
+
+        <receiver android:name=".core.CorePushReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.linphone.core.action.PUSH_RECEIVED"/>
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".notifications.NotificationBroadcastReceiver"
@@ -174,10 +251,16 @@
 
         <!-- Providers -->
 
-
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${linphone_file_provider}"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
     </application>
-
-
 
 </manifest>

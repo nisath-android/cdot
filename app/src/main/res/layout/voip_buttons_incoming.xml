@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.ControlsViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.ControlsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

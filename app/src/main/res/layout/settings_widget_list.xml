@@ -21,7 +21,7 @@
             type="java.util.ArrayList&lt;String&gt;" />
         <variable
             name="listener"
-            type="com.naminfo.cdot_vc.activities.main.settings.SettingListener" />
+            type="org.naminfo.activities.main.settings.SettingListener" />
     </data>
 
     <RelativeLayout
@@ -68,7 +68,8 @@
         <Spinner
             android:id="@+id/settings_spinner"
             android:entries="@{labels}"
-
+            selectedIndex="@{selectedIndex}"
+            settingListener="@{listener}"
             android:enabled="@{enabled ?? true}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

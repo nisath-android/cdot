@@ -12,15 +12,15 @@
 
         <variable
             name="selectionListViewModel"
-            type="com.naminfo.cdot_vc.activities.main.viewmodels.ListTopBarViewModel" />
+            type="org.naminfo.activities.main.viewmodels.ListTopBarViewModel" />
 
         <variable
             name="contactListViewModel"
-            type="com.naminfo.cdot_vc.activities.main.contact.viewmodels.MasterContactsViewModel" />
+            type="org.naminfo.activities.main.contact.viewmodels.ContactsListViewModel" />
 
         <variable
             name="contact"
-            type="com.naminfo.cdot_vc.activities.main.contact.data.GroupSettingsContact" />
+            type="org.naminfo.activities.main.contact.data.GroupSettingsContact" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,8 +44,8 @@
             android:src="@drawable/voip_single_contact_avatar"
             app:layout_constraintBottom_toBottomOf="@+id/bcDetails"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:loadProfileInitials="@{contact.groupName}" />
         <!-- Group Details Section -->
         <LinearLayout
             android:id="@+id/bcDetails"

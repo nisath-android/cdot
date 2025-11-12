@@ -1,61 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_nav_graph"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph_xml"
     app:startDestination="@id/dialerFragment">
 
-
     <fragment
-        android:id="@+id/dialerFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.dialer.DialerFragment"
-        android:label="DialerFragment" >
+        android:id="@+id/masterChatRoomsFragment"
+        android:name="org.naminfo.activities.main.chat.fragments.MasterChatRoomsFragment"
+        android:label="MasterChatRoomsFragment"
+        tools:layout="@layout/chat_room_master_fragment" >
         <action
-            android:id="@+id/action_dialerFragment_to_masterContactsFragment2"
-            app:destination="@id/masterContactsFragment" />
+            android:id="@+id/action_masterChatRoomsFragment_to_dialerFragment"
+            app:destination="@id/dialerFragment" />
         <action
-            android:id="@+id/action_dialerFragment_to_masterCallLogsFragment"
+            android:id="@+id/action_masterChatRoomsFragment_to_masterCallLogsFragment"
             app:destination="@id/masterCallLogsFragment" />
+        <action
+            android:id="@+id/action_masterChatRoomsFragment_to_masterContactsFragment"
+            app:destination="@id/masterContactsFragment" />
+        <argument
+            android:name="LocalSipUri"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
+        <argument
+            android:name="RemoteSipUri"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
+        <deepLink
+            app:uri="linphone-android://chat-room/{LocalSipUri}/{RemoteSipUri}"
+            android:autoVerify="true" />
     </fragment>
+    <action
+        android:id="@+id/action_global_masterChatRoomsFragment"
+        app:destination="@id/masterChatRoomsFragment" />
     <fragment
         android:id="@+id/masterContactsFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.contact.fragments.MasterContactsFragment"
-        android:label="MasterContactsFragment" >
+        android:name="org.naminfo.activities.main.contact.fragments.MasterContactsFragment"
+        android:label="MasterContactsFragment"
+        tools:layout="@layout/contact_master_fragment" >
+        <action
+            android:id="@+id/action_masterContactsFragment_to_masterCallLogsFragment"
+            app:destination="@id/masterCallLogsFragment" />
         <action
             android:id="@+id/action_masterContactsFragment_to_dialerFragment"
             app:destination="@id/dialerFragment" />
         <action
-            android:id="@+id/action_masterContactsFragment_to_masterCallLogsFragment"
-            app:destination="@id/masterCallLogsFragment" />
-    </fragment>
-    <action android:id="@+id/action_global_dialerFragment"
-        app:destination="@id/dialerFragment"/>
-    <action android:id="@+id/action_global_masterContactsFragment"
-        app:destination="@id/masterContactsFragment"/>
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.settings.fragments.SettingsFragment"
-        tools:layout="@layout/fragment_settings"
-        android:label="SettingsFragment" >
+            android:id="@+id/action_masterContactsFragment_to_masterChatRoomsFragment"
+            app:destination="@id/masterChatRoomsFragment" />
         <deepLink
-            app:uri="linphone-android://settings/{Identity}"
+            app:uri="linphone-android://contact/view/{id}"
             android:autoVerify="true" />
-        <action
-            android:id="@+id/action_settingsFragment_to_dialerFragment"
-            app:destination="@id/dialerFragment" />
+        <deepLink
+            app:uri="linphone-android://contact/view-friend/{address}"
+            android:autoVerify="true" />
+        <deepLink
+            app:uri="linphone-android://contact/new/{sipUri}"
+            android:autoVerify="true" />
     </fragment>
     <action
-        android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment" />
+        android:id="@+id/action_global_masterContactsFragment"
+        app:destination="@id/masterContactsFragment" />
     <fragment
-        android:id="@+id/helpFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.about.HelpFragment"
-        android:label="HelpFragment" >
+        android:id="@+id/masterCallLogsFragment"
+        android:name="org.naminfo.activities.main.history.fragments.MasterCallLogsFragment"
+        android:label="MasterCallLogsFragment"
+        tools:layout="@layout/history_master_fragment" >
+        <action
+            android:id="@+id/action_masterCallLogsFragment_to_dialerFragment"
+            app:destination="@id/dialerFragment" />
+        <action
+            android:id="@+id/action_masterCallLogsFragment_to_masterContactsFragment"
+            app:destination="@id/masterContactsFragment" />
+        <action
+            android:id="@+id/action_masterCallLogsFragment_to_masterChatRoomsFragment"
+            app:destination="@id/masterChatRoomsFragment" />
     </fragment>
+    <action
+        android:id="@+id/action_global_masterCallLogsFragment"
+        app:destination="@id/masterCallLogsFragment"/>
+    <fragment
+        android:id="@+id/dialerFragment"
+        android:name="org.naminfo.activities.main.dialer.fragments.DialerFragment"
+        android:label="DialerFragment"
+        tools:layout="@layout/dialer_fragment" >
+        <action
+            android:id="@+id/action_dialerFragment_to_masterCallLogsFragment"
+            app:destination="@id/masterCallLogsFragment"/>
+        <action
+            android:id="@+id/action_dialerFragment_to_masterContactsFragment"
+            app:destination="@id/masterContactsFragment" />
+        <action
+            android:id="@+id/action_dialerFragment_to_masterChatRoomsFragment"
+            app:destination="@id/masterChatRoomsFragment" />
+        <argument
+            android:name="Transfer"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_dialerFragment_to_PTTFragment"
+            app:destination="@id/PTTFragment" />
+        <action
+            android:id="@+id/action_dialerFragment_to_PTTVoiceFragment"
+            app:destination="@id/PTTVoiceFragment" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_dialerFragment"
+        app:destination="@id/dialerFragment" />
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.about.AboutFragment"
-        tools:layout="@layout/fragment_about"
+        android:name="org.naminfo.activities.main.about.AboutFragment"
+        tools:layout="@layout/about_fragment"
         android:label="AboutFragment" >
         <action
             android:id="@+id/action_aboutFragment_to_helpFragment"
@@ -67,20 +124,142 @@
         android:id="@+id/action_global_aboutFragment"
         app:destination="@id/aboutFragment"/>
     <fragment
-        android:id="@+id/masterCallLogsFragment"
-        android:name="com.naminfo.cdot_vc.activities.main.history.MasterCallLogsFragment"
-        android:label="MasterCallLogsFragment" >
-        <action
-            android:id="@+id/action_masterCallLogsFragment_to_dialerFragment"
-            app:destination="@id/dialerFragment" />
-        <action
-            android:id="@+id/action_masterCallLogsFragment_to_masterContactsFragment"
-            app:destination="@id/masterContactsFragment" />
+        android:id="@+id/recordingsFragment"
+        android:name="org.naminfo.activities.main.recordings.fragments.RecordingsFragment"
+        tools:layout="@layout/recordings_fragment"
+        android:label="RecordingsFragment" />
+    <action
+        android:id="@+id/action_global_recordingsFragment"
+        app:destination="@id/recordingsFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="org.naminfo.activities.main.settings.fragments.SettingsFragment"
+        tools:layout="@layout/settings_fragment"
+        android:label="SettingsFragment" >
+        <deepLink
+            app:uri="linphone-android://settings/{Identity}"
+            android:autoVerify="true" />
     </fragment>
-    <action android:id="@+id/action_global_masterCallLogsFragment"
-        app:destination="@id/masterCallLogsFragment" />
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment" />
+
+    <fragment
+        android:id="@+id/textViewerFragment"
+        android:name="org.naminfo.activities.main.files.fragments.TextViewerFragment"
+        android:label="TextViewerFragment" />
+    <action
+        android:id="@+id/action_global_textViewerFragment"
+        app:destination="@id/textViewerFragment" />
+    <fragment
+        android:id="@+id/pdfViewerFragment"
+        android:name="org.naminfo.activities.main.files.fragments.PdfViewerFragment"
+        android:label="PdfViewerFragment" />
+    <action
+        android:id="@+id/action_global_pdfViewerFragment"
+        app:destination="@id/pdfViewerFragment" />
+    <fragment
+        android:id="@+id/imageViewerFragment"
+        android:name="org.naminfo.activities.main.files.fragments.ImageViewerFragment"
+        android:label="ImageViewerFragment" />
+    <action
+        android:id="@+id/action_global_imageViewerFragment"
+        app:destination="@id/imageViewerFragment"/>
+    <fragment
+        android:id="@+id/videoViewerFragment"
+        android:name="org.naminfo.activities.main.files.fragments.VideoViewerFragment"
+        android:label="VideoViewerFragment" />
+    <action
+        android:id="@+id/action_global_videoViewerFragment"
+        app:destination="@id/videoViewerFragment"/>
+    <fragment
+        android:id="@+id/audioViewerFragment"
+        android:name="org.naminfo.activities.main.files.fragments.AudioViewerFragment"
+        android:label="AudioViewerFragment" />
+    <action
+        android:id="@+id/action_global_audioViewerFragment"
+        app:destination="@id/audioViewerFragment"/>
+    <fragment
+        android:id="@+id/configViewerFragment"
+        android:name="org.naminfo.activities.main.dialer.fragments.ConfigViewerFragment"
+        android:label="ConfigViewerFragment" />
+    <action
+        android:id="@+id/action_global_configViewerFragment"
+        app:destination="@id/configViewerFragment" />
 
     <action
-        android:id="@+id/action_global_accountSettingsFragment"
-        app:destination="@id/accountSettingsFragment"/>
+        android:id="@+id/action_global_conferenceSchedulingFragment"
+        app:destination="@id/conference_scheduling_nav_graph" />
+
+    <navigation android:id="@+id/conference_scheduling_nav_graph"
+        app:startDestination="@id/conferenceSchedulingFragment">
+        <fragment
+            android:id="@+id/conferenceSchedulingSummaryFragment"
+            android:name="org.naminfo.activities.main.conference.fragments.ConferenceSchedulingSummaryFragment"
+            android:label="ConferenceSchedulingSummaryFragment" />
+        <fragment
+            android:id="@+id/conferenceSchedulingFragment"
+            android:name="org.naminfo.activities.main.conference.fragments.ConferenceSchedulingFragment"
+            android:label="ConferenceSchedulingFragment">
+            <action
+                android:id="@+id/action_conferenceSchedulingFragment_to_conferenceSchedulingParticipantsListFragment"
+                app:destination="@id/conferenceSchedulingParticipantsListFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/conferenceSchedulingParticipantsListFragment"
+            android:name="org.naminfo.activities.main.conference.fragments.ConferenceSchedulingParticipantsListFragment"
+            android:label="ConferenceSchedulingParticipantsListFragment">
+            <action
+                android:id="@+id/action_conferenceSchedulingParticipantsListFragment_to_conferenceSchedulingSummaryFragment"
+                app:destination="@id/conferenceSchedulingSummaryFragment" />
+        </fragment>
+    </navigation>
+
+    <fragment
+        android:id="@+id/conferenceWaitingRoomFragment"
+        android:name="org.naminfo.activities.main.conference.fragments.ConferenceWaitingRoomFragment"
+        tools:layout="@layout/conference_waiting_room_fragment"
+        android:label="ConferenceWaitingRoomFragment" />
+    <action
+        android:id="@+id/action_global_conferenceWaitingRoomFragment"
+        app:destination="@id/conferenceWaitingRoomFragment"/>
+
+    <fragment
+        android:id="@+id/scheduledConferencesFragment"
+        android:name="org.naminfo.activities.main.conference.fragments.ScheduledConferencesFragment"
+        tools:layout="@layout/conferences_scheduled_fragment"
+        android:label="ScheduledConferencesFragment" />
+    <action
+        android:id="@+id/action_global_scheduledConferencesFragment"
+        app:destination="@id/scheduledConferencesFragment"/>
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="org.naminfo.activities.main.about.HelpFragment"
+        android:label="HelpFragment" >
+    </fragment>
+    <fragment
+        android:id="@+id/PTTFragment"
+        android:name="org.linphone.activities.main.ptt.PTTFragment"
+        android:label="PTTFragment" >
+        <action
+            android:id="@+id/action_PTTFragment_to_dialerFragment"
+            app:destination="@id/dialerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/PTTVoiceFragment"
+        android:name="org.naminfo.activities.main.ptt.pttvoice.PTTVoiceFragment"
+        android:label="PTTVoiceFragment" >
+        <action
+            android:id="@+id/action_PTTVoiceFragment_to_PTTFragment"
+            app:destination="@id/PTTFragment" />
+        <action
+            android:id="@+id/action_PTTVoiceFragment_to_PTTRecentsFragment"
+            app:destination="@id/PTTRecentsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/PTTRecentsFragment"
+        android:name="org.naminfo.activities.main.ptt.pttrecents.PTTRecentsFragment"
+        android:label="PTTRecentsFragment" />
+
+
 </navigation>

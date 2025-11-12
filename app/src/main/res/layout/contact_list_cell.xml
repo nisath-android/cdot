@@ -17,10 +17,10 @@
             type="Integer"/>
         <variable
             name="viewModel"
-            type="com.naminfo.cdot_vc.activities.main.contact.viewmodels.ContactViewModel" />
+            type="org.naminfo.activities.main.contact.viewmodels.ContactViewModel" />
         <variable
             name="selectionListViewModel"
-            type="com.naminfo.cdot_vc.activities.main.viewmodels.ListTopBarViewModel" />
+            type="org.naminfo.activities.main.viewmodels.ListTopBarViewModel" />
     </data>
 
     <RelativeLayout
@@ -39,6 +39,7 @@
             android:id="@+id/avatar"
             android:layout_width="@dimen/contact_avatar_size"
             android:layout_height="@dimen/contact_avatar_size"
+            coilContact="@{viewModel}"
             android:layout_marginRight="10dp"
             android:layout_centerVertical="true"
             android:background="@drawable/generated_avatar_bg"
@@ -53,25 +54,55 @@
             android:adjustViewBounds="true"
             android:background="@drawable/led_background"
             android:padding="@dimen/contact_presence_badge_padding"
+            app:presenceIcon="@{viewModel.presenceStatus}"
+            android:visibility="@{viewModel.presenceStatus == ConsolidatedPresence.Offline ? View.GONE : View.VISIBLE, default=gone}"
             tools:ignore="ContentDescription" />
 
+        <LinearLayout
+            android:id="@+id/right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true">
+
+
+            <CheckBox
+                android:onClick="@{() -> selectionListViewModel.onToggleSelect(position)}"
+                android:visibility="@{selectionListViewModel.isEditionEnabled &amp;&amp; viewModel.isNativeContact ? View.VISIBLE : View.GONE, default=gone}"
+                android:checked="@{selectionListViewModel.selectedItems.contains(position)}"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp" />
+
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@id/right"
             android:layout_toRightOf="@id/avatar">
 
-            <com.naminfo.cdot_vc.views.MarqueeTextView
+            <org.naminfo.views.MarqueeTextView
                 android:id="@+id/name"
-                style="@style/contact_name_list_cell_font"
                 android:text="@{viewModel.contact.name ?? viewModel.displayName}"
+                style="@style/contact_name_list_cell_font"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:singleLine="true" />
 
+            <org.naminfo.views.MarqueeTextView
+                android:id="@+id/contactOrganization"
+                android:text="@{viewModel.contact.organization}"
+                android:visibility="@{viewModel.displayOrganization &amp;&amp; viewModel.contact.organization.length() > 0 ? View.VISIBLE : View.GONE}"
+                style="@style/contact_organization_font"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:singleLine="true" />
 
         </RelativeLayout>
 

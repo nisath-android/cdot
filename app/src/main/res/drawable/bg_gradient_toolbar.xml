@@ -1,8 +1,0 @@
-<!-- res/drawable/bg_gradient_toolbar.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:startColor="@color/primary_color"
-            android:endColor="@color/grey_color"
-        android:angle="270"
-        />
-</shape>

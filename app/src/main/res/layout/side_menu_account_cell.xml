@@ -5,7 +5,7 @@
         <import type="android.view.View" />
         <variable
             name="data"
-            type="com.naminfo.cdot_vc.activities.main.settings.viewmodels.AccountSettingsViewModel" />
+            type="org.naminfo.activities.main.settings.viewmodels.AccountSettingsViewModel" />
     </data>
 
     <RelativeLayout
@@ -27,8 +27,9 @@
             android:layout_marginLeft="@dimen/settings_margin" />
 
         <ImageView
-            android:src="@drawable/led_not_registered"
+            android:src="@{data.iconResource, default=@drawable/led_not_registered}"
             android:background="@drawable/led_background"
+            android:contentDescription="@{data.iconContentDescription}"
             android:layout_width="20dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

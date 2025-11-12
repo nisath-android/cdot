@@ -29,7 +29,7 @@
             type="android.view.View.OnClickListener"/>
         <variable
             name="viewModel"
-            type="com.naminfo.cdot_vc.activities.main.sidemenu.viewmodels.SideMenuViewModel" />
+            type="org.naminfo.activities.main.sidemenu.viewmodels.SideMenuViewModel" />
     </data>
 
     <RelativeLayout
@@ -46,11 +46,13 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:background="?attr/lightToolbarBackgroundColor">
-            <!-- coilRounded="@{viewModel.defaultAccountAvatar}"
-            android:onClick="@{selfPictureClickListener}"-->
+<!-- coilRounded="@{viewModel.defaultAccountAvatar}"
+android:onClick="@{selfPictureClickListener}"-->
 
             <ImageView
                 android:id="@+id/avatar"
+
+                loadProfileInitials="@{viewModel.defaultAccountViewModel.displayName.isEmpty() ? viewModel.defaultAccountViewModel.userName : viewModel.defaultAccountViewModel.displayName}"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
@@ -83,6 +85,7 @@
                 android:adjustViewBounds="true"
                 android:background="@drawable/led_background"
                 android:padding="@dimen/contact_presence_badge_padding"
+                app:presenceIcon="@{viewModel.presenceStatus}"
                 android:visibility="@{!viewModel.defaultAccountFound || viewModel.presenceStatus == ConsolidatedPresence.Offline ? View.GONE : View.VISIBLE, default=gone}"
                 tools:ignore="ContentDescription" />
 
@@ -125,6 +128,7 @@
             <ImageView
                 android:background="@drawable/led_background"
                 android:src="@{viewModel.defaultAccountViewModel.iconResource, default=@drawable/led_not_registered}"
+                android:contentDescription="@{viewModel.defaultAccountViewModel.iconContentDescription}"
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -157,7 +161,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout="@layout/side_menu_account_cell"/>
+                    app:entries="@{viewModel.accounts}"
+                    app:layout="@{@layout/side_menu_account_cell}"/>
 
                 <LinearLayout
                     android:id="@+id/login_text"
@@ -214,13 +219,13 @@
 
                 </LinearLayout>
 
-                <View
+                <!--<View
                     android:visibility="@{viewModel.showSettings ? View.VISIBLE : View.GONE}"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="?dividerColor" />
 
-                <!--<LinearLayout
+                <LinearLayout
                     android:onClick="@{recordingsClickListener}"
                     android:visibility="@{viewModel.showRecordings ? View.VISIBLE : View.GONE}"
                     android:layout_width="match_parent"
@@ -242,7 +247,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="16dp" />
 
-                </LinearLayout>
+                </LinearLayout>-->
 
                 <View
                     android:visibility="@{viewModel.showRecordings ? View.VISIBLE : View.GONE}"
@@ -275,9 +280,10 @@
                 </LinearLayout>
 
                 <View
+                    android:visibility="@{viewModel.showScheduledConferences ? View.VISIBLE : View.GONE}"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?dividerColor" />-->
+                    android:background="?dividerColor" />
 
                 <LinearLayout
                     android:onClick="@{aboutClickListener}"

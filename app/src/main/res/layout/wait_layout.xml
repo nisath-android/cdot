@@ -33,7 +33,6 @@
             android:layout_marginTop="10dp"
             android:textColor="@color/primary_color"
             android:textStyle="bold"
-            android:textSize="20dp"
             android:text="@string/operation_in_progress_wait" />
 
     </RelativeLayout>

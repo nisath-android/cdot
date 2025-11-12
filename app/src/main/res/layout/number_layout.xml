@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:background="@drawable/numpad_button_background"
+    android:clickable="true"
+    android:gravity="center"
+    android:padding="10dp"
+    android:orientation="vertical"
+    android:weightSum="4"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/view_dialer_button_text_textView_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="x"
+        android:textColor="@color/black_color"
+        android:textSize="50sp" />
+
+    <TextView
+        android:id="@+id/view_dialer_button_text_textView_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="-5dp"
+        android:text="ABC"
+        android:textColor="@color/black_color"
+        android:textSize="15sp" >
+    </TextView>
+
+</LinearLayout>

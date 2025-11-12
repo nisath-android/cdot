@@ -6,10 +6,10 @@
         <import type="android.view.View" />
         <variable
             name="statsViewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.StatisticsListViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.StatisticsListViewModel" />
         <variable
             name="controlsViewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.ControlsViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.ControlsViewModel" />
         <variable
             name="inflatedVisibility"
             type="Integer" />
@@ -21,7 +21,8 @@
         android:layout_height="match_parent"
         android:background="@color/voip_translucent_popup_background"
         android:clickable="true"
-        android:visibility="@{inflatedVisibility}">
+        android:visibility="@{inflatedVisibility}"
+        inflatedLifecycleOwner="@{true}">
 
         <View
             android:id="@+id/background"
@@ -63,7 +64,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout="@layout/voip_call_stat_cell" />
+                app:entries="@{statsViewModel.callStatsList}"
+                app:layout="@{@layout/voip_call_stats_cell}" />
 
         </androidx.core.widget.NestedScrollView>
 

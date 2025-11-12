@@ -28,16 +28,16 @@
             app:layout_anchor="@+id/relativeLayout"
             app:layout_anchorGravity="center"
             app:navGraph="@navigation/main_nav_graph"
-            tools:layout="@layout/fragment_dialer" />
+            tools:layout="@layout/dialer_fragment" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/tabs_fragment"
-        android:name="com.naminfo.cdot_vc.activities.main.fragments.TabsFragment"
+        android:name="org.naminfo.activities.main.fragments.TabsFragment"
         android:layout_width="match_parent"
         android:layout_height="@dimen/main_activity_tabs_fragment_size"
         android:layout_alignParentBottom="true"
-        tools:layout="@layout/fragment_tabs"/>
+        tools:layout="@layout/tabs_fragment"/>
 
 </RelativeLayout>

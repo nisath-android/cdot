@@ -1,56 +1,84 @@
 {
   "project_info": {
-    "project_number": "929724111839",
-    "firebase_url": "https://linphone-android-8a563.firebaseio.com",
-    "project_id": "linphone-android-8a563",
-    "storage_bucket": "linphone-android-8a563.appspot.com"
+    "project_number": "20422951708",
+    "firebase_url": "https://locopilot-9effd-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "locopilot-9effd",
+    "storage_bucket": "locopilot-9effd.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:929724111839:android:4662ea9a056188c4",
+        "mobilesdk_app_id": "1:20422951708:android:e72cc066d674c0bb6770d9",
         "android_client_info": {
-          "package_name": "org.linphone"
+          "package_name": "com.naminfo.locopilot"
         }
       },
       "oauth_client": [
         {
-          "client_id": "929724111839-co5kffto4j7dets7oolvfv0056cvpfbl.apps.googleusercontent.com",
+          "client_id": "20422951708-bk3jeh7aj6m8j4ai6t4sq8klsqiqoelm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.linphone",
-            "certificate_hash": "85463a95603f7b6331899b74b85d53d043dcd500"
+            "package_name": "com.naminfo.locopilot",
+            "certificate_hash": "b444e85773a6fcf10afe38a7f239535cb7fc63e4"
           }
         },
         {
-          "client_id": "929724111839-v5so1tcd65iil7dd7sde8jgii44h8luf.apps.googleusercontent.com",
+          "client_id": "20422951708-vbbitqfr0e02maaeemlvh3e6hv6f8d0t.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCKrwWhkbA7Iy3wpEI8_ZvKOMp5jf6vV6A"
+          "current_key": "AIzaSyBYn6Rztd7TnwlvyIkDhDfspx1YOFV22wA"
         }
-      ]
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "20422951708-vbbitqfr0e02maaeemlvh3e6hv6f8d0t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:929724111839:android:3cf90ee1d2f8fcb6",
+        "mobilesdk_app_id": "1:20422951708:android:b2a716fd737431956770d9",
         "android_client_info": {
-          "package_name": "org.linphone.debug"
+          "package_name": "org.naminfo.debug"
         }
       },
       "oauth_client": [
         {
-          "client_id": "929724111839-v5so1tcd65iil7dd7sde8jgii44h8luf.apps.googleusercontent.com",
+          "client_id": "20422951708-klsa3m2jiu6ajtqepahn1tr3op9927j0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.naminfo.debug",
+            "certificate_hash": "bac1ab686bc6bf43b19729270d78304168107310"
+          }
+        },
+        {
+          "client_id": "20422951708-vbbitqfr0e02maaeemlvh3e6hv6f8d0t.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCKrwWhkbA7Iy3wpEI8_ZvKOMp5jf6vV6A"
+          "current_key": "AIzaSyBYn6Rztd7TnwlvyIkDhDfspx1YOFV22wA"
         }
-      ]
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "20422951708-vbbitqfr0e02maaeemlvh3e6hv6f8d0t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

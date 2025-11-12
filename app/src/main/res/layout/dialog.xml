@@ -7,7 +7,7 @@
         <import type="android.text.InputType"/>
         <variable
             name="viewModel"
-            type="com.naminfo.cdot_vc.activities.main.viewmodels.DialogViewModel" />
+            type="org.naminfo.activities.main.viewmodels.DialogViewModel" />
     </data>
 
     <LinearLayout
@@ -67,7 +67,7 @@
             app:helperText="@{viewModel.passwordSubtitle}"
             app:helperTextEnabled="@{viewModel.passwordSubtitle.length() > 0}">
 
-            <com.naminfo.cdot_vc.views.SettingTextInputEditText
+            <org.naminfo.views.SettingTextInputEditText
                 android:id="@+id/settings_input"
                 android:text="@={viewModel.password}"
                 android:imeOptions="actionDone"

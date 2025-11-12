@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+
+    <style name="AppSplashScreenTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/dark_grey_color</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/cdot_splash_rounded</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+
+    </style>
+</resources>

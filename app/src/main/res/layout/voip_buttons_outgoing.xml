@@ -8,11 +8,11 @@
 
         <variable
             name="callsViewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.CallsViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.CallsViewModel" />
 
         <variable
             name="controlsViewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.ControlsViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.ControlsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

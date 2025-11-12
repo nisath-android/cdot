@@ -6,14 +6,19 @@
 
         <import type="android.view.View" />
 
+        <import type="org.naminfo.activities.voip.ConferenceDisplayMode" />
+
         <variable
             name="controlsViewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.ControlsViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.ControlsViewModel" />
 
         <variable
             name="callsViewModel"
-            type="com.naminfo.cdot_vc.activities.voip.viewmodels.CallsViewModel" />
+            type="org.naminfo.activities.voip.viewmodels.CallsViewModel" />
 
+        <variable
+            name="conferenceViewModel"
+            type="org.naminfo.activities.voip.viewmodels.ConferenceViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,10 +46,10 @@
             android:layout_marginEnd="5dp"
             android:background="@drawable/button_background_reverse"
             android:contentDescription="@{callsViewModel.isMicrophoneMuted ? @string/content_description_disable_mic_mute : @string/content_description_enable_mic_mute}"
-            android:enabled="@{callsViewModel.isMuteMicrophoneEnabled}"
+            android:enabled="@{callsViewModel.isMuteMicrophoneEnabled &amp;&amp; !conferenceViewModel.isMeListenerOnly}"
             android:onClick="@{() -> callsViewModel.toggleMuteMicrophone()}"
             android:padding="5dp"
-            android:selected="@{callsViewModel.isMicrophoneMuted}"
+            android:selected="@{callsViewModel.isMicrophoneMuted || conferenceViewModel.isMeListenerOnly}"
             android:src="@drawable/icon_toggle_mic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="W,1:1"
@@ -91,10 +96,10 @@
             android:layout_marginStart="5dp"
             android:background="@drawable/button_background_reverse"
             android:contentDescription="@{controlsViewModel.isVideoEnabled &amp;&amp; controlsViewModel.isSendingVideo ? @string/content_description_disable_video : @string/content_description_enable_video}"
-            android:enabled="@{controlsViewModel.isVideoAvailable &amp;&amp; !controlsViewModel.isVideoUpdateInProgress }"
-            android:onClick="@{() -> controlsViewModel.toggleVideo()}"
+            android:enabled="@{controlsViewModel.isVideoAvailable &amp;&amp; !controlsViewModel.isVideoUpdateInProgress &amp;&amp; !conferenceViewModel.isMeListenerOnly}"
+            android:onClick="@{() -> (!conferenceViewModel.conferenceExists || conferenceViewModel.conferenceDisplayMode != ConferenceDisplayMode.AUDIO_ONLY) ? controlsViewModel.toggleVideo() : conferenceViewModel.switchLayoutFromAudioOnlyToActiveSpeaker()}"
             android:padding="5dp"
-            android:selected="@{controlsViewModel.isVideoEnabled &amp;&amp; controlsViewModel.isSendingVideo }"
+            android:selected="@{controlsViewModel.isVideoEnabled &amp;&amp; controlsViewModel.isSendingVideo &amp;&amp; !conferenceViewModel.isMeListenerOnly}"
             android:visibility="@{controlsViewModel.hideVideo ? View.GONE : View.VISIBLE}"
             android:src="@drawable/icon_toggle_camera"
             app:layout_constraintBottom_toBottomOf="parent"

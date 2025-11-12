@@ -22,7 +22,7 @@
             type="Boolean" />
         <variable
             name="listener"
-            type="com.naminfo.cdot_vc.activities.main.settings.SettingListener" />
+            type="org.naminfo.activities.main.settings.SettingListener" />
     </data>
 
     <RelativeLayout
@@ -31,7 +31,7 @@
 
         <ImageView
             android:id="@+id/settings_commit_input"
-
+            android:onClick="@{() -> settingsInput.fakeImeDone(listener)}"
             android:visibility="invisible"
             android:contentDescription="@string/content_description_confirm_contact_edit"
             android:layout_width="20dp"
@@ -54,9 +54,10 @@
             app:helperText="@{subtitle}"
             app:helperTextEnabled="@{subtitle.length() > 0}">
 
-            <com.naminfo.cdot_vc.views.SettingTextInputEditText
+            <org.naminfo.views.SettingTextInputEditText
                 android:id="@+id/settings_input"
-
+                onFocusChangeVisibilityOf="@{settingsCommitInput}"
+                onSettingImeDone="@{() -> listener.onTextValueChanged(settingsInput.getText().toString())}"
                 android:text="@{defaultValue}"
                 android:imeOptions="actionDone"
                 android:inputType="@{inputType ?? InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS}"

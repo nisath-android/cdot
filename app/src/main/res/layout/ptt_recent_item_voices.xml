@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="org.naminfo.activities.main.ptt.pttrecents.PTTRecentsViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/active_status"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="15dp"
+            app:layout_constraintVertical_bias="1"
+            app:layout_constraintHorizontal_bias="1"
+            android:translationZ="90dp"
+            app:layout_constraintBottom_toBottomOf="@+id/img_profile"
+            app:layout_constraintEnd_toEndOf="@+id/img_profile"
+            app:layout_constraintStart_toStartOf="@+id/img_profile"
+            app:layout_constraintTop_toTopOf="@+id/img_profile" />
+        <!-- Profile Icon -->
+        <ImageView
+            android:id="@+id/img_profile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="Profile Image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ptt_person"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Name -->
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="John Doe"
+            android:textSize="16sp"
+            android:textStyle="bold"
+
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/img_profile"
+            app:layout_constraintTop_toTopOf="@id/img_profile" />
+        <ImageView
+            android:id="@+id/ptt_down_arrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:rotation="45"
+            android:src="@drawable/ptt_down_arrow"
+            app:layout_constraintStart_toStartOf="@id/tv_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name"/>
+        <!-- Time -->
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="20m ago"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@id/ptt_down_arrow"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name" />
+
+        <!-- Message Icon -->
+        <ImageView
+            android:id="@+id/img_message"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleX="-1"
+            android:src="@drawable/ptt_message"
+            android:contentDescription="Message Icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey_color"
+            android:backgroundTint="@color/grey_color"
+            android:layout_marginStart="54dp"
+            app:layout_constraintStart_toStartOf="@id/img_profile"
+
+            app:layout_constraintTop_toBottomOf="@id/img_profile"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

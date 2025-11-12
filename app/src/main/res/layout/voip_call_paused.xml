@@ -6,7 +6,7 @@
         <import type="android.view.View" />
         <variable
             name="data"
-            type="com.naminfo.cdot_vc.activities.voip.data.CallData" />
+            type="org.naminfo.activities.voip.data.CallData" />
         <variable
             name="inflatedVisibility"
             type="Integer" />
@@ -19,7 +19,8 @@
         android:background="@color/voip_translucent_popup_background"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="@{inflatedVisibility}">
+        android:visibility="@{inflatedVisibility}"
+        inflatedLifecycleOwner="@{true}">
 
         <ImageView
             android:id="@+id/resume_call"

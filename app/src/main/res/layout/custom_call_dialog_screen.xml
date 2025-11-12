@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <ImageView
+        android:id="@+id/close_dialog"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/field_clean"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/mobion_icon"
+        app:layout_constraintEnd_toEndOf="@+id/tittleText"
+        app:layout_constraintStart_toStartOf="@+id/tittleText"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/tittleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select your call mode"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageView2"/>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mobiFSCallBTN"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:text="Audio"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tittleText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+         />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mobiFSVideoCallBTN"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:text="Video"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/mobiFSCallBTN"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+         />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/gsmCallBTN"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="GSM"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/mobiFSCallBTN"
+        app:layout_constraintStart_toStartOf="@+id/mobiFSCallBTN"
+        app:layout_constraintTop_toBottomOf="@+id/mobiFSVideoCallBTN" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mobiWebCallBTN"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:text="Mobi web"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/gsmCallBTN"
+        app:layout_constraintStart_toStartOf="@+id/gsmCallBTN"
+        app:layout_constraintTop_toBottomOf="@+id/gsmCallBTN"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

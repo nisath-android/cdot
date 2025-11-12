@@ -59,8 +59,6 @@
         <attr name="checked" format="boolean" />
         <attr name="value" format="string" />
         <attr name="image" format="reference" />
-        <attr name="titleTextColor" format="color" />
-        <attr name="titleTextSize" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="VoiceRecordProgressBar">

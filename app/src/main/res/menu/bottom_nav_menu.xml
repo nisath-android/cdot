@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_ptt_recents"
+        android:title="Recents"
+        android:icon="@drawable/recents_24" />
+    <item
+        android:id="@+id/nav_ptt_contacts"
+        android:title="Contacts"
+        android:icon="@drawable/contact" />
+    <item
+        android:id="@+id/nav_ptt_channels"
+        android:title="Groups"
+        android:icon="@drawable/group_call" />
+</menu>
