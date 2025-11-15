@@ -20,6 +20,7 @@ import org.naminfo.R
 import org.naminfo.activities.*
 import org.naminfo.activities.clearDisplayedCallHistory
 import org.naminfo.activities.main.MainActivity
+import org.naminfo.activities.main.contact.viewmodels.MockContactList
 import org.naminfo.activities.main.fragments.MasterFragment
 import org.naminfo.activities.main.history.adapters.CallLogsListAdapter
 import org.naminfo.activities.main.history.data.GroupedCallLogData
@@ -149,6 +150,7 @@ class MasterCallLogsFragment : MasterFragment<HistoryMasterFragmentBinding, Call
                                 Log.i(
                                     "[History] Currently displayed history has been deleted, removing detail fragment"
                                 )
+                                MockContactList.SipValidator.clearHistory()
                                 clearDisplayedCallHistory()
                             }
                             dialog.dismiss()

@@ -27,17 +27,22 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.linphone.core.tools.Log
 import org.naminfo.LinphoneApplication
 import org.naminfo.R
 import org.naminfo.activities.main.adapters.SelectionListAdapter
-import org.naminfo.activities.main.contact.viewmodels.ContactsListViewModel
+import org.naminfo.activities.main.contact.viewmodels.MatchedContact
+import org.naminfo.activities.main.contact.viewmodels.MockContactList
+import org.naminfo.activities.main.contact.viewmodels.SimpleContact
 import org.naminfo.activities.main.history.data.GroupedCallLogData
 import org.naminfo.activities.main.viewmodels.ListTopBarViewModel
 import org.naminfo.databinding.GenericListHeaderBinding
@@ -55,9 +60,23 @@ class CallLogsListAdapter(
     HeaderAdapter {
 
     private val gson by lazy { Gson() }
-    private val sipListType: Type = object : TypeToken<ArrayList<ContactsListViewModel.SipContact>>() {}.type
+    /*   private val sipListType: Type = object : TypeToken<ArrayList<ContactsListViewModel.SipContact>>() {}.type
 
-    private val sipContactList: ArrayList<ContactsListViewModel.SipContact> by lazy {
+       private val sipContactList: ArrayList<ContactsListViewModel.SipContact> by lazy {
+           try {
+               gson.fromJson(
+                   LinphoneApplication.corePreferences.sipContactsSaved?.toString() ?: "[]",
+                   sipListType
+               ) ?: arrayListOf()
+           } catch (e: Exception) {
+               e.printStackTrace()
+               arrayListOf()
+           }
+       }*/
+
+    private val sipListType: Type = object : TypeToken<ArrayList<SimpleContact>>() {}.type
+
+    private val sipContactList: ArrayList<SimpleContact> by lazy {
         try {
             gson.fromJson(
                 LinphoneApplication.corePreferences.sipContactsSaved?.toString() ?: "[]",
@@ -83,7 +102,7 @@ class CallLogsListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as ViewHolder).bind(getItem(position))
+        (holder as ViewHolder).bind(getItem(position), position)
     }
 
     inner class ViewHolder(
@@ -112,7 +131,7 @@ class CallLogsListAdapter(
             }
         }
 
-        fun bind(callLogGroup: GroupedCallLogData) = with(binding) {
+        fun bind(callLogGroup: GroupedCallLogData, pos: Int) = with(binding) {
             val context = root.context
             val viewModel = callLogGroup.lastCallLogViewModel
 
@@ -120,37 +139,84 @@ class CallLogsListAdapter(
                 showSafeSnackbar("⚠️ Missing call log data")
                 return
             }
-
             // Safe data binding
             this.viewModel = viewModel
             lifecycleOwner = viewLifecycleOwner
             selectionListViewModel = selectionViewModel
 
             // Observe only once (avoids multiple observers)
-            selectionViewModel.isEditionEnabled.removeObservers(viewLifecycleOwner)
+            //   selectionViewModel.isEditionEnabled.removeObservers(viewLifecycleOwner)
             selectionViewModel.isEditionEnabled.observe(viewLifecycleOwner) {
                 position = bindingAdapterPosition
             }
-
+            val callerName = LinphoneApplication.corePreferences.getCallerName
             // Safe SIP display name replacement
             val displayName = viewModel.displayName?.value
-            if (!displayName.isNullOrBlank() && displayName.startsWith("sip:", true)) {
-                val callerName = LinphoneApplication.corePreferences.getCallerName
-                if (!callerName.isNullOrBlank()) {
-                    viewModel.displayName.value = callerName
-                } else {
-                    // showSafeSnackbar("⚠️ No display name found")
+            val remoteString = viewModel.callLog.toAddress.asStringUriOnly()
+
+            android.util.Log.i(
+                "CallLogsAdapter",
+                "bind:  toAddress.asStringUriOnly()=${viewModel.callLog.toAddress.asStringUriOnly()},\n " +
+                    "toAddress.username=${viewModel.callLog.toAddress.username},\n" +
+                    "toAddress.displayName=${viewModel.callLog.toAddress.displayName},\n"
+            )
+            viewModel.displayName.postValue(
+                viewModel.callLog.toAddress.username ?: viewModel.callLog.toAddress.displayName
+            )
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                // Fetch lists
+                val sipContacts = MockContactList.SipValidator.getSipContacts()
+                val broadcastContacts = MockContactList.SipValidator.fetchBroadcastContacts()
+                val groupContacts = MockContactList.SipValidator.fetchGroupedContacts()
+
+                // Build maps safely → ignore null keys
+                val sipMap = sipContacts.associateBy { it.phone }
+                val broadcastMap = broadcastContacts
+                    .filter { it.bcNumber != null }
+                    .associateBy { it.bcNumber!! }
+
+                val groupMap = groupContacts
+                    .filter { it.groupNumber != null }
+                    .associateBy { it.groupNumber!! }
+
+                val phone = viewModel.callLog.toAddress.username
+
+                // Priority: SIP → Broadcast → Group
+                val matched: MatchedContact? = when {
+                    sipMap.containsKey(phone) ->
+                        MatchedContact.Sip(sipMap[phone]!!)
+
+                    broadcastMap.containsKey(phone) ->
+                        MatchedContact.Broadcast(broadcastMap[phone]!!)
+
+                    groupMap.containsKey(phone) ->
+                        MatchedContact.Group(groupMap[phone]!!)
+
+                    else -> null
                 }
-            } else {
-                // showSafeSnackbar("⚠️ No display name found")
+
+                // Handle match
+                if (matched != null) {
+                    val displayName = when (matched) {
+                        is MatchedContact.Sip -> matched.data.name
+                        is MatchedContact.Broadcast -> matched.data.bcName ?: matched.data.bcNumber
+                        is MatchedContact.Group -> matched.data.groupName ?: matched.data.groupNumber
+                    }
+                    val displayContact = when (matched) {
+                        is MatchedContact.Sip -> matched.data.phone
+                        is MatchedContact.Broadcast -> matched.data.bcNumber ?: matched.data.bcName
+                        is MatchedContact.Group -> matched.data.groupNumber ?: matched.data.groupName
+                    }
+
+                    viewModel.displayName.postValue(displayName)
+                    viewModel.contactNumber.postValue(displayContact)
+
+                    Log.d("CallLogsAdapter", "Match found → phone=$phone | name=$displayName")
+                } else {
+                    Log.d("CallLogsAdapter", "No match for phone=$phone")
+                }
             }
 
-            // Match contact number from local SIP contact list
-            sipContactList.firstOrNull { it.name == viewModel.displayName?.value }?.let {
-                viewModel.contactNumber?.value = it.mobileNumber
-            }
-
-            // Click listener (single click)
             setClickListener {
                 if (selectionViewModel.isEditionEnabled.value == true) {
                     selectionViewModel.onToggleSelect(bindingAdapterPosition)
@@ -159,24 +225,22 @@ class CallLogsListAdapter(
                 }
             }
 
-            // Long press to enable multi-selection
             setLongClickListener {
                 if (selectionViewModel.isEditionEnabled.value == false) {
                     selectionViewModel.isEditionEnabled.value = true
+                    // Selection will be handled by click listener
                     true
                 } else {
                     false
                 }
             }
 
-            // Details button click
+            // This listener is disabled when in edition mode
             setDetailsClickListener {
-                if (selectionViewModel.isEditionEnabled.value == false) {
-                    selectedCallLogEvent.value = Event(callLogGroup)
-                }
+                selectedCallLogEvent.value = Event(callLogGroup)
             }
-
             groupCount = callLogGroup.callLogs.size
+
             executePendingBindings()
         }
     }
@@ -234,6 +298,8 @@ private class CallLogDiffCallback : DiffUtil.ItemCallback<GroupedCallLogData>() 
         oldItem: GroupedCallLogData,
         newItem: GroupedCallLogData
     ): Boolean {
+        if (oldItem.lastCallLogViewModel?.displayName?.value == null) return false
+        if (oldItem.callLogs.isEmpty()) return false
         return oldItem.callLogs.size == newItem.callLogs.size &&
             oldItem.lastCallLogViewModel?.displayName?.value == newItem.lastCallLogViewModel?.displayName?.value
     }

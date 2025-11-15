@@ -400,7 +400,31 @@ class ControlsViewModel : ViewModel() {
 
     fun hangUp() {
         val core = coreContext.core
-        // core.createCallLog()
+       /* val from = core.createAddress("sip:caller@sipdomain.com")
+        val to = core.createAddress("sip:callee@sipdomain.com")
+        val direction: Call.Dir? = Call.Dir.Outgoing
+        val duration = 120 // seconds
+        val startTime = System.currentTimeMillis()
+        val connectedTime = startTime + 5000
+        val status: Call.Status? = Call.Status.Success
+        val videoEnabled = false
+        val quality = 4.2f
+
+
+// Create the call log object
+        val log = core.createCallLog(
+            from!!,
+            to!!,
+            direction,
+            duration,
+            startTime,
+            connectedTime,
+            status,
+            videoEnabled,
+            quality
+        )
+
+        core.createCallLog()*/
         when {
             core.currentCall != null -> {
                 core.currentCall?.terminate()

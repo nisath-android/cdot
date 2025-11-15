@@ -1,4 +1,3 @@
-
 package org.naminfo.activities.main.history.viewmodels
 
 import androidx.lifecycle.MutableLiveData
@@ -90,33 +89,42 @@ class CallLogsListViewModel : ViewModel() {
         updateCallLogs()
     }
 
-    private fun computeCallLogs(callLogs: Array<CallLog>, missed: Boolean, conference: Boolean): ArrayList<GroupedCallLogData> {
+    private fun computeCallLogs(
+        callLogs: Array<CallLog>,
+        missed: Boolean,
+        conference: Boolean
+    ): ArrayList<GroupedCallLogData> {
+        android.util.Log.i("CalLogs", "computeCallLogs: ")
         var previousCallLogGroup: GroupedCallLogData? = null
         val list = arrayListOf<GroupedCallLogData>()
 
         for (callLog in callLogs) {
-            if ((!missed && !conference) || (missed && LinphoneUtils.isCallLogMissed(callLog)) || (conference && callLog.wasConference())) {
-                if (previousCallLogGroup == null) {
-                    previousCallLogGroup = GroupedCallLogData(callLog)
-                } else if (!callLog.wasConference() && // Do not group conference call logs
-                    callLog.wasConference() == previousCallLogGroup.lastCallLog.wasConference() && // Check that both are of the same type, if one has a conf-id and not the other the equal method will return true !
-                    previousCallLogGroup.lastCallLog.localAddress.weakEqual(callLog.localAddress) &&
-                    previousCallLogGroup.lastCallLog.remoteAddress.equal(callLog.remoteAddress)
-                ) {
-                    if (TimestampUtils.isSameDay(
-                            previousCallLogGroup.lastCallLogStartTimestamp,
-                            callLog.startDate
-                        )
+            if (callLog.toAddress.username != null) {
+                if ((!missed && !conference) || (missed && LinphoneUtils.isCallLogMissed(callLog)) || (conference && callLog.wasConference())) {
+                    if (previousCallLogGroup == null) {
+                        previousCallLogGroup = GroupedCallLogData(callLog)
+                    } else if (!callLog.wasConference() && // Do not group conference call logs
+                        callLog.wasConference() == previousCallLogGroup.lastCallLog.wasConference() && // Check that both are of the same type, if one has a conf-id and not the other the equal method will return true !
+                        previousCallLogGroup.lastCallLog.localAddress.weakEqual(
+                                callLog.localAddress
+                            ) &&
+                        previousCallLogGroup.lastCallLog.remoteAddress.equal(callLog.remoteAddress)
                     ) {
-                        previousCallLogGroup.callLogs.add(callLog)
-                        previousCallLogGroup.updateLastCallLog(callLog)
+                        if (TimestampUtils.isSameDay(
+                                previousCallLogGroup.lastCallLogStartTimestamp,
+                                callLog.startDate
+                            )
+                        ) {
+                            previousCallLogGroup.callLogs.add(callLog)
+                            previousCallLogGroup.updateLastCallLog(callLog)
+                        } else {
+                            list.add(previousCallLogGroup)
+                            previousCallLogGroup = GroupedCallLogData(callLog)
+                        }
                     } else {
                         list.add(previousCallLogGroup)
                         previousCallLogGroup = GroupedCallLogData(callLog)
                     }
-                } else {
-                    list.add(previousCallLogGroup)
-                    previousCallLogGroup = GroupedCallLogData(callLog)
                 }
             }
         }
@@ -127,11 +135,121 @@ class CallLogsListViewModel : ViewModel() {
         return list
     }
 
+    /*   private fun computeCallLogs(
+           callLogs: Array<CallLog>,
+           missed: Boolean,
+           conference: Boolean
+       ): ArrayList<GroupedCallLogData> {
+           Log.i("CallLogs", "=== computeCallLogs START ===")
+           Log.i("CallLogs", "Input: total=${callLogs.size}, missed=$missed, conference=$conference")
+
+           var previousCallLogGroup: GroupedCallLogData? = null
+           val list = arrayListOf<GroupedCallLogData>()
+
+           callLogs.forEachIndexed { index, callLog ->
+               if (callLog.toAddress.username != null) {
+                   Log.i("CallLogs", "\n--- Processing index=$index ---")
+                   Log.i(
+                       "CallLogs",
+                       "Log -> remote=${callLog.remoteAddress} local=${callLog.localAddress}"
+                   )
+                   Log.i(
+                       "CallLogs",
+                       "Start time: ${callLog.startDate}, Conference=${callLog.wasConference()}"
+                   )
+
+                   val isMissed = LinphoneUtils.isCallLogMissed(callLog)
+                   Log.i("CallLogs", "isMissed=$isMissed")
+
+                   val include =
+                       (!missed && !conference) || // Normal mode
+                           (missed && isMissed) || // Missed only
+                           (conference && callLog.wasConference()) // Conference only
+
+                   Log.i("CallLogs", "Should include this log? -> $include")
+
+                   if (!include) {
+                       Log.i("CallLogs", "SKIPPED this log")
+                       return@forEachIndexed
+                   }
+
+                   // First log into group
+                   if (previousCallLogGroup == null) {
+                       Log.i("CallLogs", "Creating FIRST group with this call log")
+                       previousCallLogGroup = GroupedCallLogData(callLog)
+                       return@forEachIndexed
+                   }
+
+                   val previous = previousCallLogGroup!!
+
+                   Log.i("CallLogs", "Comparing WITH previous group lastLog:")
+                   Log.i("CallLogs", "previous.remote=${previous.lastCallLog.remoteAddress}")
+                   Log.i("CallLogs", "previous.local=${previous.lastCallLog.localAddress}")
+                   Log.i("CallLogs", "previous.conference=${previous.lastCallLog.wasConference()}")
+
+                   val canGroup =
+                       !callLog.wasConference() &&
+                           callLog.wasConference() == previous.lastCallLog.wasConference() &&
+                           previous.lastCallLog.localAddress.weakEqual(callLog.localAddress) &&
+                           previous.lastCallLog.remoteAddress.equal(callLog.remoteAddress)
+
+                   Log.i("CallLogs", "Can group with previous? -> $canGroup")
+
+                   if (canGroup) {
+                       val sameDay = TimestampUtils.isSameDay(
+                           previous.lastCallLogStartTimestamp,
+                           callLog.startDate
+                       )
+
+                       Log.i("CallLogs", "Is same day? -> $sameDay")
+
+                       if (sameDay) {
+                           Log.i("CallLogs", "Adding call to existing group")
+                           previous.callLogs.add(callLog)
+                           previous.updateLastCallLog(callLog)
+                       } else {
+                           Log.i("CallLogs", "Different day -> creating new group")
+                           list.add(previous)
+                           previousCallLogGroup = GroupedCallLogData(callLog)
+                       }
+                   } else {
+                       Log.i("CallLogs", "CANNOT GROUP -> creating new group")
+                       list.add(previous)
+                       previousCallLogGroup = GroupedCallLogData(callLog)
+                   }
+               }
+           }
+
+           if (previousCallLogGroup != null && !list.contains(previousCallLogGroup)) {
+               Log.i("CallLogs", "Adding FINAL group")
+               list.add(previousCallLogGroup)
+           }
+
+           Log.i("CallLogs", "=== computeCallLogs END ===")
+           Log.i("CallLogs", "Output groups count: ${list.size}")
+
+           list.forEachIndexed { index, group ->
+               Log.i(
+                   "CallLogs",
+                   "Group[$index] -> size=${group.callLogs.size},  last=${group.lastCallLog.remoteAddress}"
+               )
+           }
+
+           return list
+       }*/
+
     private fun updateCallLogs() {
         callLogs.value.orEmpty().forEach(GroupedCallLogData::destroy)
 
         val allCallLogs = coreContext.core.callLogs
-        Log.i("[xxxCall Logs] ${allCallLogs.size} call logs found")
+        if (allCallLogs.isNotEmpty()) {
+            allCallLogs.toList().map { callLog ->
+                Log.i(
+                    "CallLogsAdapter",
+                    " [xxxCall Logs] ${allCallLogs.size} call logs found , username=${callLog.toAddress.username} startDate=${callLog.startDate} ,${callLog.toAddress.asStringUriOnly()}"
+                )
+            }
+        }
 
         callLogs.value = when (filter.value) {
             CallLogsFilter.MISSED -> computeCallLogs(allCallLogs, missed = true, conference = false)

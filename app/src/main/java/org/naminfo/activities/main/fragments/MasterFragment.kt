@@ -26,10 +26,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.view.doOnPreDraw
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
+import kotlinx.coroutines.launch
 import org.linphone.core.tools.Log
 import org.naminfo.R
 import org.naminfo.activities.main.adapters.SelectionListAdapter
+import org.naminfo.activities.main.contact.viewmodels.MockContactList
 import org.naminfo.activities.main.viewmodels.DialogViewModel
 import org.naminfo.activities.main.viewmodels.ListTopBarViewModel
 import org.naminfo.utils.AppUtils
@@ -99,9 +102,15 @@ abstract class MasterFragment<T : ViewDataBinding, U : SelectionListAdapter<*, *
 
                 viewModel.showDeleteButton(
                     {
+                        android.util.Log.d("CallLogsAdapter", "onViewCreated: delete clicked")
+                        MockContactList.SipValidator.clearHistory()
                         delete()
                         dialog.dismiss()
-                        listSelectionViewModel.isEditionEnabled.value = false
+                        lifecycleScope.launch {
+                            // LinphoneApplication.corePreferences.getCallerName = ""
+
+                            listSelectionViewModel.isEditionEnabled.postValue(false)
+                        }
                     },
                     getString(R.string.dialog_delete)
                 )

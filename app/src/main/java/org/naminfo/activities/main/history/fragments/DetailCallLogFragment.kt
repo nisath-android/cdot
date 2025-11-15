@@ -20,14 +20,9 @@
 package org.naminfo.activities.main.history.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.text.isDigitsOnly
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.button.MaterialButton
-import org.linphone.core.Address
 import org.linphone.core.tools.Log
 import org.naminfo.LinphoneApplication.Companion.coreContext
 import org.naminfo.LinphoneApplication.Companion.corePreferences
@@ -587,100 +582,6 @@ class DetailCallLogFragment : GenericFragment<HistoryDetailFragmentBinding>() {
         }
         corePreferences.typeOfCall = ""
         callLogGroup.callType = ""
-    }
-
-    private fun showCustomDialog(
-        phoneAddress: String,
-        remoteAddress: Address,
-        localAddress: Address,
-        isVideo: Boolean = false,
-        callType: String = ""
-    ) {
-        Log.i(
-            "[CallLogs-DetailCall] DetailCallLogFragment-In showCustomDialog = $phoneAddress  , $isVideo"
-        )
-        if (isVisible) {
-            val dialogView = LayoutInflater.from(requireContext()).inflate(
-                R.layout.custom_call_dialog_screen,
-                null
-            )
-            val dialog = AlertDialog.Builder(requireContext())
-                .setView(dialogView)
-                .create()
-
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-            val mobiFSCallBTN = dialogView.findViewById<MaterialButton>(R.id.mobiFSCallBTN)
-            val gsmCallBTN = dialogView.findViewById<MaterialButton>(R.id.gsmCallBTN)
-            val mobiWebCallBTN = dialogView.findViewById<MaterialButton>(R.id.mobiWebCallBTN)
-            val closeDialog = dialogView.findViewById<ImageView>(R.id.close_dialog)
-            if (isVideo) {
-                coreContext.core.videoActivationPolicy.automaticallyInitiate =
-                    true // Enable video initiation
-                coreContext.core.videoActivationPolicy.automaticallyAccept =
-                    true // Enable video acceptance
-                coreContext.core.isVideoCaptureEnabled = true // Enable video capture
-                coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
-                updateVideoActivationPolicy(true)
-                mobiFSCallBTN.setText("Video")
-                gsmCallBTN.visibility = View.GONE
-            } else {
-                coreContext.core.videoActivationPolicy.automaticallyInitiate =
-                    false // Enable video initiation
-                coreContext.core.videoActivationPolicy.automaticallyAccept =
-                    false // Enable video acceptance
-                coreContext.core.isVideoCaptureEnabled = false // Enable video capture
-                coreContext.core.isVideoDisplayEnabled = false // Ensure video display is enabled
-                updateVideoActivationPolicy(true)
-                mobiFSCallBTN.setText("Audio")
-            }
-            var phoneNumberModified = ""
-            corePreferences.getRemoteUserPhoneNumber = phoneAddress.trim().takeLast(10)
-            mobiFSCallBTN.setOnClickListener {
-                phoneNumberModified = phoneAddress.trim().takeLast(10)
-                /* val username = remoteAddress.username
-                 val displayName = remoteAddress.displayName
-                 remoteAddress.setUsername(phoneNumberModified)
-                 remoteAddress.setDisplayName(displayName)*/
-                remoteAddress.setUsername(phoneNumberModified)
-                Log.i(
-                    "[CallLogs-DetailCall] -Phone address mobiFSCallBTN-> $phoneNumberModified remoteAddress:${remoteAddress.asStringUriOnly()} ,localAddress:${localAddress.asStringUriOnly()}"
-                )
-                coreContext.startCall(remoteAddress, localAddress = localAddress)
-                dialog.dismiss()
-            }
-            gsmCallBTN.setOnClickListener {
-                phoneNumberModified = "11${phoneAddress.trim().takeLast(10)}"
-                val username = remoteAddress.username
-                val displayName = remoteAddress.displayName
-                remoteAddress.setUsername(phoneNumberModified)
-
-                // val sipUriModified = address.asStringUriOnly()
-                // address?.setUriParams(modifySipUri(sipUriModified, "11"))
-                Log.i(
-                    "[CallLogs-DetailCall] DetailCallLogFragment-Phone address gsmCallBTN-> username:$username,displayName:$displayName,phoneNumberModified:$phoneNumberModified sip-uri=${remoteAddress.asStringUriOnly()}"
-                )
-                coreContext.startCall(remoteAddress, localAddress = localAddress)
-                dialog.dismiss()
-            }
-            mobiWebCallBTN.setOnClickListener {
-                phoneNumberModified = "00${phoneAddress.trim().takeLast(10)}"
-
-                remoteAddress.setUsername(phoneNumberModified)
-
-                Log.i(
-                    "[CallLogs-DetailCall] DetailCallLogFragment-Phone address mobiWebCallBTN-> $phoneNumberModified sip-uri=${remoteAddress.asStringUriOnly()}"
-                )
-                coreContext.startCall(remoteAddress, localAddress = localAddress)
-                dialog.dismiss()
-            }
-            closeDialog.setOnClickListener {
-                phoneNumberModified = ""
-                corePreferences.getRemoteUserPhoneNumber = ""
-                dialog.dismiss()
-            }
-            dialog.show()
-        }
     }
 
     fun modifySipUri(sipUri: String, prefixCode: String): String {

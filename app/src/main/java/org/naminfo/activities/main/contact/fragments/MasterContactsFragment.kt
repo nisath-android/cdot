@@ -49,6 +49,8 @@ import org.naminfo.activities.main.contact.data.CustomGroupContactsDialog
 import org.naminfo.activities.main.contact.data.GroupInfoContact
 import org.naminfo.activities.main.contact.data.GroupSettingsContact
 import org.naminfo.activities.main.contact.viewmodels.ContactsListViewModel
+import org.naminfo.activities.main.contact.viewmodels.MockContactList
+import org.naminfo.activities.main.contact.viewmodels.SimpleContact
 import org.naminfo.activities.main.fragments.MasterFragment
 import org.naminfo.activities.navigateToContact
 import org.naminfo.databinding.ContactMasterFragmentBinding
@@ -177,11 +179,45 @@ class MasterContactsFragment : MasterFragment<ContactMasterFragmentBinding, Cont
         ) {
             listViewModel.fetchInProgress.value = it
         }
-
+        val gson = Gson()
         listViewModel.contactsList.observe(
             viewLifecycleOwner
         ) {
             Log.i("[Contacts] Contact List empty - [${it.isEmpty()}] ")
+            val simpleList = it.map { contactViewModel ->
+                val fullName = contactViewModel.fullName ?: contactViewModel.displayName.value ?: contactViewModel.contact.value?.name ?: contactViewModel.contact.value?.address?.displayName ?: ""
+                val phoneNumber = contactViewModel.contact.value?.address?.username ?: MockContactList.parseSipUri(
+                    contactViewModel.contact.value?.address?.asStringUriOnly()!!
+                ).first
+                    ?: "${contactViewModel.contact.value?.address?.asStringUriOnly()!!}"
+                val sipAddressUri = contactViewModel.contact.value?.address?.asStringUriOnly() ?: MockContactList.makeUrl(
+                    phoneNumber!!,
+                    corePreferences.defaultDomain
+                )
+
+                SimpleContact(
+                    phone = phoneNumber ?: "",
+                    name = fullName ?: "",
+                    sipAddress = sipAddressUri ?: ""
+                )
+            }
+            corePreferences.sipContactsSaved = gson.toJson(simpleList)
+
+            it.forEachIndexed { index, contactViewModel ->
+
+                Log.i(
+                    TAG,
+                    " [Contacts] Processed \nfullName:${ contactViewModel.fullName} ," +
+                        " displayName:${ contactViewModel.displayName.value},\n" +
+                        "contact.name:${ contactViewModel.contact.value?.name},\n" +
+                        "contact.username:${ contactViewModel.contact.value?.address?.username},\n" +
+                        "contact.asStringUriOnly:${ contactViewModel.contact.value?.address?.asStringUriOnly()},\n" +
+                        "contact.domain:${ contactViewModel.contact.value?.address?.domain},\n" +
+                        "contact.displayName:${ contactViewModel.contact.value?.address?.displayName},\n" +
+                        "contact.isSip:${ contactViewModel.contact.value?.address?.isSip}"
+                )
+            }
+
             if (it.isEmpty()) {
                 listViewModel.fetchSipContacts(requireContext())
             }
@@ -315,8 +351,8 @@ class MasterContactsFragment : MasterFragment<ContactMasterFragmentBinding, Cont
             }
             if (contacts.size > 0) {
                 // val contactList = contacts.sortedBy { it.First_Name?.uppercase() }
-                val gson = Gson()
-                corePreferences.pbxContactsSaved = gson.toJson(contacts)
+//                val gson = Gson()
+//                corePreferences.pbxContactsSaved = gson.toJson(contacts)
                 pbxAdapter.submitList(contacts) // Update the adapter with the new list of contacts
             }
         }

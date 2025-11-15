@@ -56,8 +56,10 @@ import org.linphone.core.*
 import org.linphone.core.Config
 import org.linphone.core.tools.Log
 import org.linphone.mediastream.Version
+import org.naminfo.LinphoneApplication
 import org.naminfo.LinphoneApplication.Companion.corePreferences
 import org.naminfo.R
+import org.naminfo.activities.main.contact.viewmodels.MockContactList
 import org.naminfo.compatibility.Compatibility
 import org.naminfo.compatibility.PhoneStateInterface
 import org.naminfo.contact.ContactLoader
@@ -267,13 +269,16 @@ class CoreContext(
                         Reason.NotAcceptable -> context.getString(
                             R.string.call_error_incompatible_media_params
                         )
+
                         Reason.NotFound -> context.getString(R.string.call_error_user_not_found)
                         Reason.ServerTimeout -> context.getString(
                             R.string.call_error_server_timeout
                         )
+
                         Reason.TemporarilyUnavailable -> context.getString(
                             R.string.call_error_temporarily_unavailable
                         )
+
                         else -> context.getString(R.string.call_error_generic).format(
                             "${call.errorInfo.protocolCode} / ${call.errorInfo.phrase}"
                         )
@@ -595,6 +600,7 @@ class CoreContext(
 
                 // Ensure conference factory URI is set on sip.linphone.org accounts
                 if (account.params.conferenceFactoryUri == null) {
+//                    corePreferences.conferenceServerUri= "sip:conference-factory@${corePreferences.defaultDomain }"
                     val uri = corePreferences.conferenceServerUri
                     Log.i(
                         "[Context] Setting conference factory on account ${params.identityAddress?.asString()} to default value: $uri"
@@ -667,7 +673,7 @@ class CoreContext(
         val deviceName: String = corePreferences.deviceName
         val appName: String = context.resources.getString(R.string.user_agent_app_name)
         val androidVersion = "BuildConfig.VERSION_NAME"
-        val userAgent = "$appName/$androidVersion ($deviceName) Mobion_FSSDK"
+        val userAgent = "$appName/$androidVersion ($deviceName) CDotSDK"
         val sdkVersion = context.getString(org.linphone.core.R.string.linphone_sdk_version)
         val sdkBranch = context.getString(org.linphone.core.R.string.linphone_sdk_branch)
         val sdkUserAgent = "$sdkVersion ($sdkBranch)"
@@ -809,7 +815,8 @@ class CoreContext(
             // Prevent incoming group call to start in audio only layout
             // Do the same as the conference waiting room
             params?.isVideoEnabled = true
-            params?.videoDirection = if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
+            params?.videoDirection =
+                if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
             Log.i(
                 "[Context] Enabling video on call params to prevent audio-only layout when answering"
             )
@@ -894,7 +901,7 @@ class CoreContext(
     ) {
         Log.e("[Context] Inside startBcCall method")
         if (!core.isNetworkReachable) {
-            Log.e("[Context] Network unreachable, abort outgoing call")
+            Log.e("[Context] startBcCall Network unreachable, abort outgoing call")
             callErrorMessageResourceId.value = Event(
                 context.getString(R.string.call_error_network_unreachable)
             )
@@ -904,7 +911,7 @@ class CoreContext(
         val params = callParams ?: core.createCallParams(null)
         if (params == null) {
             val call = core.inviteAddress(address)
-            Log.w("[Context] Starting call $call without params")
+            Log.w("[Context] startBcCall Starting call $call without params")
             return
         }
 
@@ -912,7 +919,7 @@ class CoreContext(
             params.mediaEncryption = MediaEncryption.ZRTP
         }
         if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
-            Log.w("[Context] Enabling low bandwidth mode!")
+            Log.w("[Context] startBcCall Enabling low bandwidth mode!")
             params.isLowBandwidthEnabled = true
         }
         params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(address)
@@ -924,11 +931,11 @@ class CoreContext(
             if (account != null) {
                 params.account = account
                 Log.i(
-                    "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
+                    "[Context] startBcCall Using account matching address ${localAddress.asStringUriOnly()} as From"
                 )
             } else {
                 Log.e(
-                    "[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
+                    "[Context] startBcCall Failed to find account matching address ${localAddress.asStringUriOnly()}"
                 )
             }
         }
@@ -936,11 +943,43 @@ class CoreContext(
         if (corePreferences.sendEarlyMedia) {
             params.isEarlyMediaSendingEnabled = true
         }
-
+        MockContactList.SipValidator.addCallHistory(
+            address.username ?: address.asStringUriOnly(),
+            address.displayName ?: address.asStringUriOnly(),
+            address.asStringUriOnly()
+        )
+        LinphoneApplication.corePreferences.getCallerName = address.username
         // params.isVideoEnabled = true
         val call = core.inviteAddressWithParams(address, params)
-        Log.i("[Context] Starting call $call")
-        Log.i("[Context] Starting call params ${params.isVideoEnabled}")
+        Log.i("[Context] startBcCall Starting call $call")
+        Log.i("[Context] startBcCall Starting call params ${params.isVideoEnabled}")
+        Log.i(
+            "[Context] --->>to number - startBcCall ${call?.callLog?.localAddress?.asStringUriOnly()},${call?.callLog?.remoteAddress?.asStringUriOnly()} ,${address.asStringUriOnly()}"
+        )
+       /* val from: Address? = core.createAddress(
+            "sip:${corePreferences.getCurrentUserPhoneNumber}@${corePreferences.defaultDomain}"
+        )
+        val to: Address? = core.createAddress("${address.asStringUriOnly()}")
+        val direction: Call.Dir? = Call.Dir.Outgoing
+        val duration = 0 // seconds
+        val startTime = System.currentTimeMillis()
+        val connectedTime = startTime
+        val status: Call.Status? = Call.Status.Success
+        val videoEnabled = false
+        val quality = 4.2f
+
+        // Create the call log object
+        val log: CallLog? = core.createCallLog(
+            from!!,
+            to!!,
+            direction,
+            duration,
+            startTime,
+            connectedTime,
+            status,
+            videoEnabled,
+            quality
+        )*/
     }
 
     fun startCall(to: String) {
@@ -971,9 +1010,11 @@ class CoreContext(
 
         if (address.username.toString().startsWith("6")) {
             Log.i("[Context] called number is broadcast ${address.username}")
+
             startBcCall(address)
+        } else {
+            startCall(address)
         }
-        startCall(address)
     }
 
     fun sendVideoInfoMessage(call: Call) {
@@ -1011,7 +1052,7 @@ class CoreContext(
 
     ) {
         Log.i(
-            "SIP Username ${address.username}"
+            "SIP Username ${address.username} ,${address.displayName} "
         )
         Log.i(
             "SIP Address ${address.asStringUriOnly()}"
@@ -1075,19 +1116,58 @@ class CoreContext(
         params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
 
         val recipientUri = address.asStringUriOnly()
-        val addr: Address? = if (address.username?.length == 4) {
+        val isConference = address.username?.length == 4
+        val addr: Address? = if (isConference) {
             if (address.username.toString().startsWith('5')) {
+                MockContactList.SipValidator.addCallHistory(
+                    address.username ?: address.asStringUriOnly(),
+                    "conference_audio",
+                    "sip:conference_audio@${address.domain}"
+                )
                 Factory.instance().createAddress("sip:conference_audio@${address.domain}")
             } else if (address.username.toString().startsWith('3')) {
+                MockContactList.SipValidator.addCallHistory(
+                    address.username ?: address.asStringUriOnly(),
+                    "conference_video",
+                    "sip:conference_video@${address.domain}"
+                )
                 Factory.instance().createAddress("sip:conference_video@${address.domain}")
             } else {
                 address
             }
         } else {
+            val from: Address? = core.createAddress(
+                "sip:${corePreferences.getCurrentUserPhoneNumber}@${corePreferences.defaultDomain}"
+            )
+            val to: Address? = core.createAddress("${address.asStringUriOnly()}")
+            val direction: Call.Dir? = Call.Dir.Outgoing
+            val duration = 0 // seconds
+            val startTime = System.currentTimeMillis() / 1000
+            val connectedTime = startTime
+            val status: Call.Status? = Call.Status.Success
+            val videoEnabled = false
+            val quality = 4.2f
+
+            // Create the call log object
+            val log: CallLog? = core.createCallLog(
+                from!!,
+                to!!,
+                direction,
+                duration,
+                startTime,
+                connectedTime,
+                status,
+                videoEnabled,
+                quality
+            )
+
+            MockContactList.SipValidator.addCallHistory(
+                address.username ?: address.asStringUriOnly(),
+                address.displayName ?: address.asStringUriOnly(),
+                address.asStringUriOnly()
+            )
             Factory.instance().createAddress("sip:${address.domain}")
         }
-
-        val isConference = address.username?.length == 4
 
         val xmlBody: String? = if (!isConference) {
             """
@@ -1134,7 +1214,21 @@ class CoreContext(
         }
         params.addCustomContent(videoInfoContent)
         Log.i("[Context] --->>to number - ${addr?.asStringUriOnly()}")
+
+        // val from: Address? = core.createAddress("${call?.callLog?.localAddress?.asStringUriOnly()}")
+        LinphoneApplication.corePreferences.getCallerName = address.username
         val call = core.inviteAddressWithParams(addr!!, params, null, null)
+        /* val address: Address? = core.interpretUrl(
+             stringAddress,
+             LinphoneUtils.applyInternationalPrefix()
+
+         )*/
+
+        Log.i(
+            "[Context] --->>startCall-to number - ${call?.callLog?.localAddress?.asStringUriOnly()} |" +
+                " ${call?.callLog?.remoteAddress?.asStringUriOnly()} | " +
+                "${address.asStringUriOnly()} | ${addr.asStringUriOnly()}"
+        )
 
         Log.i("[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
         Log.i("[Context] --->>From Header - $fromHeader")
@@ -1197,6 +1291,7 @@ class CoreContext(
                     initX = params.x - event.rawX
                     initY = params.y - event.rawY
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     val x = (event.rawX + initX).toInt()
                     val y = (event.rawY + initY).toInt()
@@ -1205,6 +1300,7 @@ class CoreContext(
                     params.y = y
                     windowManager.updateViewLayout(overlay, params)
                 }
+
                 MotionEvent.ACTION_UP -> {
                     if (abs(overlayX - params.x) < CorePreferences.OVERLAY_CLICK_SENSITIVITY &&
                         abs(overlayY - params.y) < CorePreferences.OVERLAY_CLICK_SENSITIVITY
@@ -1214,6 +1310,7 @@ class CoreContext(
                     overlayX = params.x.toFloat()
                     overlayY = params.y.toFloat()
                 }
+
                 else -> return@setOnTouchListener false
             }
             true
@@ -1327,6 +1424,7 @@ class CoreContext(
                             )
                         }
                     }
+
                     FileUtils.MimeType.Video -> {
                         if (Compatibility.addVideoToMediaStore(context, content)) {
                             Log.i(
@@ -1338,6 +1436,7 @@ class CoreContext(
                             )
                         }
                     }
+
                     FileUtils.MimeType.Audio -> {
                         if (Compatibility.addAudioToMediaStore(context, content)) {
                             Log.i(
@@ -1349,6 +1448,7 @@ class CoreContext(
                             )
                         }
                     }
+
                     else -> {
                         Log.w(
                             "[Context] File [$filePath] isn't either an image, an audio file or a video [${content.type}/${content.subtype}], can't add it to the Media Store"

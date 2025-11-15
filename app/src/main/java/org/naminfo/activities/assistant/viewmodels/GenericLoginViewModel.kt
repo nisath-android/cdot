@@ -25,7 +25,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.StringReader
@@ -134,6 +133,7 @@ class GenericLoginViewModel(private val accountCreator: AccountCreator) : ViewMo
             if (account == accountToCheck) {
                 Log.i("[Assistant] [Generic Login] Registration state is $state: $message")
                 if (state == RegistrationState.Ok) {
+                    corePreferences.getCurrentUserPhoneNumber = username.value
                     waitForServerAnswer.value = false
                     leaveAssistantEvent.value = Event(true)
                     core.removeListener(this)
@@ -490,8 +490,9 @@ class GenericLoginViewModel(private val accountCreator: AccountCreator) : ViewMo
 
                 if (allSipContacts.isNotEmpty()) {
                     withContext(Dispatchers.IO) {
-                        val gson = Gson()
-                        corePreferences.sipContactsSaved = gson.toJson(allSipContacts)
+                        // corePreferences.sipContactsSaved = gson.toJson(simpleList)
+                        // val gson = Gson()
+                        //  corePreferences.sipContactsSaved = gson.toJson(allSipContacts)
                     }
                     withContext(Dispatchers.Main) {
                         allSipContacts.forEachIndexed { index, sipContact ->

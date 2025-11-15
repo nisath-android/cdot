@@ -452,6 +452,11 @@ class CorePreferences(private val context: Context) {
         set(value) {
             config.setString("app", "sip_contacts_saved", value)
         }
+    var callHistorySaved: String?
+        get() = config.getString("app", "sip_callhistory_saved", null)
+        set(value) {
+            config.setString("app", "sip_callhistory_saved", value)
+        }
     var callType: String?
         get() = config.getString("app", "calltype_contacts_saved", null)
         set(value) {
@@ -579,12 +584,16 @@ class CorePreferences(private val context: Context) {
 
     /* Default values related */
 
-    val defaultDomain: String
+    var defaultDomain: String
         get() = config.getString("app", "default_domain", "sip.linphone.org")!!
-
-    val defaultRlsUri: String
-        get() = config.getString("sip", "rls_uri", "sips:rls@sip.linphone.org")!!
-
+        set(value) {
+            config.setString("app", "default_domain", value)
+        }
+    var defaultRlsUri: String
+        get() = config.getString("app", "rls_uri", "sips:rls@sip.linphone.org")!!
+        set(value) {
+            config.setString("app", "rls_uri", value)
+        }
     val debugPopupCode: String
         get() = config.getString("app", "debug_popup_magic", "#1234#")!!
 
@@ -592,19 +601,33 @@ class CorePreferences(private val context: Context) {
     val maxConferenceParticipantsForMosaicLayout: Int
         get() = config.getInt("app", "conference_mosaic_layout_max_participants", 6)
 
-    val conferenceServerUri: String
+    var conferenceServerUri: String
         get() = config.getString(
             "app",
             "default_conference_factory_uri",
             "sip:conference-factory@sip.linphone.org"
         )!!
+        set(value) {
+            config.setString(
+                "app",
+                "default_conference_factory_uri",
+                value
+            )
+        }
 
-    val audioVideoConferenceServerUri: String
+    var audioVideoConferenceServerUri: String
         get() = config.getString(
             "app",
             "default_audio_video_conference_factory_uri",
             "sip:videoconference-factory@sip.linphone.org"
         )!!
+        set(value) {
+            config.setString(
+                "app",
+                "default_audio_video_conference_factory_uri",
+                value
+            )
+        }
 
     val limeServerUrl: String
         get() = config.getString(

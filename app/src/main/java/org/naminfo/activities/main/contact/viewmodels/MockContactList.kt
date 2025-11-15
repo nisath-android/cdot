@@ -1,14 +1,19 @@
 package org.naminfo.activities.main.contact.viewmodels
 
 import androidx.annotation.WorkerThread
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import org.linphone.core.Factory
 import org.linphone.core.Friend
 import org.linphone.core.FriendList
 import org.linphone.core.PresenceBasicStatus
 import org.linphone.core.SubscribePolicy
 import org.linphone.core.tools.Log
+import org.naminfo.LinphoneApplication
 import org.naminfo.LinphoneApplication.Companion.coreContext
 import org.naminfo.LinphoneApplication.Companion.corePreferences
+import org.naminfo.activities.main.contact.data.BroadcastContact
 import org.naminfo.activities.main.contact.data.GroupSettingsContact
 import org.naminfo.activities.main.contact.data.PBXContactsTable
 
@@ -71,7 +76,7 @@ object MockContactList {
         return ContactViewModel(fakeFriend)
     }
     fun fetchSipMockContacts(): List<ContactViewModel> {
-        return listOf(
+        val sipContacts = listOf(
             createMockSipContacts(
                 "9874563211",
                 "Cdot-1"
@@ -110,9 +115,39 @@ object MockContactList {
             )
 
         )
+  /*     val gson = Gson()
+  val simpleList = sipContacts.map { contactVM ->
+            val friend = contactVM.contact.value
+            SimpleContact(
+                phone = friend?.address?.username ?: "",
+                name = friend?.name ?: "",
+                sipAddress = friend?.address?.asStringUriOnly() ?: ""
+            )
+        }
+        // corePreferences.sipContactsSaved = gson.toJson(simpleList)*/
+        return sipContacts
+    }
+
+    fun fetchBroadcastContacts(): List<BroadcastContact> {
+        val broadcastContact = listOf(
+            BroadcastContact(
+                bcNumber = "60000",
+                bcName = "CDOT Test Broadcast1",
+                userDetails = "Cdot-2-9874563212,Cdot-3-9874563213",
+                moderator = "no"
+            ),
+            BroadcastContact(
+                bcNumber = "60001",
+                bcName = "CDOT Test Broadcast2",
+                userDetails = "Cdot-4-9874563214,Cdot-5-9874563215",
+                moderator = "no"
+            )
+        )
+        return broadcastContact
     }
     fun fetchPBXMockContacts(): List<PBXContactsTable> {
-        return listOf(
+        val gson = Gson()
+        val pbxContacts = listOf(
             PBXContactsTable(
                 First_Name = "PBXFirstName1",
                 Last_Name = "PBXLastName1",
@@ -135,6 +170,8 @@ object MockContactList {
                 PBX = "333"
             )
         )
+        corePreferences.pbxContactsSaved = gson.toJson(pbxContacts)
+        return pbxContacts
     }
 
     fun fetchGroupSettingsMockContacts(): List<GroupSettingsContact> {
@@ -166,4 +203,119 @@ object MockContactList {
 
         )
     }
+    fun parseSipUri(sipUri: String): Pair<String?, String?> {
+        // Clean up prefix if present
+        val cleanUri = sipUri.removePrefix("sip:").removePrefix("sips:")
+
+        // Split into user and domain
+        val parts = cleanUri.split("@")
+
+        return if (parts.size == 2) {
+            val user = parts[0].trim()
+            val domain = parts[1].trim()
+            Pair(user, domain)
+        } else {
+            Pair(null, null) // invalid SIP format
+        }
+    }
+
+    fun makeUrl(phone: String, domain: String): String {
+        return "sip:$phone@$domain"
+    }
+
+    object SipValidator {
+        private const val FIXED_DOMAIN = "([a-zA-Z0-9_.-]+)"
+
+        // Allows phonenum OR text before @
+        private val sipRegex = Regex(
+            pattern = "^sips?:([a-zA-Z0-9_.-]+)@$FIXED_DOMAIN$"
+        )
+        private val phoneOnlyRegex = Regex(
+            pattern = "^sip:([0-9]+)@$FIXED_DOMAIN$"
+        )
+
+        // Accept ONLY letters in username (text only)
+        private val strictTextRegex = Regex(
+            pattern = "^sip:([A-Za-z0-9_-]+)@$FIXED_DOMAIN$"
+        )
+
+        fun isValidTextSip(sipUri: String): Boolean {
+            return strictTextRegex.matches(sipUri)
+        }
+        fun isValidPhoneSip(sipUri: String): Boolean {
+            return phoneOnlyRegex.matches(sipUri)
+        }
+        fun isValidSip(sipUri: String): Boolean {
+            return sipRegex.matches(sipUri)
+        }
+
+        fun replaceSipUsername(sipUri: String, newUsername: String): String {
+            return sipUri.replace(Regex("^sip:[^@]+"), "sip:$newUsername")
+        }
+        private val gson by lazy { Gson() }
+        private val sipListType: Type = object : TypeToken<ArrayList<SimpleContact>>() {}.type
+        private val sipContactListType: Type = object : TypeToken<ArrayList<SimpleContact>>() {}.type
+
+        fun getCallHistory(): ArrayList<SimpleContact> {
+            return try {
+                gson.fromJson(
+                    LinphoneApplication.corePreferences.callHistorySaved ?: "[]",
+                    sipListType
+                ) ?: arrayListOf()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                arrayListOf()
+            }
+        }
+
+        fun addCallHistory(phone: String, name: String, sipUrl: String) {
+            val list = getCallHistory()
+
+            // Add NEW entry on top
+            list.add(
+                0,
+                SimpleContact(
+                    phone = phone,
+                    name = name,
+                    sipAddress = sipUrl
+                )
+            )
+
+            // Save updated list
+            LinphoneApplication.corePreferences.callHistorySaved = gson.toJson(list)
+        }
+
+        fun clearHistory() {
+            LinphoneApplication.corePreferences.callHistorySaved = "[]"
+        }
+
+        fun getSipContacts(): ArrayList<SimpleContact> {
+            return try {
+                gson.fromJson(
+                    LinphoneApplication.corePreferences.sipContactsSaved ?: "[]",
+                    sipContactListType
+                ) ?: arrayListOf()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                arrayListOf()
+            }
+        }
+
+        fun fetchBroadcastContacts(): ArrayList<BroadcastContact> {
+            return ArrayList(MockContactList.fetchBroadcastContacts())
+        }
+        fun fetchGroupedContacts(): ArrayList<GroupSettingsContact> {
+            return ArrayList(MockContactList.fetchGroupSettingsMockContacts())
+        }
+    }
+}
+data class SimpleContact(
+    val phone: String,
+    val name: String,
+    val sipAddress: String
+)
+sealed class MatchedContact {
+    data class Sip(val data: SimpleContact) : MatchedContact()
+    data class Broadcast(val data: BroadcastContact) : MatchedContact()
+    data class Group(val data: GroupSettingsContact) : MatchedContact()
 }

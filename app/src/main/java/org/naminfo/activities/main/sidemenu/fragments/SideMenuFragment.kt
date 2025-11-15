@@ -158,9 +158,9 @@ class SideMenuFragment : GenericFragment<SideMenuFragmentBinding>() {
 
             // Create the AlertDialog
             val builder = AlertDialog.Builder(context)
-            builder.setTitle("Quit Mobion_FS")
+            builder.setTitle("Quit CDot")
             builder.setMessage(
-                "If you quit the Mobion_FS, you may not receive calls from the app."
+                "If you quit the CDot, you may not receive calls from the app."
             )
 
             // OK button action

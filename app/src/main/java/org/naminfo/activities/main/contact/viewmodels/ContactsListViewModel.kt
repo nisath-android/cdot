@@ -270,13 +270,7 @@ class ContactsListViewModel : ViewModel() {
         viewModelScope.launch {
             contactsList.postValue(list)
         }
-        list.forEachIndexed { index, contactViewModel ->
 
-            Log.i(
-                TAG,
-                " [Contacts] Processed fullName:${ contactViewModel.fullName} , displayName:${ contactViewModel.displayName.value},contact.name:${ contactViewModel.contact.value?.name}"
-            )
-        }
         Log.i(TAG, " processMagicSearchResults=> [Contacts] Processed ${results.size} results")
         Log.i(TAG, " processMagicSearchResults=>  Processed ${list.size} unique results")
     }

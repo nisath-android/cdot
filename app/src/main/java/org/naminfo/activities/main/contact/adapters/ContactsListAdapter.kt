@@ -20,6 +20,7 @@
 package org.naminfo.activities.main.contact.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import org.linphone.core.Friend
+import org.naminfo.LinphoneApplication
 import org.naminfo.R
 import org.naminfo.activities.main.adapters.SelectionListAdapter
 import org.naminfo.activities.main.contact.viewmodels.ContactViewModel
@@ -79,9 +81,25 @@ class ContactsListAdapter(
                 ) {
                     position = bindingAdapterPosition
                 }
+                Log.i(
+                    "ContactListAdapter",
+                    "bind: vm-numbersAndAddresses=${contactViewModel.numbersAndAddresses.value}," +
+                        "vm-fullName=${contactViewModel.fullName}," +
+                        "vm-displayName=${contactViewModel.displayName.value}," +
+                        "displayName=${contactViewModel.contact.value?.address?.displayName}," +
+                        "domain=${contactViewModel.contact.value?.address?.domain}," +
+                        "asStringUriOnly=${contactViewModel.contact.value?.address?.asStringUriOnly()}," +
+                        "username=${contactViewModel.contact.value?.address?.username},"
+                )
+                if (contactViewModel.contact.value?.address?.username == null && contactViewModel.contact.value?.address?.username != LinphoneApplication.corePreferences.getCurrentUserPhoneNumber) {
+                    LinphoneApplication.corePreferences.getCurrentUserName = contactViewModel.contact.value?.address?.displayName
+                }
+
                 setClickListener {
-                    val friend = contactViewModel.contact.value
-                    if (friend != null) selectedContactEvent.value = Event(friend)
+                    if (contactViewModel.contact.value?.address?.username != null && contactViewModel.contact.value?.address?.username != LinphoneApplication.corePreferences.getCurrentUserPhoneNumber) {
+                        val friend = contactViewModel.contact.value
+                        if (friend != null) selectedContactEvent.value = Event(friend)
+                    }
                 }
 
                 executePendingBindings()

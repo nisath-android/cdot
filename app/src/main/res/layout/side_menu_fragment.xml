@@ -255,7 +255,7 @@ android:onClick="@{selfPictureClickListener}"-->
                     android:layout_height="1dp"
                     android:background="?dividerColor" />
 
-                <LinearLayout
+           <!--     <LinearLayout
                     android:onClick="@{conferencesClickListener}"
                     android:visibility="@{viewModel.showScheduledConferences ? View.VISIBLE : View.GONE}"
                     android:layout_width="match_parent"
@@ -283,7 +283,7 @@ android:onClick="@{selfPictureClickListener}"-->
                     android:visibility="@{viewModel.showScheduledConferences ? View.VISIBLE : View.GONE}"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?dividerColor" />
+                    android:background="?dividerColor" />-->
 
                 <LinearLayout
                     android:onClick="@{aboutClickListener}"

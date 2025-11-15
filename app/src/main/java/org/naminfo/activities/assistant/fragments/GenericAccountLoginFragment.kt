@@ -92,6 +92,10 @@ class GenericAccountLoginFragment : GenericFragment<AssistantGenericAccountLogin
         ) {
             it.consume {
                 Log.i("Login Activity", "consume block executed")
+                corePreferences.defaultDomain = viewModel.domain.value.toString()
+                corePreferences.defaultRlsUri = "sip:rls@${viewModel.domain.value}"
+                corePreferences.conferenceServerUri = "sip:conference-factory@${corePreferences.defaultDomain }"
+                corePreferences.audioVideoConferenceServerUri = "sip:videoconference-factory@${corePreferences.defaultDomain }"
                 val isLinphoneAccount = viewModel.domain.value.orEmpty() == corePreferences.defaultDomain
                 coreContext.newAccountConfigured(isLinphoneAccount)
 

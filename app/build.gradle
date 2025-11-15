@@ -6,8 +6,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-def appVersionName = "4.2.4"
-def appVersionCode = 52000
+def appVersionName = "1.0.3"
+def appVersionCode = 3
 
 def packageName = "org.naminfo"
 

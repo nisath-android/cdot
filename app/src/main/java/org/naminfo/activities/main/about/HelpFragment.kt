@@ -16,10 +16,10 @@ import org.naminfo.R
 class HelpFragment : Fragment() {
 
     private val faqList = listOf(
-        "How do I open the app?" to "After installation, find the mobion_fs application in your mobile app drawer and open it.",
+        "How do I open the app?" to "After installation, find the cdot application in your mobile app drawer and open it.",
         "How do I log in?" to "On the login screen, enter your username and password. Tap the Login button to access the app.",
-        "How do I access contacts?" to "On the main screen, tap the Contacts button located below. Tap the Telephone button to display your PBX contacts.",
-        "How do I make a call?" to "Use the dial pad in the app to enter the user's number or any PBX number you want to call.",
+        "How do I access contacts?" to "On the main screen, tap the Contacts button located below. Tap the Telephone button to display your cdot contacts.",
+        "How do I make a call?" to "Use the dial pad in the app to enter the user's number or any cdot number you want to call.",
         "How do I make an audio conference call?" to "Enter 5500 on the dial pad to initiate an audio conference call.",
         "How do I make a video conference call?" to "Enter 3500 on the dial pad to initiate a video conference call."
     )
