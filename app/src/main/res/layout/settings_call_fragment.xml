@@ -87,7 +87,7 @@
                     linphone:checked="@={viewModel.vibrateOnIncomingCall}"
                     android:visibility="@{viewModel.canVibrate ? View.VISIBLE : View.GONE}"/>
 
-                <!--<include
+                <include
                     layout="@layout/settings_widget_list"
                     linphone:title="@{@string/call_settings_encryption_title}"
                     linphone:listener="@{viewModel.encryptionListener}"
@@ -113,7 +113,7 @@
                     layout="@layout/settings_widget_switch"
                     linphone:title="@{@string/call_settings_overlay_title}"
                     linphone:listener="@{viewModel.overlayListener}"
-                    linphone:checked="@={viewModel.overlay}"/>-->
+                    linphone:checked="@={viewModel.overlay}"/>
 
                 <include
                     layout="@layout/settings_widget_switch"
@@ -123,7 +123,7 @@
                     linphone:checked="@={viewModel.systemWideOverlay}"
                     linphone:enabled="@{viewModel.overlay}"/>
 
-                <!--<include
+                <include
                     layout="@layout/settings_widget_switch"
                     linphone:title="@{@string/call_settings_sipinfo_dtmf_title}"
                     linphone:listener="@{viewModel.sipInfoDtmfListener}"
@@ -211,7 +211,7 @@
                     linphone:title="@{@string/call_settings_pause_calls_lost_audio_focus_title}"
                     linphone:listener="@{viewModel.pauseCallsWhenAudioFocusIsLostListener}"
                     linphone:checked="@={viewModel.pauseCallsWhenAudioFocusIsLost}"
-                    linphone:enabled="@{!viewModel.useTelecomManager}"/>-->
+                    linphone:enabled="@{!viewModel.useTelecomManager}"/>
 
                 <include
                     layout="@layout/settings_widget_basic"

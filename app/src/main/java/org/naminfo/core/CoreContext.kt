@@ -37,6 +37,7 @@ import android.util.Pair
 import android.view.*
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.*
+import androidx.lifecycle.get
 import androidx.loader.app.LoaderManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.io.File
@@ -50,16 +51,18 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
+import kotlin.compareTo
 import kotlin.math.abs
+import kotlin.text.toInt
+import kotlin.text.toLong
+import kotlin.text.trim
 import kotlinx.coroutines.*
 import org.linphone.core.*
 import org.linphone.core.Config
 import org.linphone.core.tools.Log
 import org.linphone.mediastream.Version
-import org.naminfo.LinphoneApplication
 import org.naminfo.LinphoneApplication.Companion.corePreferences
 import org.naminfo.R
-import org.naminfo.activities.main.contact.viewmodels.MockContactList
 import org.naminfo.compatibility.Compatibility
 import org.naminfo.compatibility.PhoneStateInterface
 import org.naminfo.contact.ContactLoader
@@ -99,15 +102,15 @@ class CoreContext(
 
     val appVersion: String by lazy {
         val appVersion = "BuildConfig.VERSION_NAME"
-        val appBranch = context.getString(R.string.linphone_app_branch)
-        val appBuildType = "BuildConfig.BUILD_TYPE"
+        val appBranch = context.getString(org.naminfo.R.string.linphone_app_branch)
+        val appBuildType = BuildConfig.BUILD_TYPE
         "$appVersion ($appBranch, $appBuildType)"
     }
 
     val sdkVersion: String by lazy {
         val sdkVersion = context.getString(org.linphone.core.R.string.linphone_sdk_version)
         val sdkBranch = context.getString(org.linphone.core.R.string.linphone_sdk_branch)
-        val sdkBuildType = "org.linphone.core.BuildConfig.BUILD_TYPE"
+        val sdkBuildType = org.linphone.core.BuildConfig.BUILD_TYPE
         "$sdkVersion ($sdkBranch, $sdkBuildType)"
     }
 
@@ -219,7 +222,9 @@ class CoreContext(
                 }
             } else if (state == Call.State.OutgoingProgress) {
                 val sdp = call.currentParams.toString()
-                Log.i("Linphone", "Generated SDP: $sdp")
+                Log.i(
+                    "[Context] Generated SDP: $sdp, ${call.remoteAddress.domain}"
+                )
                 val conferenceInfo = core.findConferenceInformationFromUri(call.remoteAddress)
                 // Do not show outgoing call view for conference calls, wait for connected state
                 if (conferenceInfo == null) {
@@ -269,16 +274,13 @@ class CoreContext(
                         Reason.NotAcceptable -> context.getString(
                             R.string.call_error_incompatible_media_params
                         )
-
                         Reason.NotFound -> context.getString(R.string.call_error_user_not_found)
                         Reason.ServerTimeout -> context.getString(
                             R.string.call_error_server_timeout
                         )
-
                         Reason.TemporarilyUnavailable -> context.getString(
                             R.string.call_error_temporarily_unavailable
                         )
-
                         else -> context.getString(R.string.call_error_generic).format(
                             "${call.errorInfo.protocolCode} / ${call.errorInfo.phrase}"
                         )
@@ -296,11 +298,7 @@ class CoreContext(
                     Log.i("[Context] Call has been declined")
                     val toastMessage = context.getString(R.string.call_error_declined)
                     callErrorMessageResourceId.value = Event(toastMessage)
-                } else if (state == Call.State.OutgoingInit) {
-                    val sdp = call.currentParams.toString()
-                    Log.i("Linphone", "Generated SDP: $sdp")
-
-                    // You can now create Content object for SDP and add XML to send as multipart if needed
+                } else {
                 }
             }
 
@@ -355,12 +353,12 @@ class CoreContext(
 
         _lifecycleRegistry.currentState = Lifecycle.State.INITIALIZED
 
-        Log.i("=========================================")
+        /*Log.i("=========================================")
         Log.i("==== Linphone-android information dump ====")
-        Log.i("VERSION=${"BuildConfig.VERSION_NAME"} / ${"BuildConfig.VERSION_CODE"}")
-        Log.i("PACKAGE=${"BuildConfig.APPLICATION_ID"}")
-        Log.i("BUILD TYPE=${"BuildConfig.BUILD_TYPE"}")
-        Log.i("=========================================")
+        Log.i("VERSION=${orgBuildConfig.VERSION_NAME} / ${BuildConfig.VERSION_CODE}")
+        Log.i("PACKAGE=${BuildConfig.APPLICATION_ID}")
+        Log.i("BUILD TYPE=${BuildConfig.BUILD_TYPE}")
+        Log.i("=========================================")*/
 
         if (service != null) {
             Log.i("[Context] Starting foreground service")
@@ -600,7 +598,6 @@ class CoreContext(
 
                 // Ensure conference factory URI is set on sip.linphone.org accounts
                 if (account.params.conferenceFactoryUri == null) {
-//                    corePreferences.conferenceServerUri= "sip:conference-factory@${corePreferences.defaultDomain }"
                     val uri = corePreferences.conferenceServerUri
                     Log.i(
                         "[Context] Setting conference factory on account ${params.identityAddress?.asString()} to default value: $uri"
@@ -672,9 +669,9 @@ class CoreContext(
     private fun computeUserAgent() {
         val deviceName: String = corePreferences.deviceName
         val appName: String = context.resources.getString(R.string.user_agent_app_name)
-        val androidVersion = "BuildConfig.VERSION_NAME"
-        val userAgent = "$appName/$androidVersion ($deviceName) CDotSDK"
-        val sdkVersion = context.getString(org.linphone.core.R.string.linphone_sdk_version)
+        val androidVersion = "4.2.4" // "BuildConfig.VERSION_NAME"
+        val userAgent = "$appName/$androidVersion ($deviceName) Mobion_FSSDK"
+        val sdkVersion = context.getString(org.naminfo.R.string.about_liblinphone_sdk_version)
         val sdkBranch = context.getString(org.linphone.core.R.string.linphone_sdk_branch)
         val sdkUserAgent = "$sdkVersion ($sdkBranch)"
         core.setUserAgent(userAgent, userAgent)
@@ -717,7 +714,7 @@ class CoreContext(
             }
             if (core.mediaEncryption == MediaEncryption.None) {
                 Log.i("[Context] Enabling SRTP media encryption instead of None")
-                core.mediaEncryption = MediaEncryption.SRTP
+                // core.mediaEncryption = MediaEncryption.SRTP
             }
         } else {
             Log.i("[Context] Background mode with foreground service automatically enabled")
@@ -815,8 +812,7 @@ class CoreContext(
             // Prevent incoming group call to start in audio only layout
             // Do the same as the conference waiting room
             params?.isVideoEnabled = true
-            params?.videoDirection =
-                if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
+            params?.videoDirection = if (core.videoActivationPolicy.automaticallyInitiate) MediaDirection.SendRecv else MediaDirection.RecvOnly
             Log.i(
                 "[Context] Enabling video on call params to prevent audio-only layout when answering"
             )
@@ -851,7 +847,8 @@ class CoreContext(
         params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
 
         Log.i("[Context] Answering call with params!- ${params.customContents[0].isMultipart}")
-        call.acceptWithParams(params)
+        // call.acceptWithParams(params)
+        call.accept()
     }
 
     fun declineCall(call: Call) {
@@ -901,7 +898,7 @@ class CoreContext(
     ) {
         Log.e("[Context] Inside startBcCall method")
         if (!core.isNetworkReachable) {
-            Log.e("[Context] startBcCall Network unreachable, abort outgoing call")
+            Log.e("[Context] Network unreachable, abort outgoing call")
             callErrorMessageResourceId.value = Event(
                 context.getString(R.string.call_error_network_unreachable)
             )
@@ -911,7 +908,7 @@ class CoreContext(
         val params = callParams ?: core.createCallParams(null)
         if (params == null) {
             val call = core.inviteAddress(address)
-            Log.w("[Context] startBcCall Starting call $call without params")
+            Log.w("[Context] Starting call $call without params")
             return
         }
 
@@ -919,7 +916,7 @@ class CoreContext(
             params.mediaEncryption = MediaEncryption.ZRTP
         }
         if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
-            Log.w("[Context] startBcCall Enabling low bandwidth mode!")
+            Log.w("[Context] Enabling low bandwidth mode!")
             params.isLowBandwidthEnabled = true
         }
         params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(address)
@@ -931,11 +928,11 @@ class CoreContext(
             if (account != null) {
                 params.account = account
                 Log.i(
-                    "[Context] startBcCall Using account matching address ${localAddress.asStringUriOnly()} as From"
+                    "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
                 )
             } else {
                 Log.e(
-                    "[Context] startBcCall Failed to find account matching address ${localAddress.asStringUriOnly()}"
+                    "[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
                 )
             }
         }
@@ -943,43 +940,11 @@ class CoreContext(
         if (corePreferences.sendEarlyMedia) {
             params.isEarlyMediaSendingEnabled = true
         }
-        MockContactList.SipValidator.addCallHistory(
-            address.username ?: address.asStringUriOnly(),
-            address.displayName ?: address.asStringUriOnly(),
-            address.asStringUriOnly()
-        )
-        LinphoneApplication.corePreferences.getCallerName = address.username
+
         // params.isVideoEnabled = true
         val call = core.inviteAddressWithParams(address, params)
-        Log.i("[Context] startBcCall Starting call $call")
-        Log.i("[Context] startBcCall Starting call params ${params.isVideoEnabled}")
-        Log.i(
-            "[Context] --->>to number - startBcCall ${call?.callLog?.localAddress?.asStringUriOnly()},${call?.callLog?.remoteAddress?.asStringUriOnly()} ,${address.asStringUriOnly()}"
-        )
-       /* val from: Address? = core.createAddress(
-            "sip:${corePreferences.getCurrentUserPhoneNumber}@${corePreferences.defaultDomain}"
-        )
-        val to: Address? = core.createAddress("${address.asStringUriOnly()}")
-        val direction: Call.Dir? = Call.Dir.Outgoing
-        val duration = 0 // seconds
-        val startTime = System.currentTimeMillis()
-        val connectedTime = startTime
-        val status: Call.Status? = Call.Status.Success
-        val videoEnabled = false
-        val quality = 4.2f
-
-        // Create the call log object
-        val log: CallLog? = core.createCallLog(
-            from!!,
-            to!!,
-            direction,
-            duration,
-            startTime,
-            connectedTime,
-            status,
-            videoEnabled,
-            quality
-        )*/
+        Log.i("[Context] Starting call $call")
+        Log.i("[Context] Starting call params ${params.isVideoEnabled}")
     }
 
     fun startCall(to: String) {
@@ -1010,11 +975,9 @@ class CoreContext(
 
         if (address.username.toString().startsWith("6")) {
             Log.i("[Context] called number is broadcast ${address.username}")
-
             startBcCall(address)
-        } else {
-            startCall(address)
         }
+        startCall(address)
     }
 
     fun sendVideoInfoMessage(call: Call) {
@@ -1051,8 +1014,125 @@ class CoreContext(
         localAddress: Address? = null
 
     ) {
+        if (!core.isNetworkReachable) {
+            Log.e("[Context] Network unreachable, abort outgoing call")
+            callErrorMessageResourceId.value = Event(
+                context.getString(R.string.call_error_network_unreachable)
+            )
+            return
+        }
+
+        val params = callParams ?: core.createCallParams(null)
+
+        if (params == null) {
+            val call = core.inviteAddress(address)
+            Log.w("[Context] Starting call $call without params")
+            return
+        }
+
+        if (forceZRTP) {
+            params.mediaEncryption = MediaEncryption.ZRTP
+        }
+        if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
+            Log.w("[Context] Enabling low bandwidth mode!")
+            params.isLowBandwidthEnabled = true
+        }
+        params.recordFile = LinphoneUtils.getRecordingFilePathForAddress(address)
+
+        if (localAddress != null) {
+            val account = core.accountList.find { account ->
+                account.params.identityAddress?.weakEqual(localAddress) ?: false
+            }
+            if (account != null) {
+                params.account = account
+                Log.i(
+                    "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
+                )
+            } else {
+                Log.e(
+                    "[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
+                )
+            }
+        }
+
+        if (corePreferences.sendEarlyMedia) {
+            params.isEarlyMediaSendingEnabled = true
+        }
+
+        params.addCustomHeader("To", "<sip:${address.domain}>")
+        params.addCustomHeader("P-Preferred-Identity", "<sip:${address.username}@NamInfoCom.com>")
+        params.addCustomHeader("Privacy", "id")
+        params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
+        params.addCustomHeader("Accept-Contact", "*;+g.3gpp.mcvideo;require;explicit")
+        params.addCustomHeader(
+            "Accept-Contact",
+            "*;+g.3gpp.icsi-ref=\"urn%3Aurn-7%3A3gpp-service.ims.icsi.mcvideo\";require;explicit"
+        )
+        params.addCustomHeader("Answer-Mode", "Auto")
+        params.addCustomHeader("P-Preferred-Service", "urn:urn-7:3gpp-service.ims.icsi.mcvideo")
+        params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
+        // params.isVideoEnabled = true
+
+        // val isConference = address.username?.length == 4
+
+        val recipientUri = address.asStringUriOnly()
+        /*val xmlBody: String? = if (true) {
+            """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resource-lists xmlns="urn:ietf:params:xml/ns/resource-lists"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xmlns:cc="urn:ietf:params/xml/ns/copycontrol">
+          <list>
+            <entry uri="$recipientUri" cc:copyControl="to"/>
+          </list>
+        </resource-lists>
+            """.trimIndent()
+        } else {
+            null
+        }
+        val fromHeader = params.fromHeader.toString()
+        // val sessionType = if (address.username?.length == 4) "conference" else "private"
+
+        val videoInfoXml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <mcvideoinfo xmlns="urn:3gpp:ns:mcvideoInfo:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <mcvideo-Params>
+                    <session-type>private</session-type>
+                </mcvideo-Params>
+            </mcvideoinfo>
+        """.trimIndent()
+
+        if (xmlBody != null) {
+            val customXml = Factory.instance().createContent().apply {
+                type = "application"
+                subtype = "resource-lists+xml"
+                encoding = "utf-8"
+                utf8Text = xmlBody
+            }
+            params.addCustomContent(customXml)
+        }
+        // 3GPP Video Info XML
+        val videoInfoContent = Factory.instance().createContent().apply {
+            type = "application"
+            subtype = "vnd.3gpp.video-info+xml"
+            encoding = "utf-8"
+            utf8Text = videoInfoXml
+        }
+        params.addCustomContent(videoInfoContent)*/
+        val call = core.inviteAddressWithParams(address, params)
+        Log.i("[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
+        Log.i("[Context] --->>Starting call params ${params.isVideoEnabled}")
+    }
+
+/*    fun startCall(
+        address: Address,
+        callParams: CallParams? = null,
+        forceZRTP: Boolean = false,
+        localAddress: Address? = null
+
+    ) {
         Log.i(
-            "SIP Username ${address.username} ,${address.displayName} "
+            "SIP Username ${address.username}"
         )
         Log.i(
             "SIP Address ${address.asStringUriOnly()}"
@@ -1116,58 +1196,19 @@ class CoreContext(
         params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
 
         val recipientUri = address.asStringUriOnly()
-        val isConference = address.username?.length == 4
-        val addr: Address? = if (isConference) {
+        val addr: Address? = if (address.username?.length == 4) {
             if (address.username.toString().startsWith('5')) {
-                MockContactList.SipValidator.addCallHistory(
-                    address.username ?: address.asStringUriOnly(),
-                    "conference_audio",
-                    "sip:conference_audio@${address.domain}"
-                )
                 Factory.instance().createAddress("sip:conference_audio@${address.domain}")
             } else if (address.username.toString().startsWith('3')) {
-                MockContactList.SipValidator.addCallHistory(
-                    address.username ?: address.asStringUriOnly(),
-                    "conference_video",
-                    "sip:conference_video@${address.domain}"
-                )
                 Factory.instance().createAddress("sip:conference_video@${address.domain}")
             } else {
                 address
             }
         } else {
-            val from: Address? = core.createAddress(
-                "sip:${corePreferences.getCurrentUserPhoneNumber}@${corePreferences.defaultDomain}"
-            )
-            val to: Address? = core.createAddress("${address.asStringUriOnly()}")
-            val direction: Call.Dir? = Call.Dir.Outgoing
-            val duration = 0 // seconds
-            val startTime = System.currentTimeMillis() / 1000
-            val connectedTime = startTime
-            val status: Call.Status? = Call.Status.Success
-            val videoEnabled = false
-            val quality = 4.2f
-
-            // Create the call log object
-            val log: CallLog? = core.createCallLog(
-                from!!,
-                to!!,
-                direction,
-                duration,
-                startTime,
-                connectedTime,
-                status,
-                videoEnabled,
-                quality
-            )
-
-            MockContactList.SipValidator.addCallHistory(
-                address.username ?: address.asStringUriOnly(),
-                address.displayName ?: address.asStringUriOnly(),
-                address.asStringUriOnly()
-            )
-            Factory.instance().createAddress("sip:${address.domain}")
+            Factory.instance().createAddress("sip:${address.username}@${address.domain}")
         }
+
+        val isConference = address.username?.length == 4
 
         val xmlBody: String? = if (!isConference) {
             """
@@ -1214,27 +1255,14 @@ class CoreContext(
         }
         params.addCustomContent(videoInfoContent)
         Log.i("[Context] --->>to number - ${addr?.asStringUriOnly()}")
-
-        // val from: Address? = core.createAddress("${call?.callLog?.localAddress?.asStringUriOnly()}")
-        LinphoneApplication.corePreferences.getCallerName = address.username
-        val call = core.inviteAddressWithParams(addr!!, params, null, null)
-        /* val address: Address? = core.interpretUrl(
-             stringAddress,
-             LinphoneUtils.applyInternationalPrefix()
-
-         )*/
-
-        Log.i(
-            "[Context] --->>startCall-to number - ${call?.callLog?.localAddress?.asStringUriOnly()} |" +
-                " ${call?.callLog?.remoteAddress?.asStringUriOnly()} | " +
-                "${address.asStringUriOnly()} | ${addr.asStringUriOnly()}"
-        )
+        // val call = core.inviteAddressWithParams(addr!!, params, null, null)
+        val call = core.inviteAddress(addr!!)
 
         Log.i("[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
         Log.i("[Context] --->>From Header - $fromHeader")
 
         Log.i("[Context] --->>Starting call params ${params.isVideoEnabled}")
-    }
+    }*/
 
     fun switchCamera() {
         val currentDevice = core.videoDevice
@@ -1291,7 +1319,6 @@ class CoreContext(
                     initX = params.x - event.rawX
                     initY = params.y - event.rawY
                 }
-
                 MotionEvent.ACTION_MOVE -> {
                     val x = (event.rawX + initX).toInt()
                     val y = (event.rawY + initY).toInt()
@@ -1300,7 +1327,6 @@ class CoreContext(
                     params.y = y
                     windowManager.updateViewLayout(overlay, params)
                 }
-
                 MotionEvent.ACTION_UP -> {
                     if (abs(overlayX - params.x) < CorePreferences.OVERLAY_CLICK_SENSITIVITY &&
                         abs(overlayY - params.y) < CorePreferences.OVERLAY_CLICK_SENSITIVITY
@@ -1310,7 +1336,6 @@ class CoreContext(
                     overlayX = params.x.toFloat()
                     overlayY = params.y.toFloat()
                 }
-
                 else -> return@setOnTouchListener false
             }
             true
@@ -1333,7 +1358,12 @@ class CoreContext(
             Log.i("[Context] Overlay clicked, go back to call view")
             when (call.state) {
                 Call.State.IncomingReceived, Call.State.IncomingEarlyMedia -> onIncomingReceived()
-                Call.State.OutgoingInit, Call.State.OutgoingProgress, Call.State.OutgoingRinging, Call.State.OutgoingEarlyMedia -> onOutgoingStarted()
+                Call.State.OutgoingInit, Call.State.OutgoingProgress, Call.State.OutgoingRinging, Call.State.OutgoingEarlyMedia -> {
+                    Log.i(
+                        "[Context] Overlay clicked, go back to call view ${call.state} ,${call.remoteAddress.username}"
+                    )
+                    onOutgoingStarted()
+                }
                 else -> onCallStarted()
             }
         } else {
@@ -1424,7 +1454,6 @@ class CoreContext(
                             )
                         }
                     }
-
                     FileUtils.MimeType.Video -> {
                         if (Compatibility.addVideoToMediaStore(context, content)) {
                             Log.i(
@@ -1436,7 +1465,6 @@ class CoreContext(
                             )
                         }
                     }
-
                     FileUtils.MimeType.Audio -> {
                         if (Compatibility.addAudioToMediaStore(context, content)) {
                             Log.i(
@@ -1448,7 +1476,6 @@ class CoreContext(
                             )
                         }
                     }
-
                     else -> {
                         Log.w(
                             "[Context] File [$filePath] isn't either an image, an audio file or a video [${content.type}/${content.subtype}], can't add it to the Media Store"

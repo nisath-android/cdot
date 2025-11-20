@@ -231,14 +231,15 @@ class Compatibility {
                     pendingIntent,
                     notificationsManager
                 )
+            } else {
+                return Api26Compatibility.createIncomingCallNotification(
+                    context,
+                    call,
+                    notifiable,
+                    pendingIntent,
+                    notificationsManager
+                )
             }
-            return Api26Compatibility.createIncomingCallNotification(
-                context,
-                call,
-                notifiable,
-                pendingIntent,
-                notificationsManager
-            )
         }
 
         fun createCallNotification(

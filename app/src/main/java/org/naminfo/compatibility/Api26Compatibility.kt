@@ -186,7 +186,7 @@ class Api26Compatibility {
             }
             if (conferenceInfo == null) {
                 Log.i(
-                    "[Notifications Manager] No conference info found for remote contact address $remoteContact"
+                    "[Notifications Manager] Comp-26 No conference info found for remote contact address $remoteContact"
                 )
                 contact = coreContext.contactsManager.findContactByAddress(call.remoteAddress)
                 roundPicture =
@@ -201,7 +201,7 @@ class Api26Compatibility {
                 roundPicture = coreContext.contactsManager.groupBitmap
                 info = context.getString(R.string.incoming_group_call_notification_title)
                 Log.i(
-                    "[Notifications Manager] Displaying incoming group call notification with subject $displayName for remote contact address $remoteContact"
+                    "[Notifications Manager] Comp-26 Displaying incoming group call notification with subject $displayName for remote contact address $remoteContact"
                 )
             }
 
@@ -274,7 +274,7 @@ class Api26Compatibility {
                 )
             } else {
                 Log.i(
-                    "[Notifications Manager] No conference info found for remote contact address ${call.remoteAddress} (${call.remoteContact})"
+                    "[Notifications Manager] Comp-31 No conference info found for remote contact address ${call.remoteAddress.asStringUriOnly()} (${call.remoteContact})"
                 )
             }
 

@@ -68,11 +68,11 @@ class Api31Compatibility {
             }
             if (conferenceInfo != null) {
                 Log.i(
-                    "[Notifications Manager] Displaying incoming group call notification with subject ${conferenceInfo.subject} and remote contact address $remoteContact"
+                    "[Notifications Manager] Comp-31 Displaying incoming group call notification with subject ${conferenceInfo.subject} and remote contact address $remoteContact"
                 )
             } else {
                 Log.i(
-                    "[Notifications Manager] No conference info found for remote contact address $remoteContact"
+                    "[Notifications Manager] Comp-31 No conference info found for remote contact address $remoteContact"
                 )
             }
 
@@ -172,11 +172,11 @@ class Api31Compatibility {
             }
             if (conferenceInfo != null) {
                 Log.i(
-                    "[Notifications Manager] Displaying group call notification with subject ${conferenceInfo.subject}"
+                    "[Notifications Manager] Comp-31 Displaying group call notification with subject ${conferenceInfo.subject}"
                 )
             } else {
                 Log.i(
-                    "[Notifications Manager] No conference info found for remote contact address ${call.remoteAddress} (${call.remoteContact})"
+                    "[Notifications Manager] Comp-31 No conference info found for remote contact address ${call.remoteAddress} (${call.remoteContact})"
                 )
             }
 
