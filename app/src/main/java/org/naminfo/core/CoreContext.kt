@@ -1119,6 +1119,7 @@ class CoreContext(
             utf8Text = videoInfoXml
         }
         params.addCustomContent(videoInfoContent)*/
+        makeCallLogs(address)
         val call = core.inviteAddressWithParams(address, params)
         Log.i("[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
         Log.i("[Context] --->>Starting call params ${params.isVideoEnabled}")
@@ -1286,7 +1287,41 @@ class CoreContext(
             call.update(null)
         }
     }
+    fun makeCallLogs(address: Address) {
+        val call = core.currentCall
+        if (call == null) {
+            val from: Address? = core.createAddress(
+                "sip:${corePreferences.getCurrentUserPhoneNumber}@${corePreferences.defaultDomain}"
+            )
+            val to: Address? = core.createAddress("${address.asStringUriOnly()}")
+            val direction: Call.Dir? = Call.Dir.Outgoing
+            val duration = 0 // seconds
+            val startTime = System.currentTimeMillis() / 1000
+            val connectedTime = startTime
+            val status: Call.Status? = Call.Status.Success
+            val videoEnabled = false
+            val quality = 4.2f
 
+            // Create the call log object
+            val log: CallLog? = core.createCallLog(
+                from!!,
+                to!!,
+                direction,
+                duration,
+                startTime,
+                connectedTime,
+                status,
+                videoEnabled,
+                quality
+            )
+
+            /*MockContactList.SipValidator.addCallHistory(
+                address.username ?: address.asStringUriOnly(),
+                address.displayName ?: address.asStringUriOnly(),
+                address.asStringUriOnly()
+            )*/
+        }
+    }
     fun showSwitchCameraButton(): Boolean {
         return !corePreferences.disableVideo && core.videoDevicesList.size > 2 // Count StaticImage camera
     }

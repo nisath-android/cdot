@@ -12,9 +12,9 @@
     <string name="sync_account_name">&appName; contacts</string>
 
     <!-- About screen -->
-    <string name="about_version1">CDOT_VC Version(1.0.2)</string>
+    <string name="about_version1">CDOT_VC Version(1.0.3)</string>
     <string name="about_liblinphone_sdk_version" translatable="false">&appName; SDK %s</string>
-    <string name="date">13-11-2025</string>
+    <string name="date">21-11-2025</string>
     <string name="about_link" translatable="false">https://linphone.org</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.linphone.org/privacy-policy</string>
     <string name="about_license_link" translatable="false">https://www.gnu.org/licenses/gpl-3.0.html</string>

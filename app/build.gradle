@@ -22,7 +22,7 @@ if (firebaseAvailable) {
 }
 
 def gitBranch = new ByteArrayOutputStream()
-task getGitVersion() {
+tasks.register('getGitVersion') {
     def gitVersion = appVersionName
     def gitVersionStream = new ByteArrayOutputStream()
     def gitCommitsCount = new ByteArrayOutputStream()
@@ -62,7 +62,7 @@ configurations {
     customImplementation.extendsFrom implementation
 }
 
-task linphoneSdkSource() {
+tasks.register('linphoneSdkSource') {
     doLast {
         configurations.customImplementation.getIncoming().each {
             it.getResolutionResult().allComponents.each {
@@ -85,6 +85,23 @@ android {
   /*  kotlinOptions {
         jvmTarget = "17"
     }*/
+   /* aaptOptions {
+        cruncherEnabled = false
+    }
+
+    // Disable stable resource IDs explicitly
+    androidResources {
+        generateLocaleConfig = false
+    }*/
+    // 👇 Enable ABI splits
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64' // pick what you support
+            universalApk true // if you also want to generate a universal APK
+        }
+    }
 
     compileSdkVersion 34
     defaultConfig {
@@ -96,9 +113,24 @@ android {
     }
 
     applicationVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "CDot-${project.version}.apk"
+
+        variant.outputs.configureEach { output ->
+            // `output` is of type ApkVariantOutputImpl
+            def baseName = "CDot-(V${project.version})"
+
+            // Use filters to determine ABI or if it's universal
+            def abiFilter = output.filters.find { it.filterType == "ABI" }?.identifier
+
+            if (abiFilter != null) {
+                // Split APK for ABI
+                output.outputFileName = "${baseName}-${abiFilter}.apk"
+            } else {
+                // Universal APK
+                output.outputFileName = "${baseName}-universal.apk"
+            }
         }
+
+
 
         var enableFirebaseService = "false"
         if (firebaseAvailable) {

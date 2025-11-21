@@ -73,13 +73,13 @@
                     linphone:defaultValue="@{viewModel.userName}"
                     linphone:inputType="@{InputType.TYPE_TEXT_VARIATION_PERSON_NAME}"/>
 
-                <!--<include
+                <include
                     layout="@layout/settings_widget_text"
                     linphone:title="@{@string/account_settings_user_id_title}"
                     linphone:subtitle="@{@string/account_settings_user_id_summary}"
                     linphone:listener="@{viewModel.userIdListener}"
                     linphone:defaultValue="@{viewModel.userId}"
-                    linphone:inputType="@{InputType.TYPE_TEXT_VARIATION_PERSON_NAME}"/>-->
+                    linphone:inputType="@{InputType.TYPE_TEXT_VARIATION_PERSON_NAME}"/>
 
                 <include
                     layout="@layout/settings_widget_text"
@@ -127,7 +127,7 @@
 
 
 
-                <!-- <TextView
+                 <TextView
                     style="@style/settings_category_font"
                     android:text="@string/account_settings_manage_title"
                     android:paddingTop="15dp"
@@ -258,15 +258,15 @@
                     layout="@layout/settings_widget_switch"
                     linphone:title="@{@string/account_setting_disable_bundle_mode_title}"
                     linphone:listener="@{viewModel.disableBundleModeListener}"
-                    linphone:checked="@={viewModel.disableBundleMode}"/>-->
+                    linphone:checked="@={viewModel.disableBundleMode}"/>
 
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-       <!-- <include
+        <include
             layout="@layout/wait_layout"
-            bind:visibility="@{viewModel.waitForUnregister}"/>-->
+            bind:visibility="@{viewModel.waitForUnregister}"/>
 
     </RelativeLayout>
 

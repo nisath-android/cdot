@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!--<include
+                <include
                     layout="@layout/settings_widget_switch"
                     linphone:title="@{@string/audio_settings_software_echo_cancellation_title}"
                     linphone:subtitle="@{@string/audio_settings_echo_cancellation_summary}"
@@ -134,7 +134,7 @@
                     linphone:subtitle="@{@string/audio_settings_playback_gain_summary}"
                     linphone:listener="@{viewModel.playbackGainListener}"
                     linphone:defaultValue="@{viewModel.playbackGain.toString()}"
-                    linphone:inputType="@{InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL}"/>-->
+                    linphone:inputType="@{InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL}"/>
 
                 <TextView
                     style="@style/settings_category_font"
