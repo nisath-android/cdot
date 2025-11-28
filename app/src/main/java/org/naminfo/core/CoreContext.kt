@@ -838,7 +838,168 @@ class CoreContext(
         }
         return false
     }
+    fun startPTTCall(
+        to: String,
+        callParams: CallParams? = null,
+        forceZRTP: Boolean = false,
+        localAddress: Address? = null
+    ) {
+        var stringAddress = to.trim()
+        if (android.util.Patterns.PHONE.matcher(to).matches()) {
+            val contact = contactsManager.findContactByPhoneNumber(to)
+            val alias = contact?.getContactForPhoneNumberOrAddress(to)
+            if (alias != null) {
+                Log.i("[Context] Found matching alias $alias for phone number $to, using it")
+                stringAddress = alias
+            }
+        }
 
+        val address: Address? = core.interpretUrl(
+            stringAddress,
+            LinphoneUtils.applyInternationalPrefix()
+
+        )
+
+        if (address == null) {
+            Log.e("[Context] Failed to parse $stringAddress, abort outgoing call")
+            callErrorMessageResourceId.value = Event(
+                context.getString(R.string.call_error_network_unreachable)
+            )
+            return
+        }
+        Log.i("[Context] called number ${address.username}")
+
+        if (!core.isNetworkReachable) {
+            Log.e("[Context] Network unreachable, abort outgoing call")
+            callErrorMessageResourceId.value = Event(
+                context.getString(R.string.call_error_network_unreachable)
+            )
+            return
+        }
+
+        // Call params
+        val params = callParams ?: core.createCallParams(null)
+        if (params == null) {
+            val call = core.inviteAddress(address)
+            Log.w("[Context] Starting call $call without params")
+            return
+        }
+
+        // ZRTP
+        if (forceZRTP) {
+            params.mediaEncryption = MediaEncryption.ZRTP
+        }
+
+        // Low bandwidth
+        if (LinphoneUtils.checkIfNetworkHasLowBandwidth(context)) {
+            Log.w("[Context] Enabling low bandwidth mode!")
+            params.isLowBandwidthEnabled = true
+        }
+
+        // Record path
+        params.recordFile =
+            LinphoneUtils.getRecordingFilePathForAddress(address)
+
+        // Select correct account
+        if (localAddress != null) {
+            val account = core.accountList.find { acc ->
+                acc.params.identityAddress?.weakEqual(localAddress) ?: false
+            }
+
+            if (account != null) {
+                params.account = account
+                Log.i(
+                    "[Context] Using account matching address ${localAddress.asStringUriOnly()} as From"
+                )
+            } else {
+                Log.e(
+                    "[Context] Failed to find account matching address ${localAddress.asStringUriOnly()}"
+                )
+            }
+        }
+
+        // Early media
+        if (corePreferences.sendEarlyMedia) {
+            params.isEarlyMediaSendingEnabled = true
+        }
+
+        // SIP Headers
+        params.addCustomHeader("To", "<sip:${address.domain}>")
+        params.addCustomHeader("P-Preferred-Identity", "<sip:${address.username}@NamInfoCom.com>")
+        params.addCustomHeader("Privacy", "id")
+        params.addCustomHeader("P-Access-Network-Info", "ADSL;utran-cell-id-3gpp=00000000")
+        params.addCustomHeader("Accept-Contact", "*;+g.3gpp.mcvideo;require;explicit")
+        params.addCustomHeader(
+            "Accept-Contact",
+            "*;+g.3gpp.icsi-ref=\"urn%3Aurn-7%3A3gpp-service.ims.icsi.mcvideo\";require;explicit"
+        )
+        params.addCustomHeader("Answer-Mode", "Auto")
+        params.addCustomHeader(
+            "P-Preferred-Service",
+            "urn:urn-7:3gpp-service.ims.icsi.mcvideo"
+        )
+
+        // SDP attributes
+        params.addCustomSdpAttribute("m", "application 6026 udp MCPTT")
+        params.addCustomSdpAttribute("E2E_RCVR_MAT", "D4C3B21A")
+        // params.isVideoEnabled = true  // left untouched
+
+        // XML body
+        val recipientUri = address.asStringUriOnly()
+
+        val xmlBody: String? = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resource-lists xmlns="urn:ietf:params:xml/ns/resource-lists"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xmlns:cc="urn:ietf:params/xml/ns/copycontrol">
+            <list>
+                <entry uri="$recipientUri" cc:copyControl="to"/>
+            </list>
+        </resource-lists>
+        """.trimIndent()
+
+        val fromHeader = params.fromHeader.toString()
+
+        // 3GPP video info XML
+        val videoInfoXml = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <mcvideoinfo xmlns="urn:3gpp:ns:mcvideoInfo:1.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <mcvideo-Params>
+                <session-type>private</session-type>
+            </mcvideo-Params>
+        </mcvideoinfo>
+        """.trimIndent()
+
+        // Attach resource-lists XML
+        if (xmlBody != null) {
+            val customXml = Factory.instance().createContent().apply {
+                type = "application"
+                subtype = "resource-lists+xml"
+                encoding = "utf-8"
+                utf8Text = xmlBody
+            }
+            params.addCustomContent(customXml)
+        }
+
+        // Attach video-info XML
+        val videoInfoContent = Factory.instance().createContent().apply {
+            type = "application"
+            subtype = "vnd.3gpp.video-info+xml"
+            encoding = "utf-8"
+            utf8Text = videoInfoXml
+        }
+        params.addCustomContent(videoInfoContent)
+
+        // Logging helper
+        makeCallLogs(address)
+
+        // Start call
+        val call = core.inviteAddressWithParams(address, params)
+
+        Log.i("[Context] --->>Starting call ${call?.callLog?.status} ${call?.reason}")
+        Log.i("[Context] --->>Starting call params isVideoEnabled=${params.isVideoEnabled}")
+    }
     fun startCall(to: String, isVideo: Boolean = false) {
         var stringAddress = to.trim()
         if (android.util.Patterns.PHONE.matcher(to).matches()) {

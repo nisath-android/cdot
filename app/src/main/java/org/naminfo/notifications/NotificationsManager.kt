@@ -25,6 +25,7 @@ import kotlin.hashCode
 import kotlin.text.get
 import org.linphone.core.*
 import org.linphone.core.tools.Log
+import org.naminfo.LinphoneApplication
 import org.naminfo.LinphoneApplication.Companion.coreContext
 import org.naminfo.LinphoneApplication.Companion.corePreferences
 import org.naminfo.R
@@ -778,7 +779,8 @@ class NotificationsManager(private val context: Context) {
             incomingCallNotificationIntent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
+        if (LinphoneApplication.corePreferences.isThisPTTCall == false) {
+        }
         val notification = Compatibility.createIncomingCallNotification(
             context,
             call,

@@ -40,23 +40,23 @@ class PTTContactsFragment : SecureFragment<FragmentPttContactsBinding>() {
     private fun setRecyclerView() {
         val messageList = listOf(
             PttContactsItem(
-                "Nisath",
-                "9879898989",
+                "CDot-1",
+                "9874563211",
                 "https://ui-avatars.com/api/?name=Nisath+P&background=0D8ABC&color=fff&size=128"
             ),
             PttContactsItem(
-                "Dhivya",
-                "9176066606",
+                "CDot-2",
+                "9874563212",
                 "https://ui-avatars.com/api/?name=Dhivya+P&background=0D8ABC&color=fff&size=128"
             ),
             PttContactsItem(
-                "NAM Jio",
-                "6369410798",
+                "CDot-11",
+                "1001",
                 "https://ui-avatars.com/api/?name=NAMJio+P&background=0D8ABC&color=fff&size=128"
             ),
             PttContactsItem(
-                "Magesh",
-                "8680986859",
+                "CDot-12",
+                "1002",
                 "https://ui-avatars.com/api/?name=Magesh+P&background=0D8ABC&color=fff&size=128"
             )
 

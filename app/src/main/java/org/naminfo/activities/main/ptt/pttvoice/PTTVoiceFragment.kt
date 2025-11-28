@@ -11,6 +11,8 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -29,6 +31,12 @@ import androidx.navigation.fragment.findNavController
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.linphone.core.Call
+import org.linphone.core.Core
+import org.linphone.core.CoreListenerStub
+import org.naminfo.LinphoneApplication
+import org.naminfo.LinphoneApplication.Companion.coreContext
+import org.naminfo.LinphoneApplication.Companion.corePreferences
 import org.naminfo.R
 import org.naminfo.activities.main.fragments.SecureFragment
 import org.naminfo.activities.main.ptt.PTTFragment
@@ -36,7 +44,7 @@ import org.naminfo.activities.main.ptt.pttrecents.PTTRecentsFragment
 import org.naminfo.databinding.FragmentPttVoiceBinding
 
 class PTTVoiceFragment : SecureFragment<FragmentPttVoiceBinding>() {
-
+    val handler: Handler = Handler(Looper.getMainLooper())
     companion object {
         private const val ARG_USER_NAME = "arg_user_name"
         private const val ARG_PHONE = "arg_phone"
@@ -56,6 +64,8 @@ class PTTVoiceFragment : SecureFragment<FragmentPttVoiceBinding>() {
     private var cameraImageUri: Uri? = null
 
     private var mediaRecorder: MediaRecorder? = null
+    private lateinit var userName: String
+    private lateinit var userPhone: String
     private var audioFile: File? = null
     private val viewModel: PTTVoiceViewModel by viewModels()
     override fun getLayoutId(): Int {
@@ -77,8 +87,8 @@ class PTTVoiceFragment : SecureFragment<FragmentPttVoiceBinding>() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val userName = arguments?.getString(ARG_USER_NAME)
-        val phone = arguments?.getString(ARG_PHONE)
+        userName = arguments?.getString(ARG_USER_NAME).toString()
+        userPhone = arguments?.getString(ARG_PHONE).toString()
         val avatar = arguments?.getString(ARG_AVATAR)
         Log.i("PTT Voice", "UserName : $userName")
         binding.tvName.text = userName
@@ -150,6 +160,49 @@ class PTTVoiceFragment : SecureFragment<FragmentPttVoiceBinding>() {
             if (isSpeakerOn) R.drawable.icon_speaker else R.drawable.icon_earpiece
         )
     }
+    private fun updateVideoActivationPolicy(enable: Boolean) {
+        val policy = coreContext.core.videoActivationPolicy
+        policy.automaticallyInitiate = enable
+        policy.automaticallyAccept = enable
+        coreContext.core.videoActivationPolicy = policy
+    }
+    private val listener = LinphoneApplication.coreContext.core.addListener(
+        object : CoreListenerStub() {
+
+            override fun onCallStateChanged(
+                core: Core,
+                call: Call,
+                state: Call.State,
+                message: String
+            ) {
+                org.linphone.core.tools.Log.i("[Context] -----Call state changed [$state]")
+                val sdp = call.currentParams.getRtpProfile().toString()
+                org.linphone.core.tools.Log.i("Linphone", "---Generated SDP: $sdp")
+                if (state == Call.State.IncomingReceived || state == Call.State.IncomingEarlyMedia) {
+                    if (corePreferences.autoAnswerEnabled) {
+                        coreContext.answerCall(call)
+                    }
+                } else if (state == Call.State.OutgoingProgress) {
+                } else {
+                    if (state == Call.State.Connected) {
+                    } else if (state == Call.State.StreamsRunning) {
+                    } else if (state == Call.State.End || state == Call.State.Error || state == Call.State.Released) {
+                    }
+                }
+            }
+
+            override fun onLastCallEnded(core: Core) {
+                org.linphone.core.tools.Log.i("[Context] Last call has ended")
+                // removeCallOverlay()
+                if (!core.isMicEnabled) {
+                    org.linphone.core.tools.Log.w(
+                        "[Context] Mic was muted in Core, enabling it back for next call"
+                    )
+                    core.isMicEnabled = true
+                }
+            }
+        }
+    )
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setPTTMic() {
@@ -167,11 +220,25 @@ class PTTVoiceFragment : SecureFragment<FragmentPttVoiceBinding>() {
                     binding.imgMic.setColorFilter(activeColor)
                     // Change card stroke
                     binding.pttRecordMicCard.setStrokeColor(activeColor)
+                    LinphoneApplication.corePreferences.isThisPTTCall = true
+                    coreContext.core.videoActivationPolicy.automaticallyInitiate = false // Disable video initiation
+                    coreContext.core.videoActivationPolicy.automaticallyAccept = false // Disable video acceptance
+                    coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
+                    coreContext.core.isVideoDisplayEnabled = false
+                    coreContext.core.currentCall?.currentParams?.isVideoEnabled = false
+                    updateVideoActivationPolicy(true)
+                    LinphoneApplication.corePreferences.isThisPTTCall = true
+                    LinphoneApplication.corePreferences.autoAnswerEnabled = true
+
+                    LinphoneApplication.coreContext.startPTTCall(userPhone.toString())
                     startRecording()
                     true
                 }
 
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    LinphoneApplication.corePreferences.isThisPTTCall = false
+                    LinphoneApplication.corePreferences.autoAnswerEnabled = false
+
                     stopWaveAnimation(binding.waveCircle)
                     animateOuterRing(binding.outerRing, activeColor, inactiveColor)
 

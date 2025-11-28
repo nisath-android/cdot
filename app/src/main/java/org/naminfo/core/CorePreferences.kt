@@ -425,6 +425,11 @@ class CorePreferences(private val context: Context) {
         set(value) {
             config.setBool("app", "redirect_declined_call_to_voice_mail", value)
         }
+    var isThisPTTCall: Boolean
+        get() = config.getBool("app", "isThisPTTCall", false)
+        set(value) {
+            config.setBool("app", "isThisPTTCall", value)
+        }
 
     var lastUpdateAvailableCheckTimestamp: Int
         get() = config.getInt("app", "version_check_url_last_timestamp", 0)
