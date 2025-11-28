@@ -6,8 +6,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-def appVersionName = "1.0.3"
-def appVersionCode = 3
+def appVersionName = "1.0.5"
+def appVersionCode = 5
 
 def packageName = "org.naminfo"
 
@@ -116,7 +116,7 @@ android {
 
         variant.outputs.configureEach { output ->
             // `output` is of type ApkVariantOutputImpl
-            def baseName = "CDot-(V${project.version})"
+            def baseName = "CDot-(V${appVersionName})"
 
             // Use filters to determine ABI or if it's universal
             def abiFilter = output.filters.find { it.filterType == "ABI" }?.identifier

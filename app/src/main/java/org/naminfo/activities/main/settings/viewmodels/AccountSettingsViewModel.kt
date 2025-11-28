@@ -318,26 +318,60 @@ class AccountSettingsViewModel(val account: Account) : GenericSettingsViewModel(
 
     val stunServerListener = object : SettingListenerStub() {
         override fun onTextValueChanged(newValue: String) {
-            val params = account.params.clone()
+        /*    val params = account.params.clone()
             val natPolicy = params.natPolicy
             val newNatPolicy = natPolicy?.clone() ?: core.createNatPolicy()
+
+
             newNatPolicy.stunServer = newValue
             newNatPolicy.isStunEnabled = newValue.isNotEmpty()
             params.natPolicy = newNatPolicy
             account.params = params
+            stunServer.value = newValue*/
+
+            val params = account.params.clone()
+            val natPolicy = params.natPolicy ?: core.createNatPolicy()
+
+            // 1️⃣ Apply NEW STUN value
+            natPolicy.stunServer = newValue
+            natPolicy.isStunEnabled = newValue.isNotEmpty()
+
+            // 2️⃣ Save back to account
+            params.natPolicy = natPolicy
+            account.params = params
+
+            // 3️⃣ Apply SAME updated NAT policy to CORE
+            core.natPolicy = natPolicy.clone()
+
             stunServer.value = newValue
+            core.enableLogCollection(LogCollectionState.Enabled)
         }
     }
     val stunServer = MutableLiveData<String>()
 
     val iceListener = object : SettingListenerStub() {
         override fun onBoolValueChanged(newValue: Boolean) {
-            val params = account.params.clone()
+  /*          val params = account.params.clone()
             val natPolicy = params.natPolicy
             val newNatPolicy = natPolicy?.clone() ?: core.createNatPolicy()
+
             newNatPolicy.isIceEnabled = newValue
             params.natPolicy = newNatPolicy
+            account.params = params*/
+
+            val params = account.params.clone()
+            val natPolicy = params.natPolicy ?: core.createNatPolicy()
+
+            // 1️⃣ Apply NEW ICE value
+            natPolicy.isIceEnabled = newValue
+
+            // 2️⃣ Save back to account
+            params.natPolicy = natPolicy
             account.params = params
+
+            // 3️⃣ Apply SAME updated policy to CORE
+            core.natPolicy = natPolicy.clone()
+            core.enableLogCollection(LogCollectionState.Enabled)
         }
     }
     val ice = MutableLiveData<Boolean>()

@@ -1,4 +1,33 @@
 # Change Log
+#CDOT-V1.0.5
+Date: 28-11-2025 time 12.15pm
+(use "git restore <file>..." to discard changes in working directory)
+modified:   .idea/deploymentTargetSelector.xml
+modified:   app/build.gradle
+modified:   app/src/main/java/org/naminfo/activities/assistant/fragments/GenericAccountLoginFragment.kt
+modified:   app/src/main/java/org/naminfo/activities/main/contact/adapters/BroadcastContactAdapter.kt
+modified:   app/src/main/java/org/naminfo/activities/main/contact/fragments/DetailContactFragment.kt
+modified:   app/src/main/java/org/naminfo/activities/main/contact/viewmodels/ContactsListViewModel.kt
+modified:   app/src/main/java/org/naminfo/activities/main/contact/viewmodels/MockContactList.kt
+modified:   app/src/main/java/org/naminfo/activities/main/dialer/viewmodels/DialerViewModel.kt
+modified:   app/src/main/java/org/naminfo/activities/main/history/adapters/CallLogsListAdapter.kt
+modified:   app/src/main/java/org/naminfo/activities/main/history/fragments/DetailCallLogFragment.kt
+modified:   app/src/main/java/org/naminfo/activities/main/settings/viewmodels/AccountSettingsViewModel.kt
+modified:   app/src/main/java/org/naminfo/activities/main/settings/viewmodels/CallSettingsViewModel.kt
+modified:   app/src/main/java/org/naminfo/activities/voip/CallActivity.kt
+modified:   app/src/main/java/org/naminfo/activities/voip/data/CallData.kt
+modified:   app/src/main/java/org/naminfo/activities/voip/viewmodels/ControlsViewModel.kt
+modified:   app/src/main/java/org/naminfo/contact/ContactDataInterface.kt
+modified:   app/src/main/java/org/naminfo/core/CoreContext.kt
+modified:   app/src/main/java/org/naminfo/core/MyCall.kt
+modified:   app/src/main/res/layout/assistant_phone_account_creation_fragment.xml
+modified:   app/src/main/res/layout/dialer_fragment.xml
+modified:   app/src/main/res/layout/dialog.xml
+modified:   app/src/main/res/layout/voip_single_call_fragment.xml
+modified:   app/src/main/res/navigation/main_nav_graph.xml
+modified:   app/src/main/res/values/strings.xml
+
+
 All notable changes to this project will be documented in this file.
 
 Group changes to describe their impact on the project, as follows:

@@ -12,24 +12,24 @@
     <string name="sync_account_name">&appName; contacts</string>
 
     <!-- About screen -->
-    <string name="about_version1">CDOT_VC Version(1.0.3)</string>
+    <string name="about_version1">CDOT_VC Version(1.0.5)</string>
     <string name="about_liblinphone_sdk_version" translatable="false">&appName; SDK %s</string>
-    <string name="date">21-11-2025</string>
+    <string name="date">28-11-2025</string>
     <string name="about_link" translatable="false">https://linphone.org</string>
-    <string name="about_privacy_policy_link" translatable="false">https://www.linphone.org/privacy-policy</string>
+    <string name="about_privacy_policy_link" translatable="false">https://www.naminfocom.com/privacy-policy</string>
     <string name="about_license_link" translatable="false">https://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="about_version" translatable="false">&appName; Android %s</string>
     <string name="about_privacy_policy">Visit our privacy policy</string>
     <string name="contact_phone_numbers">7550375730, 7339318185</string>
     <string name="about_text" translatable="false">NAM InfoCom Pvt Ltd</string>
-    <string name="about_weblate_link" translatable="false">https://weblate.linphone.org/projects/linphone/</string>
+    <string name="about_weblate_link" translatable="false">https://naminfocom.com/projects/cdot/</string>
     <string name="about_weblate_translation">Help us translate &appName;</string>
 
     <!-- Logs -->
     <string name="logs_upload_failure">Failed to upload logs!</string>
     <string name="logs_reset_complete">Logs have been cleared</string>
     <string name="logs_url_copied_to_clipboard">Logs URL copied into clipboard</string>
-    <string name="about_bugreport_email" translatable="false">linphone-android@belledonne-communications.com</string>
+    <string name="about_bugreport_email" translatable="false">naminfo.chennai@gmail.com</string>
 
     <!-- Common -->
     <string name="phone_number">Phone number</string>
@@ -102,7 +102,7 @@
     <string name="no_sip_contact">No SIP contact in your address book.</string>
     <string name="contact_filter_hint">Search contacts</string>
     <string name="contact_send_sms_invite_text">Hello, join me on &appName;! You can download it for free at %s</string>
-    <string name="contact_send_sms_invite_download_link" translatable="false">https://linphone.org/download</string>
+    <string name="contact_send_sms_invite_download_link" translatable="false">https://naminfocom.org/download</string>
     <string name="contact_last_name">Last name</string>
     <string name="contact_first_name">First name</string>
     <string name="contact_organization">Organization</string>
@@ -472,7 +472,7 @@
     <string name="assistant_linphone_login_desc">Please enter your &appName; account username and password</string>
     <string name="assistant_login_with_username">Use your username and password instead of your phone number</string>
     <string name="assistant_login_forgotten_password">Forgot your password?</string>
-    <string name="assistant_forgotten_password_link" translatable="false">https://subscribe.linphone.org/</string>
+    <string name="assistant_forgotten_password_link" translatable="false">www.naminfocom.com</string>
     <string name="assistant_login">Login</string>
     <string name="assistant_finish">Finish configuration</string>
     <string name="assistant_confirmation_code">Confirmation code</string>

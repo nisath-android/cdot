@@ -239,7 +239,7 @@
     </fragment>
     <fragment
         android:id="@+id/PTTFragment"
-        android:name="org.linphone.activities.main.ptt.PTTFragment"
+        android:name="org.naminfo.activities.main.ptt.PTTFragment"
         android:label="PTTFragment" >
         <action
             android:id="@+id/action_PTTFragment_to_dialerFragment"

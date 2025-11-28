@@ -317,7 +317,7 @@ class ContactsListViewModel : ViewModel() {
         viewModelScope.launch {
             if (domainMain != null) {
                 val contactsBc = withContext(Dispatchers.IO) {
-                    if (corePreferences.getCurrentUserPhoneNumber == "1001") {
+                    if (corePreferences.getCurrentUserPhoneNumber == "1001" || corePreferences.getCurrentUserPhoneNumber == "9874563211") {
                         fetchBcContacts1(context, domainMain)
                     } else {
                         emptyList()
@@ -423,7 +423,7 @@ class ContactsListViewModel : ViewModel() {
         coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
         coreContext.core.isVideoDisplayEnabled = false
         // val addrPbx = "sip:$number@$domainMain"
-        coreContext.startCall(number)
+        coreContext.startCall(number, isVideo = false)
     }
 
     fun startVideoCall(number: String) {
@@ -436,7 +436,7 @@ class ContactsListViewModel : ViewModel() {
         coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
         Log.i(TAG, " startVideoCall=>  after-> video enable :  ${coreContext.core.isVideoEnabled}")
         val addrPbx = "sip:$number@$domainMain"
-        coreContext.startCall(addrPbx)
+        coreContext.startCall(addrPbx, isVideo = true)
     }
 
     fun startBcAudioCall(number: String) {
@@ -448,7 +448,7 @@ class ContactsListViewModel : ViewModel() {
         coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
         coreContext.core.isVideoDisplayEnabled = false
         // val addrPbx = "sip:$number@$domainMain"
-        coreContext.startCall(number)
+        coreContext.startCall(number, isVideo = false)
     }
 
     fun startBcVideoCall(number: String) {
@@ -463,7 +463,7 @@ class ContactsListViewModel : ViewModel() {
         LinphoneApplication.coreContext.core.nativeVideoWindowId = null
         Log.i(TAG, " startVideoCall=>  after-> video enable :  ${coreContext.core.isVideoEnabled}")
         // val addrPbx = "sip:$number@$domainMain"
-        coreContext.startCall(number)
+        coreContext.startCall(number, isVideo = true)
     }
 
     // Coroutine function to fetch contacts

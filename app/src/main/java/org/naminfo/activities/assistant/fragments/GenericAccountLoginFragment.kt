@@ -109,6 +109,7 @@ class GenericAccountLoginFragment : GenericFragment<AssistantGenericAccountLogin
                         // coreContext.core.isVideoEnabled = true
                         coreContext.core.isVideoCaptureEnabled = true
                         coreContext.core.isVideoCaptureEnabled = true
+                        coreContext.core.currentCall?.currentParams?.isVideoEnabled = true
                         updateVideoActivationPolicy(true)
                     }
                     val intent = Intent(context, MainActivity::class.java)

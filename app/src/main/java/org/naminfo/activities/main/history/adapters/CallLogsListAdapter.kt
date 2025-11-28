@@ -158,7 +158,9 @@ class CallLogsListAdapter(
                 "CallLogsAdapter",
                 "bind:  toAddress.asStringUriOnly()=${viewModel.callLog.toAddress.asStringUriOnly()},\n " +
                     "toAddress.username=${viewModel.callLog.toAddress.username},\n" +
-                    "toAddress.displayName=${viewModel.callLog.toAddress.displayName},\n"
+                    "toAddress.displayName=${viewModel.callLog.toAddress.displayName},\n" +
+                    "displayName =$displayName,\n" +
+                    "remoteString=$remoteString"
             )
             viewModel.displayName.postValue(
                 viewModel.callLog.toAddress.username ?: viewModel.callLog.toAddress.displayName

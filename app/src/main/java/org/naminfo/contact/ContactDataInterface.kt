@@ -199,9 +199,14 @@ abstract class GenericContactViewModel(private val sipAddressMain: Address) :
                 "CallLogsAdapter",
                 "2-GenericContactViewModel=>Else->username=${sipAddress?.username} ,selectedcontect=$callerName,size:${MockContactList.SipValidator.getCallHistory().size}"
             )
-           /* if (sipAddress?.username != null && sipAddress?.username?.isNotEmpty() == true) {
-                displayName.postValue(sipAddress?.username)
-            }*/
+            /* if (sipAddress?.username != null && sipAddress?.username?.isNotEmpty() == true) {
+                 displayName.postValue(sipAddress?.username)
+             }*/
+            if (sipAddress?.displayName?.isNotEmpty() == true) {
+                if (sipAddress?.username.toString() == "0000000000") {
+                    displayName.postValue(sipAddress?.displayName)
+                }
+            }
             // displayName.postValue(sipAddress?.asStringUriOnly())
             /*  viewModelScope.launch(Dispatchers.Main) {
                   val historyList = MockContactList.SipValidator.getCallHistory()

@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:text="@{(callsViewModel.currentCallData.contact.name ?? callsViewModel.currentCallData.displayName) + ` - `, default=`John Doe - `}"
+                android:text="@{(callsViewModel.currentCallData.contact.name ?? callsViewModel.currentCallData.displayName ??  callsViewModel.currentCallData.nameFromDisplayableAddress??  callsViewModel.currentCallData.displayableAddress) + ` - `, default=`John Doe - `}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/hinge_top" />
 
@@ -222,15 +222,17 @@
                 android:visibility="@{controlsViewModel.fullScreenMode || controlsViewModel.pipMode ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="@id/background"
                 app:layout_constraintTop_toTopOf="@id/background" />
-
+<!--                android:visibility="@{controlsViewModel.isVideoEnabled &amp;&amp; !callsViewModel.currentCallData.isRemotelyPaused &amp;&amp; !callsViewModel.currentCallData.isPaused ? View.VISIBLE : View.GONE}"
+-->
             <org.naminfo.activities.voip.views.RoundCornersTextureView
                 android:id="@+id/local_preview_video_surface"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_size="@{controlsViewModel.pipMode ? @dimen/video_preview_pip_max_size : @dimen/video_preview_max_size}"
-                android:visibility="@{controlsViewModel.isVideoEnabled &amp;&amp; !callsViewModel.currentCallData.isRemotelyPaused &amp;&amp; !callsViewModel.currentCallData.isPaused ? View.VISIBLE : View.GONE}"
                 app:alignTopRight="true"
                 app:displayMode="black_bars"
+                android:visibility="@{controlsViewModel.isVideoEnabled &amp;&amp; !callsViewModel.currentCallData.isRemotelyPaused &amp;&amp; !callsViewModel.currentCallData.isPaused ? View.VISIBLE : View.GONE}"
+
                 app:layout_constraintBottom_toTopOf="@id/bottom_barrier"
                 app:layout_constraintEnd_toEndOf="@id/background"
                 app:layout_constraintHeight_max="200dp"

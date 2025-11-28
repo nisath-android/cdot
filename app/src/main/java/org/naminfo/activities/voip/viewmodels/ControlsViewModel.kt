@@ -695,6 +695,10 @@ class ControlsViewModel : ViewModel() {
     private fun updateVideoAvailable() {
         val core = coreContext.core
         val currentCall = core.currentCall
+        android.util.Log.i(
+            "[Control]",
+            "updateVideoAvailable: ${core.isVideoCaptureEnabled }, ${core.isVideoPreviewEnabled},$currentCall,${core.isVideoPreviewEnabled}"
+        )
         isVideoAvailable.value = (core.isVideoCaptureEnabled || core.isVideoPreviewEnabled) &&
             (currentCall != null && !currentCall.mediaInProgress())
     }
@@ -719,7 +723,7 @@ class ControlsViewModel : ViewModel() {
             }
         }
 
-        isVideoEnabled.value = enabled
+        isVideoEnabled.value = true
         showTakeSnapshotButton.value = enabled && corePreferences.showScreenshotButton
         val videoDirection = if (coreContext.core.currentCall?.conference != null) {
             coreContext.core.currentCall?.currentParams?.videoDirection

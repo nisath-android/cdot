@@ -24,11 +24,15 @@ import android.widget.Toast
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import java.util.*
+import kotlin.collections.containsKey
+import kotlin.collections.get
 import kotlinx.coroutines.*
 import org.linphone.core.*
 import org.linphone.core.tools.Log
 import org.naminfo.LinphoneApplication.Companion.coreContext
 import org.naminfo.R
+import org.naminfo.activities.main.contact.viewmodels.MatchedContact
+import org.naminfo.activities.main.contact.viewmodels.MockContactList
 import org.naminfo.compatibility.Compatibility
 import org.naminfo.contact.GenericContactData
 import org.naminfo.utils.AppUtils
@@ -40,6 +44,7 @@ open class CallData(val call: Call) : GenericContactData(call.remoteAddress) {
     }
 
     val displayableAddress = MutableLiveData<String>()
+    val nameFromDisplayableAddress = MutableLiveData<String?>()
 
     val isPaused = MutableLiveData<Boolean>()
     val isRemotelyPaused = MutableLiveData<Boolean>()
@@ -119,6 +124,66 @@ open class CallData(val call: Call) : GenericContactData(call.remoteAddress) {
         call.addListener(listener)
         isRemotelyRecorded.value = call.remoteParams?.isRecording
         displayableAddress.value = LinphoneUtils.getDisplayableAddress(call.remoteAddress)
+        val phone = MockContactList.parseSipUri(displayableAddress.value.toString()).first
+
+        scope.launch(Dispatchers.IO) {
+            // Fetch lists
+            val sipContacts = MockContactList.SipValidator.getSipContacts()
+            val broadcastContacts = MockContactList.SipValidator.fetchBroadcastContacts()
+            val groupContacts = MockContactList.SipValidator.fetchGroupedContacts()
+
+            // Build maps safely → ignore null keys
+            val sipMap = sipContacts.associateBy { it.phone }
+            val broadcastMap = broadcastContacts
+                .filter { it.bcNumber != null }
+                .associateBy { it.bcNumber!! }
+
+            val groupMap = groupContacts
+                .filter { it.groupNumber != null }
+                .associateBy { it.groupNumber!! }
+
+            // Priority: SIP → Broadcast → Group
+            val matched: MatchedContact? = when {
+                sipMap.containsKey(phone) ->
+                    MatchedContact.Sip(sipMap[phone]!!)
+
+                broadcastMap.containsKey(phone) ->
+                    MatchedContact.Broadcast(broadcastMap[phone]!!)
+
+                groupMap.containsKey(phone) ->
+                    MatchedContact.Group(groupMap[phone]!!)
+
+                else -> null
+            }
+
+            // Handle match
+            if (matched != null) {
+                val displayName = when (matched) {
+                    is MatchedContact.Sip -> matched.data.name
+                    is MatchedContact.Broadcast -> matched.data.bcName ?: matched.data.bcNumber
+                    is MatchedContact.Group -> matched.data.groupName ?: matched.data.groupNumber
+                }
+                val displayContact = when (matched) {
+                    is MatchedContact.Sip -> matched.data.phone
+                    is MatchedContact.Broadcast -> matched.data.bcNumber ?: matched.data.bcName
+                    is MatchedContact.Group -> matched.data.groupNumber ?: matched.data.groupName
+                }
+                if (displayName != null) {
+                    nameFromDisplayableAddress.postValue(displayName)
+                } else if (displayContact != null) {
+                    nameFromDisplayableAddress.postValue(displayContact)
+                } else {
+                    nameFromDisplayableAddress.postValue(phone)
+                }
+                // viewModel.displayName.postValue(displayName)
+                // viewModel.contactNumber.postValue(displayContact)
+
+                Log.i("CallLogsAdapter", "Match found → phone=$phone | name=$displayName")
+            } else {
+                nameFromDisplayableAddress.postValue(phone)
+                Log.i("CallLogsAdapter", "No match for phone=$phone")
+            }
+        }
 
         isConferenceCall.addSource(remoteConferenceSubject) {
             isConferenceCall.value = remoteConferenceSubject.value.orEmpty().isNotEmpty() || conferenceParticipants.value.orEmpty().isNotEmpty()
@@ -215,7 +280,7 @@ open class CallData(val call: Call) : GenericContactData(call.remoteAddress) {
         isPaused.value = isCallPaused()
         isRemotelyPaused.value = isCallRemotelyPaused()
         canBePaused.value = canCallBePaused()
-
+        android.util.Log.i("[CallData]", "update: ${isRemotelyPaused.value} ,${isPaused.value}")
         updateConferenceInfo()
 
         isOutgoing.value = when (call.state) {

@@ -66,13 +66,13 @@ class CallSettingsViewModel : GenericSettingsViewModel() {
     val encryptionListener = object : SettingListenerStub() {
         override fun onListValueChanged(position: Int) {
             core.mediaEncryption = MediaEncryption.fromInt(encryptionValues[position])
-            encryptionIndex.value = 0
-            // if (position == 0) {
-            encryptionMandatory.value = false
-            //  }
+            encryptionIndex.value = position
+            if (position == 0) {
+                encryptionMandatory.value = false
+            }
         }
     }
-    val encryptionIndex = MutableLiveData<Int>(0)
+    val encryptionIndex = MutableLiveData<Int>()
     val encryptionLabels = MutableLiveData<ArrayList<String>>()
     private val encryptionValues = arrayListOf<Int>()
 
@@ -291,7 +291,6 @@ class CallSettingsViewModel : GenericSettingsViewModel() {
 
         labels.add(prefs.getString(R.string.call_settings_media_encryption_none))
         encryptionValues.add(MediaEncryption.None.toInt())
-/*
         if (core.mediaEncryptionSupported(MediaEncryption.SRTP)) {
             labels.add(prefs.getString(R.string.call_settings_media_encryption_srtp))
             encryptionValues.add(MediaEncryption.SRTP.toInt())
@@ -309,9 +308,9 @@ class CallSettingsViewModel : GenericSettingsViewModel() {
         if (core.mediaEncryptionSupported(MediaEncryption.DTLS)) {
             labels.add(prefs.getString(R.string.call_settings_media_encryption_dtls))
             encryptionValues.add(MediaEncryption.DTLS.toInt())
-        }*/
+        }
 
         encryptionLabels.value = labels
-        encryptionIndex.value = 0 // encryptionValues.indexOf(core.mediaEncryption.toInt())
+        encryptionIndex.value = encryptionValues.indexOf(core.mediaEncryption.toInt())
     }
 }

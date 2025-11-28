@@ -68,7 +68,7 @@ class DetailCallLogFragment : GenericFragment<HistoryDetailFragmentBinding>() {
         viewModel = callLogGroup.lastCallLogViewModel
         binding.viewModel = viewModel
 
-        updateCallType(callLogGroup)
+        // updateCallType(callLogGroup)
         if (viewModel.relatedCallLogs.value.orEmpty().isEmpty()) {
             viewModel.addRelatedCallLogs(callLogGroup.callLogs)
         }
@@ -113,6 +113,7 @@ class DetailCallLogFragment : GenericFragment<HistoryDetailFragmentBinding>() {
                 coreContext.core.videoActivationPolicy.automaticallyAccept = false // Enable video acceptance
                 coreContext.core.isVideoCaptureEnabled = false // Enable video capture
                 coreContext.core.isVideoDisplayEnabled = false // Ensure video display is enabled
+                coreContext.core.currentCall?.currentParams?.isVideoEnabled = false
                 Log.i(
                     "[History] video enable after enabling:  ${coreContext.core.isVideoEnabled}"
                 )
@@ -160,6 +161,7 @@ class DetailCallLogFragment : GenericFragment<HistoryDetailFragmentBinding>() {
                 Log.i(
                     "[History] video enable after enabling:  ${coreContext.core.isVideoEnabled}"
                 )
+                coreContext.core.currentCall?.currentParams?.isVideoEnabled = true
                 updateVideoActivationPolicy(true)
                 // To remove the GRUU if any
                 val address = callLog.remoteAddress.clone()

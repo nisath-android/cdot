@@ -240,9 +240,11 @@ class DialerViewModel : LogsUploadViewModel() {
             coreContext.core.videoActivationPolicy.automaticallyAccept = false // Disable video acceptance
             coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
             coreContext.core.isVideoDisplayEnabled = false
+            coreContext.core.currentCall?.currentParams?.isVideoEnabled = false
+            updateVideoActivationPolicy(true)
             Log.i("[Dialer] video enable after disabling: ${coreContext.core.isVideoEnabled}")
             Log.i("[Dialer] SIP Address - $addressToCall")
-            coreContext.startCall(addressToCall)
+            coreContext.startCall(addressToCall, isVideo = true)
             eraseAll()
         } else {
             setLastOutgoingCallAddress()
@@ -258,9 +260,11 @@ class DialerViewModel : LogsUploadViewModel() {
             coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
             coreContext.core.isVideoCaptureEnabled = true // Enable video capture
             coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
+            coreContext.core.currentCall?.currentParams?.isVideoEnabled = true
+            updateVideoActivationPolicy(true)
             Log.i("[Dialer] video enable after enabling:  ${coreContext.core.isVideoEnabled}")
             // coreContext.switchCamera()
-            coreContext.startCall(addressToCall)
+            coreContext.startCall(addressToCall, isVideo = true)
             eraseAll()
         } else {
             setLastOutgoingCallAddress()

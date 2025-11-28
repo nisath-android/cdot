@@ -220,10 +220,11 @@ class CallActivity : ProximitySensorActivity() {
 
     override fun onResume() {
         super.onResume()
-        // coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
+        coreContext.core.videoActivationPolicy.automaticallyInitiate = true // Enable video initiation
         coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
         coreContext.core.isVideoCaptureEnabled = true // Enable video capture
         coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
+
         updateVideoActivationPolicy(true)
 
         if (coreContext.core.callsNb == 0) {
@@ -252,8 +253,7 @@ class CallActivity : ProximitySensorActivity() {
             Call.State.IncomingReceived, Call.State.IncomingEarlyMedia -> {
                 Log.i("Incoming - Is video enabled - ${currentCall.params.isVideoEnabled}")
                 val earlyMediaVideoEnabled = corePreferences.acceptEarlyMedia &&
-                    currentCall.state == Call.State.IncomingEarlyMedia &&
-                    currentCall.currentParams.isVideoEnabled
+                    currentCall.state == Call.State.IncomingEarlyMedia && currentCall.currentParams.isVideoEnabled
                 navigateToIncomingCall(earlyMediaVideoEnabled)
             }
             else -> {}

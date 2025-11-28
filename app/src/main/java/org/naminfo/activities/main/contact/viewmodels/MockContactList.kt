@@ -44,7 +44,7 @@ object MockContactList {
         val friend = core.createFriend().apply {
             edit()
             // this.name = phoneNumber
-            this.setName(userName)
+            this.name = userName
             this.addPhoneNumber(phoneNumber)
             address?.let { addAddress(it) }
             refKey = addressString
@@ -85,38 +85,38 @@ object MockContactList {
                 "9874563212",
                 "Cdot-2"
             ),
-            createMockSipContacts(
-                "9874563213",
-                "Cdot-3"
-            ),
-            createMockSipContacts(
-                "9874563214",
-                "Cdot-4"
-            ),
-            createMockSipContacts(
-                "9874563215",
-                "Cdot-5"
-            ),
-            createMockSipContacts(
-                "9874563216",
-                "Cdot-6"
-            ),
-            createMockSipContacts(
-                "9874563217",
-                "Cdot-7"
-            ),
-            createMockSipContacts(
-                "9874563218",
-                "Cdot-8"
-            ),
-            createMockSipContacts(
-                "9874563219",
-                "Cdot-9"
-            ),
-            createMockSipContacts(
-                "1000",
-                "Cdot-10"
-            ),
+            /*  createMockSipContacts(
+                 "9874563213",
+                 "Cdot-3"
+             ),
+             createMockSipContacts(
+                 "9874563214",
+                 "Cdot-4"
+             ),
+             createMockSipContacts(
+                 "9874563215",
+                 "Cdot-5"
+             ),
+             createMockSipContacts(
+                 "9874563216",
+                 "Cdot-6"
+             ),
+             createMockSipContacts(
+                 "9874563217",
+                 "Cdot-7"
+             ),
+             createMockSipContacts(
+                 "9874563218",
+                 "Cdot-8"
+             ),
+             createMockSipContacts(
+                 "9874563219",
+                 "Cdot-9"
+             ),
+             createMockSipContacts(
+                 "1000",
+                 "Cdot-10"
+             ),*/
             createMockSipContacts(
                 "1001",
                 "Cdot-11"
@@ -125,7 +125,6 @@ object MockContactList {
                 "1002",
                 "Cdot-12"
             )
-
         )
   /*     val gson = Gson()
   val simpleList = sipContacts.map { contactVM ->
@@ -225,6 +224,7 @@ object MockContactList {
         return if (parts.size == 2) {
             val user = parts[0].trim()
             val domain = parts[1].trim()
+
             Pair(user, domain)
         } else {
             Pair(null, null) // invalid SIP format
@@ -257,6 +257,7 @@ object MockContactList {
         fun isValidPhoneSip(sipUri: String): Boolean {
             return phoneOnlyRegex.matches(sipUri)
         }
+
         fun isValidSip(sipUri: String): Boolean {
             return sipRegex.matches(sipUri)
         }

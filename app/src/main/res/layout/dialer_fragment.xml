@@ -36,6 +36,7 @@
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
             android:padding="10dp"
+            android:onClick="@{ ()->viewModel.startPTT()}"
             android:textAllCaps="true" />
 
         <!--<LinearLayout

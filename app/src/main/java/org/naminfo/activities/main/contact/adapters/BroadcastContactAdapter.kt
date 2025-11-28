@@ -59,9 +59,7 @@ class BroadcastContactAdapter(
                 )
             }
             binding.audioButton.setOnClickListener {
-                contactListViewModel.startBcAudioCall(
-                    contact.bcNumber.toString()
-                )
+                contactListViewModel.startBcAudioCall(contact.bcNumber.toString())
             }
         }
     }

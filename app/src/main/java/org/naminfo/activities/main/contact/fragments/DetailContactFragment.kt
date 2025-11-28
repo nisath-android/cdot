@@ -101,6 +101,7 @@ class DetailContactFragment : GenericFragment<ContactDetailFragmentBinding>() {
                 coreContext.core.videoActivationPolicy.automaticallyAccept = false // Disable video acceptance
                 coreContext.core.isVideoCaptureEnabled = false // Ensure video is disabled
                 coreContext.core.isVideoDisplayEnabled = false
+                coreContext.core.currentCall?.currentParams?.isVideoEnabled = false
                 updateVideoActivationPolicy(true)
                 Log.i(
                     "[Contact] video enable after disabling: ${coreContext.core.isVideoEnabled}"
@@ -145,6 +146,7 @@ class DetailContactFragment : GenericFragment<ContactDetailFragmentBinding>() {
                 coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
                 coreContext.core.isVideoCaptureEnabled = true // Enable video capture
                 coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
+                coreContext.core.currentCall?.currentParams?.isVideoEnabled = true
                 updateVideoActivationPolicy(true)
 
                 Log.i(
@@ -297,6 +299,7 @@ class DetailContactFragment : GenericFragment<ContactDetailFragmentBinding>() {
                 coreContext.core.videoActivationPolicy.automaticallyAccept = true // Enable video acceptance
                 coreContext.core.isVideoCaptureEnabled = true // Enable video capture
                 coreContext.core.isVideoDisplayEnabled = true // Ensure video display is enabled
+                coreContext.core.currentCall?.currentParams?.isVideoEnabled = true
                 updateVideoActivationPolicy(true)
                 mobiFSCallBTN.setText("Video")
                 gsmCallBTN.visibility = View.GONE
@@ -305,6 +308,7 @@ class DetailContactFragment : GenericFragment<ContactDetailFragmentBinding>() {
                 coreContext.core.videoActivationPolicy.automaticallyAccept = false // Enable video acceptance
                 coreContext.core.isVideoCaptureEnabled = false // Enable video capture
                 coreContext.core.isVideoDisplayEnabled = false // Ensure video display is enabled
+                coreContext.core.currentCall?.currentParams?.isVideoEnabled = false
                 updateVideoActivationPolicy(true)
                 mobiFSCallBTN.setText("Audio")
             }

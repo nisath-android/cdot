@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/assistant_forgotten_password_link"
-            android:visibility="@{viewModel.showSubscribeLinphoneOrgLink ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{viewModel.showSubscribeLinphoneOrgLink ? View.GONE : View.GONE}" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/settings_input_layout"
